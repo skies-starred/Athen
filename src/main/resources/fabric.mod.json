@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "A very awesome Hypixel SkyBlock mod.",
+  "authors": [
+    "Starred"
+  ],
+  "contact": {},
+  "license": "BSD 3-Clause",
+  "icon": "assets/athen/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      {
+        "value": "xyz.aerii.athen.Athen",
+        "adapter": "kotlin"
+      }
+    ],
+    "modmenu": [
+      {
+        "value": "xyz.aerii.athen.config.modMenu.Impl",
+        "adapter": "kotlin"
+      }
+    ]
+  },
+  "mixins": [
+    "${id}.mixins.json"
+  ],
+  "accessWidener": "${id}.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.18",
+    "fabric-api": "*",
+    "fabric-language-kotlin": ">=${kotlin}",
+    "hypixel-mod-api": ">=${hm_api}",
+    "skyblock-api": ">=${sb_api}",
+    "minecraft": "${minecraft}"
+  }
+}

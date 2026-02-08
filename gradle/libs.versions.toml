@@ -1,0 +1,77 @@
+[versions]
+loom = "1.14-SNAPSHOT"
+fletchingTable = "0.1.0-alpha.22"
+ksp = "2.3.0"
+kotlin = "2.3.0"
+
+devauth = "1.2.1"
+
+fabric-loader = "0.18.4"
+fabric-language-kotlin = "1.13.8+kotlin.2.3.0"
+
+fabric-api-1-21-10 = "0.138.4+1.21.10"
+fabric-api-1-21-11 = "0.140.2+1.21.11"
+
+modmenu-1-21-10 = "16.0.0-rc.1"
+modmenu-1-21-11 = "17.0.0-alpha.1"
+
+olympus-1-21-10 = "1.6.2"
+olympus-1-21-11 = "1.7.0"
+
+rlib-1-21-10 = "3.9.0"
+rlib-1-21-11 = "3.11.0"
+
+parchment-1-21-10 = "2025.10.12"
+parchment-1-21-11 = "2025.12.20"
+
+entityculling-1-21-10 = "zwBaFdjH"
+entityculling-1-21-11 = "Dx3xsUER"
+
+skyblock-api = "4.0.7"
+classgraph = "4.8.184"
+lwjgl-nanovg = "3.3.3"
+omnicore = "1.0.0-beta.40"
+autoupdate = "1.3.1"
+
+hypixel-modapi = "1.0.1"
+hypixel-modapi-fabric = "1.0.1+build.1+mc1.21"
+
+[libraries]
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+fabric-language-kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric-language-kotlin" }
+
+devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
+
+fabric-api-1-21-10 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-1-21-10" }
+fabric-api-1-21-11 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-1-21-11" }
+
+modmenu-1-21-10 = { module = "com.terraformersmc:modmenu", version.ref = "modmenu-1-21-10" }
+modmenu-1-21-11 = { module = "com.terraformersmc:modmenu", version.ref = "modmenu-1-21-11" }
+
+omnicore-1-21-10 = { module = "dev.deftu:omnicore-1.21.10-fabric", version.ref = "omnicore" }
+omnicore-1-21-11 = { module = "dev.deftu:omnicore-1.21.11-fabric", version.ref = "omnicore" }
+
+olympus-1-21-10 = { module = "earth.terrarium.olympus:olympus-fabric-1.21.9", version.ref = "olympus-1-21-10" }
+olympus-1-21-11 = { module = "earth.terrarium.olympus:olympus-fabric-1.21.11", version.ref = "olympus-1-21-11" }
+
+rlib-1-21-10 = { module = "com.teamresourceful.resourcefullib:resourcefullib-fabric-1.21.9", version.ref = "rlib-1-21-10" }
+rlib-1-21-11 = { module = "com.teamresourceful.resourcefullib:resourcefullib-fabric-1.21.11", version.ref = "rlib-1-21-11" }
+
+parchment-1-21-10 = { module = "org.parchmentmc.data:parchment-1.21.10", version.ref = "parchment-1-21-10" }
+parchment-1-21-11 = { module = "org.parchmentmc.data:parchment-1.21.11", version.ref = "parchment-1-21-11" }
+
+entityculling-1-21-10 = { module = "maven.modrinth:entityculling", version.ref = "entityculling-1-21-10" }
+entityculling-1-21-11 = { module = "maven.modrinth:entityculling", version.ref = "entityculling-1-21-11" }
+
+skyblock-api = { module = "tech.thatgravyboat:skyblock-api", version.ref = "skyblock-api" }
+classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+lwjgl-nanovg = { module = "org.lwjgl:lwjgl-nanovg", version.ref = "lwjgl-nanovg" }
+autoupdate = { module = "moe.nea:libautoupdate", version.ref = "autoupdate" }
+hypixel-modapi = { module = "net.hypixel:mod-api", version.ref = "hypixel-modapi" }
+hypixel-modapi-fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixel-modapi-fabric" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+loom = { id = "fabric-loom", version.ref = "loom" }
+fletchingTable = { id = "dev.kikugie.fletching-table.fabric", version.ref = "fletchingTable" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
