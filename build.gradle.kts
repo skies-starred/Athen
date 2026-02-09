@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.loom)
     alias(libs.plugins.ksp)
     alias(libs.plugins.fletchingTable)
+    `maven-publish`
 }
 
 val platforms = listOf("windows", "linux", "macos", "macos-arm64")
@@ -87,6 +88,22 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
         optIn.add("kotlin.time.ExperimentalTime")
+    }
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "xyz.aerii"
+            artifactId = "Athen"
+            version = version
+            from(components["java"])
+        }
     }
 }
 
