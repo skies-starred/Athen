@@ -9,16 +9,14 @@ jobs:
       - name: Notify
         env:
           TOKEN: ${{ secrets.TOKEN }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           COMMITS: ${{ toJson(github.event.commits) }}
           REPO: ${{ github.repository }}
         run: |
           jq -n \
             --arg repo "$REPO" \
-            --arg token "$GH_TOKEN" \
             --argjson commits "$COMMITS" \
-            '{repo: $repo, commits: $commits, github_token: $token}' \
-          | curl -X POST https://athen.skies-starred.workers.dev/ping/commit \
+            '{repo: $repo, commits: $commits}' \
+          | curl -X POST https://api.aerii.xyz/ping/commit \
             -H "Content-Type: application/json" \
             -H "Authorization: $TOKEN" \
             -d @-
