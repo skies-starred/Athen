@@ -10,7 +10,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -49,18 +49,14 @@ jobs:
       - name: Notify Discord
         env:
           TOKEN: ${{ secrets.TOKEN }}
-          COMMITS: ${{ toJson(github.event.commits) }}
-          REPO: ${{ github.repository }}
-          BRANCH: ${{ github.ref_name }}
-          RUN_ID: ${{ github.run_id }}
         run: |
-          jq -n \
-            --arg repo "$REPO" \
-            --arg branch "$BRANCH" \
-            --arg run_id "$RUN_ID" \
-            --argjson commits "$COMMITS" \
-            '{repo: $repo, commits: $commits, branch: $branch, run_id: $run_id}' \
-          | curl -X POST https://api.aerii.xyz/builds/notify \
+          curl -X POST https://api.aerii.xyz/builds/notify \
             -H "Content-Type: application/json" \
             -H "Authorization: $TOKEN" \
-            -d @-
+            -d "{
+              \"repo\": \"${{ github.repository }}\",
+              \"branch\": \"${{ github.ref_name }}\",
+              \"run_id\": \"${{ github.run_id }}\",
+              \"before\": \"${{ github.event.before }}\",
+              \"after\": \"${{ github.event.after }}\"
+            }"
