@@ -1,6 +1,8 @@
 package xyz.aerii.athen.api.kuudra
 
+import net.minecraft.world.entity.monster.MagmaCube
 import tech.thatgravyboat.skyblockapi.helpers.McClient
+import tech.thatgravyboat.skyblockapi.utils.extentions.serverMaxHealth
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.anyMatch
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.api.kuudra.enums.KuudraPlayer
@@ -12,7 +14,9 @@ import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.ScoreboardEvent
 import xyz.aerii.athen.events.core.EventBus.on
 import xyz.aerii.athen.events.core.runWhen
+import xyz.aerii.athen.handlers.Schrodinger
 import xyz.aerii.athen.handlers.Smoothie
+import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Typo.stripped
 
 @Priority
@@ -20,6 +24,9 @@ object KuudraAPI {
     private val deathRegex = Regex("^ ☠ (?:(?<username>\\w+)|You were) .+(?: and became a ghost)?\\.$")
     private val tierRegex = Regex(" ⏣ Kuudra's Hollow \\(T(?<t>\\d+)\\)")
     private val completeRegex = Regex("\\s+KUUDRA DOWN!")
+
+    @JvmStatic
+    val kuudra: MagmaCube? by Schrodinger(::fn) { !it.isAlive }
 
     @JvmStatic
     var inRun: Boolean = false
@@ -72,6 +79,9 @@ object KuudraAPI {
             }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
     }
+
+    private fun fn(): MagmaCube? =
+        client.level?.entitiesForRendering()?.find { it is MagmaCube && it.size == 30 && it.serverMaxHealth == 100_000f } as? MagmaCube
 
     private fun reset() {
         tier = null
