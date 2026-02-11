@@ -4,6 +4,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
+import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 import xyz.aerii.athen.events.core.CancellableEvent
@@ -40,6 +41,13 @@ sealed class GuiEvent {
                 val slot: Slot
             ) : Event()
         }
+
+        data class Click (
+            val slot: Slot?,
+            val slotId: Int,
+            val mouseButton: Int,
+            val clickType: ClickType
+        ) : CancellableEvent()
     }
 
     sealed class Tooltip {

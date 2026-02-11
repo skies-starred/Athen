@@ -4,6 +4,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,6 +31,11 @@ public class AbstractContainerScreenMixin {
     private void athen$onRenderSlot$post(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
     //? }
         new GuiEvent.Slots.Render.Post(guiGraphics, slot).post();
+    }
+
+    @Inject(method = "slotClicked", at = @At("HEAD"), cancellable = true)
+    private void athen$slotClick(Slot slot, int slotId, int mouseButton, ClickType type, CallbackInfo ci) {
+        if (new GuiEvent.Slots.Click(slot, slotId, mouseButton, type).post()) ci.cancel();
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
