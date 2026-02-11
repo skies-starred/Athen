@@ -43,6 +43,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import dev.deftu.omnicore.api.client.render.stack.OmniPoseStack
 import dev.deftu.omnicore.api.client.render.stack.OmniPoseStacks
 import dev.deftu.omnicore.api.client.render.vertex.OmniBufferBuilder
+import dev.deftu.omnicore.api.client.render.vertex.OmniBufferBuilders
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.MultiBufferSource
@@ -84,8 +85,6 @@ private class RenderQueue {
 
 object Render3D {
     private val queue = RenderQueue()
-    private val lineBuckets = HashMap<Float, OmniBufferBuilder>()
-    private val boxBuckets = HashMap<Float, OmniBufferBuilder>()
 
     private val BOX_EDGES = arrayOf(
         intArrayOf(0, 0, 0, 1, 0, 0), intArrayOf(1, 0, 0, 1, 0, 1),
@@ -103,10 +102,10 @@ object Render3D {
             pose.pushPose()
             pose.translate(-camera.x, -camera.y, -camera.z)
 
-            val omniPose = OmniPoseStacks.vanilla(pose)
-            flushLines(omniPose)
-            flushBoxes(omniPose)
-            flushFilledBoxes(omniPose)
+            val poseStack = OmniPoseStacks.vanilla(pose)
+            flushLines(poseStack)
+            flushBoxes(poseStack)
+            flushFilledBoxes(poseStack)
             flushTexts(pose, consumers)
 
             pose.popPose()
@@ -129,10 +128,9 @@ object Render3D {
             if (lines.isEmpty()) return@forDepth
 
             val pipeline = if (depth) StarredPipelines.lines else StarredPipelines.linesNoDepth
-            lineBuckets.clear()
 
             for (line in lines) {
-                val buffer = lineBuckets.getOrPut(line.width) { pipeline.createBufferBuilder() }
+                val buffer = pipeline.createBufferBuilder()
 
                 addLineVertices(
                     buffer,
@@ -141,10 +139,8 @@ object Render3D {
                     line.x2, line.y2, line.z2,
                     line.color
                 )
-            }
 
-            for ((width, buffer) in lineBuckets) {
-                buffer.buildOrThrow().drawAndClose(pipeline) { setLineWidth(width) }
+                buffer.buildOrThrow().drawAndClose(pipeline) { setLineWidth(line.width) }
             }
         }
     }
@@ -152,12 +148,10 @@ object Render3D {
     private fun flushBoxes(poseStack: OmniPoseStack) {
         forDepth(queue.boxesDepth, queue.boxesNoDepth) { depth, boxes ->
             if (boxes.isEmpty()) return@forDepth
-
             val pipeline = if (depth) StarredPipelines.lines else StarredPipelines.linesNoDepth
-            boxBuckets.clear()
 
             for (box in boxes) {
-                val buffer = boxBuckets.getOrPut(box.width) { pipeline.createBufferBuilder() }
+                val buffer = pipeline.createBufferBuilder()
 
                 val aabb = box.aabb
                 val x0 = aabb.minX
@@ -180,10 +174,8 @@ object Render3D {
                         box.color
                     )
                 }
-            }
 
-            for ((width, buffer) in boxBuckets) {
-                buffer.buildOrThrow().drawAndClose(pipeline) { setLineWidth(width) }
+                buffer.buildOrThrow().drawAndClose(pipeline) { setLineWidth(box.width) }
             }
         }
     }
