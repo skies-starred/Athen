@@ -601,7 +601,7 @@ object PartyFinder : Module(
     }
 
     private enum class ClassType(short: String, val full: String, color: String) {
-        ARCHER("A", "Archer", "<gold>"),
+        ARCHER("A", "Archer", "<orange>"),
         BERSERK("B", "Berserk", "<red>"),
         HEALER("H", "Healer", "<pink>"),
         MAGE("M", "Mage", "<aqua>"),

@@ -47,6 +47,7 @@ object Commander {
         "/${Athen.modId} toggle help" to "Toggle the UI helper tooltip",
         "/${Athen.modId} clear chat" to "Clear the chat history",
         "/${Athen.modId} stats <name>" to "View stats for any player",
+        "/${Athen.modId} stats slayers" to "Shows the slayer kill pbs",
         "/${Athen.modId} update [stream]" to "Install updates (release/beta/alpha)",
         "/${Athen.modId} checkupdate [stream]" to "Check for available updates"
     )
