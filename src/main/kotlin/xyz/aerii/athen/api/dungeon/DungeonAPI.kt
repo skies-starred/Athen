@@ -47,7 +47,6 @@ import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.events.*
 import xyz.aerii.athen.events.core.EventBus.on
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.React
 import xyz.aerii.athen.handlers.Smoothie
 import xyz.aerii.athen.handlers.Typo.devMessage
@@ -271,7 +270,7 @@ object DungeonAPI {
         }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
 
         on<TickEvent.Client> {
-            if (Chronos.Ticker.tickClient % 5 != 0) return@on
+            if (ticks % 5 != 0) return@on
 
             if (floor.value?.floorNumber == 7 && inBoss.value) {
                 val y = Smoothie.player?.y ?: return@on

@@ -10,7 +10,6 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.events.TickEvent
-import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
@@ -33,7 +32,7 @@ object SlayerDisplay : Module(
         }
 
         on<TickEvent.Client> {
-            if (Chronos.Ticker.tickClient % 2 != 0) return@on
+            if (ticks % 2 != 0) return@on
             val entity = slayerEntity ?: return@on
 
             val lines = entity.getAttachedLines()
@@ -43,24 +42,15 @@ object SlayerDisplay : Module(
             for (i in lines.indices) {
                 val line = lines[i]
                 val name = line.stripped()
-                if (name.contains("Spawned by:")) continue
+                if ("Spawned by:" in name) continue
 
-                var ok = name.indexOf(':') != -1
-                if (!ok) {
-                    val it = SLAYER_NAMES.iterator()
-                    while (it.hasNext()) {
-                        if (name.contains(it.next())) {
-                            ok = true
-                            break
-                        }
-                    }
-                }
+                val co = ":" in name
+                if (!co && SLAYER_NAMES.none { it in name }) continue
 
-                if (!ok) continue
-                if (line.string.indexOf(':') != -1) c.add(line) else cc.add(line)
+                if (co) c.add(line) else cc.add(line)
             }
 
-            c.addAll(cc)
+            c += cc
             displayComponents = c
         }
 
