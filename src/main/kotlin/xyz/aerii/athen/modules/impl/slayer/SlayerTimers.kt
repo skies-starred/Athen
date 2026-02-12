@@ -86,7 +86,7 @@ object SlayerTimers : Module(
 
         on<CommandRegistration> {
             event.register(Athen.modId) {
-                then("stats") {
+                then("times") {
                     thenCallback("slayers") {
                         val b0 = "<gray>${"-".repeatBreak()}".parse()
                         val b1 = "<dark_gray>${"-".repeatBreak()}".parse()
