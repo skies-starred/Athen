@@ -7,6 +7,7 @@ import net.minecraft.Util
 //? }
 
 private val durationRegex = Regex("""(\d+(?:\.\d+)?)([dhms])""")
+private val longDurationRegex = Regex("""(\d+(?:\.\d+)?)\s+(day|days|hour|hours|minute|minutes|second|seconds)""")
 
 fun String.toCamelCase(): String {
     return this
@@ -43,6 +44,23 @@ fun String.fromDuration(): Double {
             "h" -> v * 3600
             "m" -> v * 60
             "s" -> v
+            else -> 0.0
+        }
+    }
+
+    return total
+}
+
+fun String.fromLongDuration(): Double {
+    var total = 0.0
+
+    for ((value, unit) in longDurationRegex.findAll(lowercase()).map { it.destructured }) {
+        val v = value.toDouble()
+        total += when (unit) {
+            "day", "days" -> v * 86400
+            "hour", "hours" -> v * 3600
+            "minute", "minutes" -> v * 60
+            "second", "seconds" -> v
             else -> 0.0
         }
     }

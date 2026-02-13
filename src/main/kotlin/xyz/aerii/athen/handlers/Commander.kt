@@ -1,4 +1,4 @@
-@file:Suppress("ObjectPropertyName")
+@file:Suppress("ObjectPropertyName", "Unused")
 
 package xyz.aerii.athen.handlers
 
@@ -32,9 +32,10 @@ import xyz.aerii.athen.updater.ModUpdater
 
 @Load
 object Commander {
-    private object StateTracker {
+    object StateTracker {
         var `warning$updater$sentOnce` = false
         var `warning$clickUiHelper$sentOnce` = false
+        var `warning$kat$sentOnce` = false
     }
 
     private val commands = listOf(
