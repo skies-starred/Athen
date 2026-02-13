@@ -55,26 +55,26 @@ import xyz.aerii.athen.handlers.Typo.stripped
 @Priority
 object DungeonAPI {
     // <editor-fold desc="Regex & Variables">
-    private val watcherSpawnedAllRegex = Regex("""\[BOSS] The Watcher: That will be enough for now\.""")
-    private val watcherKilledAllRegex = Regex("\\[BOSS] The Watcher: You have proven yourself\\. You may pass\\.")
+    private val watcherSpawnedAllRegex = Regex("""^\[BOSS] The Watcher: That will be enough for now\.$""")
+    private val watcherKilledAllRegex = Regex("^\\[BOSS] The Watcher: You have proven yourself\\. You may pass\\.$")
 
     private val dungeonFloorRegex = Regex("The Catacombs \\((?<floor>.+)\\)")
 
-    private val keyObtainedRegex = Regex("(?:\\[.+] ?)?\\w+ has obtained (?<type>\\w+) Key!")
-    private val keyPickedUpRegex = Regex("A (?<type>\\w+) Key was picked up!")
+    private val keyObtainedRegex = Regex("^(?:\\[.+] ?)?\\w+ has obtained (?<type>\\w+) Key!$")
+    private val keyPickedUpRegex = Regex("^A (?<type>\\w+) Key was picked up!$")
 
-    private val witherDoorOpenRegex = Regex("\\w+ opened a WITHER door!")
-    private val bloodDoorOpenRegex = Regex("The BLOOD DOOR has been opened!")
+    private val witherDoorOpenRegex = Regex("^\\w+ opened a WITHER door!$")
+    private val bloodDoorOpenRegex = Regex("^The BLOOD DOOR has been opened!$")
 
-    private val startRegex = Regex("\\[NPC] Mort: Here, I found this map when I first entered the dungeon\\.")
+    private val startRegex = Regex("^\\[NPC] Mort: Here, I found this map when I first entered the dungeon\\.$")
     private val endRegex = Regex("""^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$""")
     private val bossStartRegex = Regex("^\\[BOSS] (?<boss>.+?):")
 
-    private val uniqueClassRegex = Regex("Your .+ stats are doubled because you are the only player using this class!")
+    private val uniqueClassRegex = Regex("^Your .+ stats are doubled because you are the only player using this class!$")
     private val sectionCompleteRegex = Regex("""^\w{1,16} (?:activated|completed) a \w+! \((?:7/7|8/8)\)$""")
 
     private val playerTabRegex = Regex("\\[\\d+] (?:\\[[A-Za-z]+] )?(?<name>[A-Za-z0-9_]+) (?:.+ )?\\((?<class>\\S+) ?(?<level>[LXVI0]+)?\\)")
-    private val playerGhostRegex = Regex(" ☠ (?<name>[A-Za-z0-9_]+) .+ became a ghost\\.")
+    private val playerGhostRegex = Regex("^ ☠ (?<name>[A-Za-z0-9_]+) .+ became a ghost\\.$")
 
     private val cataRegex = Regex("^ Catacombs (?<level>\\d+):")
     private val locationRegex = Regex(" *[⏣ф] *(?<location>(?:\\s?[^ൠ\\s]+)*)(?: ൠ x\\d)?")
