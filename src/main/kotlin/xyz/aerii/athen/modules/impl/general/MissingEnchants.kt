@@ -24,7 +24,7 @@ import xyz.aerii.athen.utils.enchants
 
 @Load
 @OnlyIn(skyblock = true)
-object ShowMissingEnchants : Module(
+object MissingEnchants : Module(
     "Missing enchants",
     "Shows missing enchants on the item you hover over.",
     Category.GENERAL
@@ -79,22 +79,18 @@ object ShowMissingEnchants : Module(
             if (enchants.contains("one_for_all")) return@on
 
             val all = a[i] ?: return@on
-            val hasSet = enchants.toHashSet()
-
-            val conflicting = HashSet<String>()
-            for (pool in b) {
-                if (pool.any(hasSet::contains)) conflicting.addAll(pool)
-            }
-
             val missing = ArrayList<String>(all.size)
-            for (enc in all) {
-                if (enc in hasSet || enc in conflicting) continue
+
+            a@ for (enc in all) {
+                if (enc in enchants) continue
+
+                for (pool in b) if (enc in pool && pool.any(enchants::contains)) continue@a
                 if (!enc.startsWith("ultimate_")) missing.add(enc.prettify())
             }
 
-            val hasUltimate = hasSet.any { it.startsWith("ultimate_") }
-            if (hasUltimate && missing.isEmpty()) return@on
-            if (!hasUltimate) missing.add(0, "Ultimate enchant")
+            val ult = enchants.any { it.startsWith("ultimate_") }
+            if (ult && missing.isEmpty()) return@on
+            if (!ult) missing.add(0, "Ultimate enchant")
 
             var ii = -1
             var se = false
@@ -116,15 +112,7 @@ object ShowMissingEnchants : Module(
                 break
             }
 
-            if (ii == -1) {
-                for (i in tooltip.indices) {
-                    if (tooltip[i].string.isNotBlank()) continue
-                    ii = i
-                    break
-                }
-            }
-
-            if (ii == -1) ii = minOf(tooltip.size, 1)
+            if (ii == -1) ii = tooltip.indexOfFirst { it.string.isEmpty() }.takeIf { it != -1 } ?: minOf(tooltip.size, 1)
 
             val nl = ArrayList<Component>(2 + missing.size)
             nl.add(EMPTY_COMPONENT)
