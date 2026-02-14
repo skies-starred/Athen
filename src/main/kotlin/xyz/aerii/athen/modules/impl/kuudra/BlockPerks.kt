@@ -9,6 +9,7 @@ import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
+import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 
@@ -24,6 +25,7 @@ object BlockPerks : Module(
     private val specialist = listOf("Steady Hands", "Ballista Mechanic", "Bomberman", "Mining Frenzy")
     private val support = listOf("Healing Aura", "Mana Aura", "Protective Aura", "Faster Respawn")
 
+    private val cancelRender = config.switch("Cancel slot render", true).custom("cancelRender")
     private val key by config.keybind("Override key")
 
     private val blockedExpandable by config.expandable("Blocked perks")
@@ -52,6 +54,14 @@ object BlockPerks : Module(
         onSend<ServerboundContainerClosePacket> {
             inGui = false
         }
+
+        on<GuiEvent.Slots.Render.Pre> {
+            if (!inGui) return@on
+            if (OmniKeyboard.isPressed(key)) return@on
+
+            val name = slot.item?.hoverName?.stripped()?.substringBeforeLast(" ") ?: return@on
+            if (name in blocked) cancel()
+        }.runWhen(cancelRender.state)
 
         on<GuiEvent.Slots.Click> {
             if (!inGui) return@on
