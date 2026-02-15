@@ -30,7 +30,7 @@ object TerminalSolver : Module(
     Category.DUNGEONS
 ) {
     private val settingsExpandable by config.expandable("Settings")
-    val fcDelay by config.slider("First click delay", 350, 150, 1000).childOf { settingsExpandable }
+    val fcDelay by config.slider("First click delay", 350, 150, 1000, "ms").childOf { settingsExpandable }
     val dropKey by config.switch("Allow using drop key", true).childOf { settingsExpandable }
     val keybindL by config.keybind("Keybind left click").childOf { settingsExpandable }
     val keybindR by config.keybind("Keybind right click").childOf { settingsExpandable }

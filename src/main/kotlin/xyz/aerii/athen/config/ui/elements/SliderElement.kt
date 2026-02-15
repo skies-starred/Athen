@@ -50,9 +50,9 @@ class SliderElement(
         val textW = textWidth(valueText)
         val textX = x + width - textW - 6f
         val textY = y + 8f
-        val isTextHovered = isAreaHovered(textX - 4f, textY - 2f, textW + 8f, 20f)
+        val isHovered = isAreaHovered(lastX, lastY + 20f, width, 16f)
 
-        `anim$tooltip`.value = if (isTextHovered && !editing) 1f else 0f
+        `anim$tooltip`.value = if (isHovered && !editing) 1f else 0f
         drawText(rawText, textX, textY, color = if (editing) Mocha.Text.argb else Mocha.Subtext0.argb)
         if (unit.isNotEmpty()) drawText(" $unit", textX + rawW, textY, color = Mocha.Subtext0.argb)
 
