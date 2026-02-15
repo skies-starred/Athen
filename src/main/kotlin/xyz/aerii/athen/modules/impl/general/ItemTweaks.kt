@@ -2,6 +2,10 @@
 
 package xyz.aerii.athen.modules.impl.general
 
+import dev.deftu.omnicore.api.client.input.OmniKeyboard
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.core.component.DataComponents
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
@@ -9,12 +13,17 @@ import tech.thatgravyboat.skyblockapi.api.item.calculator.getItemValue
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.translate
 import tech.thatgravyboat.skyblockapi.utils.extentions.format
+import tech.thatgravyboat.skyblockapi.utils.extentions.getHoveredSlot
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
+import tech.thatgravyboat.skyblockapi.utils.text.TextColor
+import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
+import xyz.aerii.athen.accessors.invalidate
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.runWhen
+import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.colorCoded
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
@@ -43,11 +52,19 @@ object ItemTweaks : Module(
     private val tooltipExpandable by config.expandable("Tooltip tweaks")
     private val removeGearScore by config.switch("Remove gear score").childOf { tooltipExpandable }
     private val removeEnchants by config.switch("Remove vanilla enchants").childOf { tooltipExpandable }
+
     private val showItemAge by config.switch("Show age").childOf { tooltipExpandable }
     private val `showItemAge$style` by config.textInput("Style", "&7Age: &c#age &8(#time)").dependsOn { showItemAge }.childOf { tooltipExpandable }
+
     private val showItemPrice by config.switch("Show price").childOf { tooltipExpandable }
     private val `showItemPrice$style` by config.textInput("Style", "&fCraft cost: &b#price").dependsOn { showItemPrice }.childOf { tooltipExpandable }
     private val `showItemPrice$abb` by config.dropdown("Numbers", listOf("Abbreviate", "Normal with comma")).dependsOn { showItemPrice }.childOf { tooltipExpandable }
+
+    private val showItemHex = config.switch("Show hex color").childOf { tooltipExpandable }.custom("showItemHex")
+    private val `showItemHex$style` by config.textInput("Style", "&7Color: #hex").dependsOn { showItemHex.value }.childOf { tooltipExpandable }
+    private val `showItemHex$color` by config.switch("Color the hex").dependsOn { showItemHex.value }.childOf { tooltipExpandable }
+    private val `showItemHex$box` by config.switch("Display color box", true).dependsOn { showItemHex.value }.childOf { tooltipExpandable }
+    private val `showItemHex$keybind` by config.keybind("Keybind").dependsOn { showItemHex.value }.childOf { tooltipExpandable }
 
     init {
         on<GuiEvent.Slots.Render.Post> {
@@ -100,6 +117,23 @@ object ItemTweaks : Module(
 
             tooltip.add(str.price().literal())
         }
+
+        on<GuiEvent.Input.Key.Press> {
+            if (`showItemHex$keybind` == 0) return@on
+            if (`showItemHex$keybind` == keyEvent.key()) (client.screen as? AbstractContainerScreen<*>)?.getHoveredSlot()?.item?.invalidate()
+        }.runWhen(showItemHex.state)
+
+        on<GuiEvent.Input.Key.Release> {
+            if (`showItemHex$keybind` == 0) return@on
+            if (`showItemHex$keybind` == keyEvent.key()) (client.screen as? AbstractContainerScreen<*>)?.getHoveredSlot()?.item?.invalidate()
+        }.runWhen(showItemHex.state)
+
+        on<GuiEvent.Tooltip.Update> {
+            if (`showItemHex$keybind` != 0 && !OmniKeyboard.isPressed(`showItemHex$keybind`)) return@on
+
+            val rgb = item.get(DataComponents.DYED_COLOR)?.rgb ?: return@on
+            tooltip.add(1, rgb.hex())
+        }.runWhen(showItemHex.state)
     }
 
     private fun String.price(): String =
@@ -112,4 +146,12 @@ object ItemTweaks : Module(
             .replace("&", "§")
             .replace("#age", this)
             .replace("#time", time)
+
+    private fun Int.hex(): Component =
+        `showItemHex$style`
+            .replace("&", "§")
+            .replace("#hex", "")
+            .literal()
+            .append(String.format("#%06X", this).literal { color = if (`showItemHex$color`) this@hex else TextColor.DARK_GRAY })
+            .apply { if (`showItemHex$box`) append("⬛".literal { color = this@hex }) }
 }
