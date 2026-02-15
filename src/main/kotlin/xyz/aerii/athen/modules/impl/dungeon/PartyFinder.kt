@@ -211,14 +211,11 @@ object PartyFinder : Module(
                 val username = member.username
                 if (statsCache[username] != null) continue
 
-                val uuid = member.uuid
-                if (uuid == null) {
-                    UUIDUtils.getUUID(username) { resolved ->
-                        val id = resolved ?: return@getUUID
-                        member.uuid = id
-                        hovered.requestStats(id, username, data.floor, data.isMaster)
-                    }
-                } else {
+                member.uuid?.let {
+                    hovered.requestStats(it, username, data.floor, data.isMaster)
+                } ?: UUIDUtils.getUUID(username) { uuid ->
+                    val uuid = uuid ?: return@getUUID
+                    member.uuid = uuid
                     hovered.requestStats(uuid, username, data.floor, data.isMaster)
                 }
             }
@@ -277,14 +274,21 @@ object PartyFinder : Module(
             }
 
             if (!inPartyFinder) return@onReceive
-            slotData.clear()
+            with (items.getOrNull(45)?.getRawLore() ?: return@onReceive) {
+                val l = this.getOrNull(1) ?: return@with
+                if (l == "defeat a Dungeon.") return@with
 
+                inPartyFinder = false
+                return@onReceive
+            }
+
+            slotData.clear()
             for ((i, it) in items.withIndex()) {
                 if (i >= 54) break
                 if (it == null) continue
                 if (it.item != Items.PLAYER_HEAD) continue
 
-                val lore = it.getLore().takeIf { it.size >= 4} ?: continue
+                val lore = it.getLore().takeIf { it.size >= 4 } ?: continue
                 val strippedLore = lore.map { it.stripped() }
 
                 val master = "Master Mode" in strippedLore.first()
@@ -346,31 +350,29 @@ object PartyFinder : Module(
         if (cached != null && !cached.stats.loading) return cached.stats.stats(this)
 
         UUIDUtils.getUUID(this) { uuid ->
-            uuid?.let {
-                null.requestStats(it, this, sendToChat = true)
-            }
+            val uuid = uuid ?: return@getUUID
+            null.requestStats(uuid, this, sendToChat = true)
         }
     }
 
     private fun PlayerStats.kick(username: String) {
-        var pb: Long?
         val floor = PartyFinderAPI.queuedDungeonFloor
 
-        if (detectKickFloor && floor != null) {
-            val isMaster = "Master Mode" in floor.longName
-            pb = (if (isMaster) masterPB else normalPB)?.get(floor.floorNumber)
-        } else {
-            val isMaster = kickFloor > 0
-            val floor = if (isMaster) kickFloor + 3 else 7
-            pb = (if (isMaster) masterPB else normalPB)?.get(floor)
-        }
+        val pb =
+            if (detectKickFloor && floor != null) {
+                val master = "Master Mode" in floor.longName
+                (if (master) masterPB else normalPB)?.get(floor.floorNumber)
+            } else {
+                val master = kickFloor > 0
+                (if (master) masterPB else normalPB)?.get(if (master) kickFloor + 3 else 7)
+            }
 
-        val secrets = secrets
-        val mp = bagData?.calculateMP(abiphoneContacts, consumedPrism)
+        val secrets = secrets ?: 0
+        val avg = secretAvg ?: 0.0
+        val mp = bagData?.calculateMP(abiphoneContacts, consumedPrism) ?: 0
 
         val pbReqStr = requiredPB.takeIf(String::isNotBlank)
         val pbReq = pbReqStr?.fromHMS()?.toLong()
-
         val secretsReq = requiredSecrets.takeIf(String::isNotBlank)?.unabbreviate()
         val avgReq = requiredSecretAvg.takeIf(String::isNotBlank)?.toDoubleOrNull()
         val mpReq = requiredMP.takeIf(String::isNotBlank)?.unabbreviate()
@@ -383,15 +385,15 @@ object PartyFinder : Module(
         }
 
         secretsReq?.let {
-            if ((secrets ?: 0) < it) reasons += "Secrets: ${secrets ?: 0} < $it"
+            if (secrets < it) reasons += "Secrets: $secrets < $it"
         }
 
         avgReq?.let {
-            if ((secretAvg ?: 0.0) < it) reasons += "Secret average: ${secretAvg ?: 0} < $it"
+            if (avg < it) reasons += "Secret average: $avg < $it"
         }
 
         mpReq?.let {
-            if ((mp ?: 0) < it) reasons += "MP: ${mp ?: 0} < $it"
+            if (mp < it) reasons += "MP: $mp < $it"
         }
 
         if (reasons.isEmpty()) return
@@ -415,9 +417,10 @@ object PartyFinder : Module(
             statsCache[username] = CachedStats(stats)
             yearning.remove(username)
             if (sendToChat) stats.stats(username)
-            this?.let {
-                slotData[index]?.let { updateLore(it, requireNotNull(floor), requireNotNull(master)) }
-            }
+            if (this == null) return@fetchPlayerStats
+            val data = slotData[index] ?: return@fetchPlayerStats
+
+            updateLore(data, floor!!, master!!)
         })
     }
 
