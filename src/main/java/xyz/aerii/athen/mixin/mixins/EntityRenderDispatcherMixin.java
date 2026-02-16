@@ -22,16 +22,15 @@ public class EntityRenderDispatcherMixin {
         ((EntityRenderStateAccessor) renderState).athen$setEntity(entity);
     }
 
-    @Inject(method = "submit", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V"), cancellable = true)
+    @Inject(method = "submit", at = @At("HEAD"), cancellable = true)
     private void athen$submit$pre(EntityRenderState renderState, CameraRenderState cameraRenderState, double camX, double camY, double camZ, PoseStack poseStack, SubmitNodeCollector nodeCollector, CallbackInfo ci) {
-        if (new WorldRenderEvent.Entity.Pre(renderState, poseStack, cameraRenderState).post()) {
-            ci.cancel();
-            poseStack.popPose();
-        }
+        Entity entity = ((EntityRenderStateAccessor) renderState).athen$getEntity();
+        if (new WorldRenderEvent.Entity.Pre(renderState, poseStack, cameraRenderState, entity).post()) ci.cancel();
     }
 
-    @Inject(method = "submit", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", shift = At.Shift.AFTER))
+    @Inject(method = "submit", at = @At(value = "RETURN"))
     private void athen$submit$post(EntityRenderState renderState, CameraRenderState cameraRenderState, double camX, double camY, double camZ, PoseStack poseStack, SubmitNodeCollector nodeCollector, CallbackInfo ci) {
-        new WorldRenderEvent.Entity.Post(renderState, poseStack, cameraRenderState).post();
+        Entity entity = ((EntityRenderStateAccessor) renderState).athen$getEntity();
+        new WorldRenderEvent.Entity.Post(renderState, poseStack, cameraRenderState, entity).post();
     }
 }
