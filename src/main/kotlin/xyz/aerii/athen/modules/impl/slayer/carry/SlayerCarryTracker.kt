@@ -20,6 +20,7 @@ import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.literal
+import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.centeredText
 import xyz.aerii.athen.handlers.Typo.command
@@ -51,7 +52,7 @@ object SlayerCarryTracker : Module(
 
     private val announceInParty by config.switch("Announce in party", true)
     private val showSpawnMessage by config.switch("Show spawn message", true)
-    private val useCustomMessages by config.switch("Use custom msgs", true)
+    private val useCustomMessages by config.switch("Use custom messages")
 
     private val voidExpanded by config.expandable("Voidgloom Prices")
     private val voidT3Price by config.textInput("T3 Price (M)", "0.8, 0.65").childOf { voidExpanded }
@@ -191,11 +192,10 @@ object SlayerCarryTracker : Module(
 
             val result = carry.onKill() ?: return@on
 
-            "Killed boss for <aqua>$player<r> in <yellow>${result.killTime.toDuration(secondsDecimals = 1)}".also { if (useCustomMessages) it.notify() else it.parse().modMessage() }
+            "Killed boss for <aqua>$player<r> in <yellow>${result.killTime.toDuration(secondsDecimals = 1)} <gray>| <yellow>${(result.killTicks / 20.0).toDuration(secondsDecimals = 1)}".parse().onHover("<red>${result.killTicks} ticks.".parse()).modMessage()
             if (announceInParty) "pc $player: ${result.current}/${result.total}".command()
-
             if (result.completed) {
-                "<${Mocha.Green.argb}>Completed bosses for <aqua>$player <gray>[${slayerType.shortName}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]<r> in <yellow>${result.totalTime.toDuration()}".also { if (useCustomMessages) it.notify() else it.parse().modMessage() }
+                "<${Mocha.Green.argb}>Completed bosses for <aqua>$player <gray>[${slayerType.shortName}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]<r> in <yellow>${result.totalTime.toDuration()}".parse().modMessage()
 
                 SlayerCarryStateTracker.add(player, result.amount, carry.getType())
                 tracked.remove(player)

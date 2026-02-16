@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.world.entity.Entity
 import tech.thatgravyboat.skyblockapi.api.area.slayer.SlayerType
 import xyz.aerii.athen.annotations.Priority
+import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.modules.common.carry.ICarryStateTracker
 import xyz.aerii.athen.modules.common.carry.ICarryStateTracker.HistoryEntry
 import xyz.aerii.athen.modules.common.carry.ITrackedCarry
@@ -41,11 +42,13 @@ object SlayerCarryStateTracker : ICarryStateTracker<SlayerCarryStateTracker.Trac
         override var completed: Int = 0,
         override var lastCompletionTime: Long = 0L,
         override var firstCompletionTime: Long = 0L,
+        var startTick: Int = 0,
         var entity: Entity? = null
     ) : ITrackedCarry {
 
         data class KillResult(
             val killTime: Double,
+            val killTicks: Int,
             val completed: Boolean,
             val current: Int,
             val total: Int,
@@ -56,7 +59,12 @@ object SlayerCarryStateTracker : ICarryStateTracker<SlayerCarryStateTracker.Trac
         override fun getType() = "${slayerType.shortName}${if (tier == -1) " Any" else " T$tier"}"
         override fun getShortType() = getType()
 
-        fun onSpawn(boss: Entity): Boolean = (entity == null).also { if (it) entity = boss }
+        fun onSpawn(boss: Entity): Boolean {
+            if (entity != null) return false
+            entity = boss
+            startTick = Chronos.Ticker.tickServer
+            return true
+        }
 
         fun onKill(): KillResult? {
             val ent = entity ?: return null
@@ -69,6 +77,7 @@ object SlayerCarryStateTracker : ICarryStateTracker<SlayerCarryStateTracker.Trac
 
             return KillResult(
                 killTime = ent.tickCount / 20.0,
+                killTicks = Chronos.Ticker.tickServer - startTick,
                 completed = completed >= total,
                 current = completed,
                 total = total,
