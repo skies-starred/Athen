@@ -52,12 +52,12 @@ object SlayerTimers : Module(
         on<SlayerEvent.Boss.Spawn> {
             if (!slayerInfo.isOwnedByPlayer) return@on
 
+            startTick = Chronos.Ticker.tickServer
             val spawnTime = System.currentTimeMillis()
             if (questStartTime <= 0) return@on
 
             val time = (spawnTime - questStartTime) / 1000.0
             "Slayer spawned in <yellow>${time.toDuration(secondsDecimals = 1)}<r>.".parse().modMessage()
-            startTick = Chronos.Ticker.tickServer
         }
 
         on<SlayerEvent.Boss.Death> {
