@@ -9,7 +9,9 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
+import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
+import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
@@ -28,6 +30,7 @@ object SlayerTimers : Module(
     private val scribble = Scribble("features/slayerTimers")
     private val killPBs = scribble.mutableMap("kill_pbs", Codec.STRING, Codec.DOUBLE)
     private var questStartTime: Long = 0
+    private var startTick: Int = 0
 
     init {
         on<SlayerEvent.Quest.Start> {
@@ -54,6 +57,7 @@ object SlayerTimers : Module(
 
             val time = (spawnTime - questStartTime) / 1000.0
             "Slayer spawned in <yellow>${time.toDuration(secondsDecimals = 1)}<r>.".parse().modMessage()
+            startTick = Chronos.Ticker.tickServer
         }
 
         on<SlayerEvent.Boss.Death> {
@@ -61,27 +65,31 @@ object SlayerTimers : Module(
 
             val time = entity.tickCount / 20.0
             val str0 = time.toDuration(secondsDecimals = 1)
+            val time0 = Chronos.Ticker.tickServer - startTick
+            val str1 = (time0 / 20.0).toDuration(secondsDecimals = 1)
             val key = slayerInfo.str
             val pb = killPBs.value[key]
 
             val str = when {
                 pb == null -> {
                     killPBs.update { this[key] = time }
-                    "<yellow>$str0 <green>[New PB]"
+                    "<yellow>$str0 <gray>| <yellow>$str1 <green>[New PB]"
                 }
 
                 time < pb -> {
                     killPBs.update { this[key] = time }
-                    "<green>$str0 [-${(pb - time).toDuration(secondsDecimals = 1)}]"
+                    "<green>$str0 <gray>| <green>$str1 <dark_green>[-${(pb - time).toDuration(secondsDecimals = 1)}]"
                 }
 
                 else -> {
-                    val color = if (time < pb * 1.1) Mocha.Peach.argb else TextColor.RED
-                    "<$color>$str0 [+${(time - pb).toDuration(secondsDecimals = 1)}]"
+                    val a = time < pb * 1.1
+                    val color = if (a) Mocha.Peach.argb else TextColor.RED
+                    val tc = if (a) Mocha.Pink.argb else Mocha.Red.argb
+                    "<$color>$str0 <gray>| <$color>$str1 <$tc>[+${(time - pb).toDuration(secondsDecimals = 1)}]"
                 }
             }
 
-            "Slayer killed in $str<r>.".parse().modMessage()
+            "Slayer killed in $str<r>.".parse().onHover("<red>$time0 ticks.".parse()).modMessage()
         }
 
         on<CommandRegistration> {
