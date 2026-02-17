@@ -8,6 +8,8 @@ sealed class KuudraEvent {
     sealed class End {
         data object Success : Event()
 
+        data object Defeat : Event()
+
         data object Any : Event()
     }
 }

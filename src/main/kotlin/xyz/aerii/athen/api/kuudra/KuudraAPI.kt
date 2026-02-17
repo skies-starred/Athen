@@ -17,7 +17,7 @@ import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.ScoreboardEvent
-import xyz.aerii.athen.events.core.EventBus.on
+import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Schrodinger
 import xyz.aerii.athen.handlers.Smoothie
@@ -29,6 +29,7 @@ object KuudraAPI {
     private val deathRegex = Regex("^ ☠ (?:(?<username>\\w+)|You were) .+(?: and became a ghost)?\\.$")
     private val tierRegex = Regex(" ⏣ Kuudra's Hollow \\(T(?<t>\\d+)\\)")
     private val completeRegex = Regex("^\\s+KUUDRA DOWN!")
+    private val defeatRegex = Regex("^\\s+DEFEAT")
     private val buildRegex = Regex("Building Progress (?<progress>\\d+)% \\((?<players>\\d) Players Helping\\)")
     private val progressRegex = Regex("^PROGRESS: \\d+%")
 
@@ -72,21 +73,42 @@ object KuudraAPI {
 
         on<EntityEvent.NameChange> {
             if (!inRun) return@on
-            if (phase != KuudraPhase.BUILD) return@on
+            val phase = phase ?: return@on
+
+            if (phase.int > 2) return@on
+            val pos = infoLineEntity.blockPosition()
             val n = component.stripped()
 
-            if (n == "PROGRESS: COMPLETE") {
-                KuudraSupply.at(infoLineEntity.blockPosition())?.built = true
-                return@on
-            }
+            when (phase) {
+                KuudraPhase.SUPPLIES -> {
+                    when (n) {
+                        "BRING SUPPLY CHEST HERE" -> {
+                            KuudraSupply.at(pos)?.active = false
+                        }
 
-            progressRegex.findThenNull(n) {
-                KuudraSupply.at(infoLineEntity.blockPosition())?.built = false
-            } ?: return@on
+                        "✓ SUPPLIES RECEIVED ✓" -> {
+                            KuudraSupply.at(pos)?.active = true
+                        }
+                    }
+                }
 
-            buildRegex.findOrNull(n, "progress", "players") { (p0, p1) ->
-                buildProgress = p0.toInt()
-                buildPlayers = p1.toInt()
+                KuudraPhase.BUILD -> {
+                    if (n == "PROGRESS: COMPLETE") {
+                        KuudraSupply.at(pos)?.built = true
+                        return@on
+                    }
+
+                    progressRegex.findThenNull(n) {
+                        KuudraSupply.at(pos)?.built = false
+                    } ?: return@on
+
+                    buildRegex.findOrNull(n, "progress", "players") { (p0, p1) ->
+                        buildProgress = p0.toInt()
+                        buildPlayers = p1.toInt()
+                    }
+                }
+
+                else -> {}
             }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
 
@@ -121,13 +143,15 @@ object KuudraAPI {
                     if (tier == KuudraTier.INFERNAL) phase = KuudraPhase.LAIR
                 }
 
-                message == "[NPC] Elle: Good job everyone. A hard fought battle come to an end. Let's get out of here before we run into any more trouble!" -> {
+                completeRegex.matches(message) -> {
+                    KuudraEvent.End.Success.post()
                     KuudraEvent.End.Any.post()
                     inRun = false
                 }
 
-                completeRegex.matches(message) -> {
-                    KuudraEvent.End.Success.post()
+                defeatRegex.matches(message) -> {
+                    KuudraEvent.End.Defeat.post()
+                    KuudraEvent.End.Any.post()
                     inRun = false
                 }
 

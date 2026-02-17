@@ -2,7 +2,7 @@
 
 package xyz.aerii.athen.api.kuudra.enums
 
-enum class KuudraPhase(val phase: Int) {
+enum class KuudraPhase(val int: Int) {
     SUPPLIES(1),
     BUILD(2),
     FUEL(3),
