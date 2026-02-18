@@ -45,6 +45,7 @@ object BlockPerks : Module(
         perks1.state.onChange(::r)
         perks2.state.onChange(::r)
         perks3.state.onChange(::r)
+        perks4.state.onChange(::r)
 
         on<PacketEvent.Receive, ClientboundOpenScreenPacket> {
             inGui = title.stripped() == "Perk Menu"
