@@ -5,13 +5,12 @@ import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.events.ChatEvent
 import xyz.aerii.athen.events.KuudraEvent
+import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Smoothie
 import xyz.aerii.athen.handlers.Typo.command
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 
 @Load
@@ -26,11 +25,10 @@ object KuudraQueuer : Module(
     private var disableRequeue: Boolean = false
 
     init {
-        on<ChatEvent> {
-            if (actionBar) return@on
+        on<MessageEvent.Chat> {
             if (PartyAPI.leader?.name != Smoothie.playerName) return@on
 
-            partyRegex.findOrNull(message.stripped(), "message") { (message) ->
+            partyRegex.findOrNull(stripped, "message") { (message) ->
                 if (message == "!dt") disableRequeue = true
             }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)

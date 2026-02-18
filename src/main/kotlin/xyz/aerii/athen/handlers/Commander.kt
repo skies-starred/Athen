@@ -8,8 +8,8 @@ import tech.thatgravyboat.skyblockapi.helpers.McClient
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.ui.ClickGUI
-import xyz.aerii.athen.events.ChatEvent
 import xyz.aerii.athen.events.CommandRegistration
+import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Smoothie.client
@@ -156,7 +156,10 @@ object Commander {
                             thenCallback("message", StringArgumentType.greedyString()) {
                                 val actionBar = BoolArgumentType.getBool(this, "actionbar")
                                 val message = StringArgumentType.getString(this, "message")
-                                ChatEvent(message.literal(), actionBar).post()
+
+                                if (actionBar) MessageEvent.ActionBar(message.literal()).post()
+                                else MessageEvent.Chat(message.literal()).post()
+
                                 "<gray>Simulated (actionBar=$actionBar): <red>$message".parse().modMessage()
                             }
                         }

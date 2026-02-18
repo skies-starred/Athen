@@ -24,9 +24,9 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.events.ChatEvent
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.GuiEvent
+import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Chronos
@@ -158,11 +158,10 @@ object PartyFinder : Module(
             }
         }
 
-        on<ChatEvent> {
-            if (actionBar) return@on
+        on<MessageEvent.Chat> {
             if (!joinStats && !canKick) return@on
 
-            val username = pfJoinRegex.findGroup(message.stripped(), "name") ?: return@on
+            val username = pfJoinRegex.findGroup(stripped, "name") ?: return@on
             if (username == client.player?.name?.string) return@on
 
             val cached = statsCache[username]

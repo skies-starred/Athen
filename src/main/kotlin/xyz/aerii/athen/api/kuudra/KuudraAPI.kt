@@ -15,10 +15,10 @@ import xyz.aerii.athen.api.kuudra.enums.KuudraPlayer
 import xyz.aerii.athen.api.kuudra.enums.KuudraSupply
 import xyz.aerii.athen.api.kuudra.enums.KuudraTier
 import xyz.aerii.athen.api.location.SkyBlockIsland
-import xyz.aerii.athen.events.ChatEvent
 import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.ScoreboardEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.events.core.runWhen
@@ -154,43 +154,40 @@ object KuudraAPI {
             }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
 
-        on<ChatEvent> {
-            if (actionBar) return@on
-            val message = message.stripped()
-
+        on<MessageEvent.Chat> {
             when {
-                message == "[NPC] Elle: Okay adventurers, I will go and fish up Kuudra!" -> {
+                stripped == "[NPC] Elle: Okay adventurers, I will go and fish up Kuudra!" -> {
                     KuudraEvent.Start.post()
                     phase = KuudraPhase.SUPPLIES
                     inRun = true
                 }
 
-                message == "[NPC] Elle: OMG! Great work collecting my supplies!" -> {
+                stripped == "[NPC] Elle: OMG! Great work collecting my supplies!" -> {
                     phase = KuudraPhase.BUILD
                 }
 
-                message == "[NPC] Elle: Phew! The Ballista is finally ready! It should be strong enough to tank Kuudra's blows now!" -> {
+                stripped == "[NPC] Elle: Phew! The Ballista is finally ready! It should be strong enough to tank Kuudra's blows now!" -> {
                     phase = KuudraPhase.FUEL
                 }
 
-                message == "[NPC] Elle: POW! SURELY THAT'S IT! I don't think he has any more in him!" -> {
+                stripped == "[NPC] Elle: POW! SURELY THAT'S IT! I don't think he has any more in him!" -> {
                     if (tier == KuudraTier.INFERNAL) phase = KuudraPhase.LAIR
                 }
 
-                completeRegex.matches(message) -> {
+                completeRegex.matches(stripped) -> {
                     KuudraEvent.End.Success.post()
                     KuudraEvent.End.Any.post()
                     inRun = false
                 }
 
-                defeatRegex.matches(message) -> {
+                defeatRegex.matches(stripped) -> {
                     KuudraEvent.End.Defeat.post()
                     KuudraEvent.End.Any.post()
                     inRun = false
                 }
 
                 else -> {
-                    val m = deathRegex.find(message) ?: return@on
+                    val m = deathRegex.find(stripped) ?: return@on
                     val n = m.groups["username"]?.value?.takeIf { it != "You" } ?: Smoothie.playerName ?: return@on
 
                     teammates.find { it.name == n }?.deaths++

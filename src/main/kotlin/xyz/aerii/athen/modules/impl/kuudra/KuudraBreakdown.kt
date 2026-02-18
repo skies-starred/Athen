@@ -7,13 +7,12 @@ import xyz.aerii.athen.api.kuudra.KuudraAPI
 import xyz.aerii.athen.api.kuudra.enums.KuudraTier
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.events.ChatEvent
 import xyz.aerii.athen.events.KuudraEvent
+import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 
 @Load
@@ -34,11 +33,10 @@ object KuudraBreakdown : Module(
             for (t in KuudraAPI.teammates) set.add(Player(t.name))
         }
 
-        on<ChatEvent> {
-            if (actionBar) return@on
-            val message = message.stripped().takeIf { it.isNotEmpty() } ?: return@on
+        on<MessageEvent.Chat> {
+            if (stripped.isEmpty()) return@on
 
-            if (message == "[NPC] Elle: Good job everyone. A hard fought battle come to an end. Let's get out of here before we run into any more trouble!") {
+            if (stripped == "[NPC] Elle: Good job everyone. A hard fought battle come to an end. Let's get out of here before we run into any more trouble!") {
                 if (set.isEmpty()) return@on
 
                 "<red>Run breakdown:".parse().modMessage()
@@ -51,12 +49,12 @@ object KuudraBreakdown : Module(
                 return@on
             }
 
-            supplyRegex.findThenNull(message, "user") { (user) ->
+            supplyRegex.findThenNull(stripped, "user") { (user) ->
                 val p = set.find { it.name == user } ?: return@findThenNull
                 p.supply++
             } ?: return@on
 
-            fuelRegex.findThenNull(message, "user") { (user) ->
+            fuelRegex.findThenNull(stripped, "user") { (user) ->
                 val p = set.find { it.name == user } ?: return@findThenNull
                 p.fuel++
             } ?: return@on
@@ -64,7 +62,7 @@ object KuudraBreakdown : Module(
             val tier = KuudraAPI.tier?.tier ?: return@on
             if (tier < KuudraTier.BURNING.tier) return@on
 
-            stunRegex.findThenNull(message, "user") { (user) ->
+            stunRegex.findThenNull(stripped, "user") { (user) ->
                 val p = set.find { it.name == user } ?: return@findThenNull
                 p.stun++
             }

@@ -176,11 +176,8 @@ object DungeonAPI {
             }
         }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
 
-        on<ChatEvent> {
-            if (actionBar) return@on
-            val message = message.stripped()
-
-            playerGhostRegex.findThenNull(message, "name") { (name) ->
+        on<MessageEvent.Chat> {
+            playerGhostRegex.findThenNull(stripped, "name") { (name) ->
                 var name = name
                 if (name == "You") Smoothie.player?.let { name = it.name.stripped() }
 
@@ -194,62 +191,62 @@ object DungeonAPI {
             } ?: return@on
 
             if (!inBoss.value && floor.value != DungeonFloor.E) {
-                bossStartRegex.findThenNull(message, "boss") { (boss) ->
+                bossStartRegex.findThenNull(stripped, "boss") { (boss) ->
                     if (boss == "The Watcher") return@findThenNull
                     inBoss.value = floor.value?.chatBossName == boss
                 }
             }
 
             when {
-                watcherSpawnedAllRegex.matches(message) -> {
+                watcherSpawnedAllRegex.matches(stripped) -> {
                     bloodSpawnedAll.value = true
                     return@on
                 }
 
-                watcherKilledAllRegex.matches(message) -> {
+                watcherKilledAllRegex.matches(stripped) -> {
                     bloodKilledAll.value = true
                     return@on
                 }
 
-                uniqueClassRegex.matches(message) -> {
+                uniqueClassRegex.matches(stripped) -> {
                     uniqueClass = true
                     return@on
                 }
 
-                endRegex.matches(message) -> {
+                endRegex.matches(stripped) -> {
                     floorCompleted = true
                     floor.value?.let { (DungeonEvent.End(it)).post() }
                     "DungeonAPI: Floor ended.".devMessage()
                     return@on
                 }
 
-                !floorStarted && startRegex.matches(message) -> {
+                !floorStarted && startRegex.matches(stripped) -> {
                     floorStarted = true
                     floor.value?.let { (DungeonEvent.Start(it)).post() }
                     "DungeonAPI: Floor started.".devMessage()
                     return@on
                 }
 
-                sectionCompleteRegex.matches(message) -> {
+                sectionCompleteRegex.matches(stripped) -> {
                     P3Phase.value++
                     "DungeonAPI: P3 Phase set to $P3Phase.".devMessage()
                     return@on
                 }
 
-                message == "[BOSS] Storm: I should have known that I stood no chance." -> {
+                stripped == "[BOSS] Storm: I should have known that I stood no chance." -> {
                     P3Phase.value = 1
                     "DungeonAPI: P3 Phase set to 1.".devMessage()
                     return@on
                 }
 
-                message == "The Core entrance is opening!" -> {
+                stripped == "The Core entrance is opening!" -> {
                     P3Phase.value = 0
                     "DungeonAPI: P3 Phase set to 0.".devMessage()
                     return@on
                 }
             }
 
-            matchWhen(message) {
+            matchWhen(stripped) {
                 case(keyObtainedRegex, "type") { (type) ->
                     handleGetKey(type)
                 }

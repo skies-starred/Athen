@@ -58,7 +58,8 @@ object Signal {
         }
 
         ClientReceiveMessageEvents.ALLOW_GAME.register { message, actionBar ->
-            !ChatEvent(message, actionBar).post()
+            val event = if (actionBar) MessageEvent.ActionBar(message) else MessageEvent.Chat(message)
+            !event.post()
         }
 
         ClientLifecycleEvents.CLIENT_STARTED.register { _ ->

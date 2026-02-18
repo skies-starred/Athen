@@ -8,9 +8,9 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.events.ChatEvent
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Commander
@@ -19,7 +19,6 @@ import xyz.aerii.athen.handlers.Smoothie.showTitle
 import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.fromLongDuration
 import xyz.aerii.athen.utils.toDurationFromMillis
@@ -90,11 +89,10 @@ object KatReminder : Module(
             }
         }
 
-        on<ChatEvent> {
-            if (actionBar) return@on
-            val message = message.stripped().takeIf { "[NPC] Kat: " in it } ?: return@on
+        on<MessageEvent.Chat> {
+            if ("[NPC] Kat: " !in stripped) return@on
 
-            when (message) {
+            when (stripped) {
                 "[NPC] Kat: A flower? For me? How sweet!" -> {
                     fn1(1.days)
                     return@on
@@ -111,21 +109,21 @@ object KatReminder : Module(
                 }
             }
 
-            giveRegex.findThenNull(message, "pet") { (p) ->
+            giveRegex.findThenNull(stripped, "pet") { (p) ->
                 pet = p
             } ?: return@on
 
-            remindRegex.findThenNull(message, "pet") { (p) ->
+            remindRegex.findThenNull(stripped, "pet") { (p) ->
                 pet = p
             } ?: return@on
 
-            durationRegex.findThenNull(message, "duration") { (d) ->
+            durationRegex.findThenNull(stripped, "duration") { (d) ->
                 val s = d.fromLongDuration().toLong()
                 time = System.currentTimeMillis() + (s * 1000L)
                 fn()
             } ?: return@on
 
-            durationRemindRegex.findThenNull(message, "duration") { (d) ->
+            durationRemindRegex.findThenNull(stripped, "duration") { (d) ->
                 val s = d.fromLongDuration().toLong()
                 time = System.currentTimeMillis() + (s * 1000L)
                 fn()

@@ -5,9 +5,9 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster./*? >= 1.21.11 { *//*spider.*//*? }*/CaveSpider
 import tech.thatgravyboat.skyblockapi.api.area.slayer.*
 import xyz.aerii.athen.annotations.Priority
-import xyz.aerii.athen.events.ChatEvent
 import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Typo.devMessage
@@ -27,22 +27,19 @@ object SlayerAPI {
     private val questCompletedRegex = Regex("\\s+SLAYER QUEST COMPLETE!")
 
     init {
-        on<ChatEvent> {
-            if (actionBar) return@on
-            val text = message.stripped()
-
+        on<MessageEvent.Chat> {
             when {
-                questStartedRegex.matches(text) -> {
+                questStartedRegex.matches(stripped) -> {
                     "SlayerAPI: Quest started!".devMessage()
                     SlayerEvent.Quest.Start.post()
                 }
 
-                questCompletedRegex.matches(text) -> {
+                questCompletedRegex.matches(stripped) -> {
                     "SlayerAPI: Quest completed!".devMessage()
                     SlayerEvent.Quest.End.post()
                 }
 
-                questFailedRegex.matches(text) -> {
+                questFailedRegex.matches(stripped) -> {
                     "SlayerAPI: Quest failed!".devMessage()
                     SlayerEvent.Cleanup(SlayerEvent.CleanupType.QuestFail).post()
                 }

@@ -27,7 +27,6 @@ import xyz.aerii.athen.handlers.Typo.command
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.Typo.repeatBreak
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryStateTracker.bossToPlayer
 import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryStateTracker.tracked
@@ -118,15 +117,12 @@ object SlayerCarryTracker : Module(
             for (t in tracked.values) t.clean()
         }
 
-        on<ChatEvent> {
-            if (actionBar) return@on
-            val text = message.stripped()
-
-            tradeCompleteRegex.findThenNull(text, "player") { (player) ->
+        on<MessageEvent.Chat> {
+            tradeCompleteRegex.findThenNull(stripped, "player") { (player) ->
                 recentTradeWith = player
             } ?: return@on
 
-            coinsReceivedRegex.findThenNull(text, "amount") { (amountStr) ->
+            coinsReceivedRegex.findThenNull(stripped, "amount") { (amountStr) ->
                 val recent = recentTradeWith ?: return@findThenNull
                 val amount = amountStr.toDoubleOrNull() ?: return@findThenNull
                 val matches = getPrices().flatMap { (slayerType, tiers) ->
@@ -163,7 +159,7 @@ object SlayerCarryTracker : Module(
                 }
             } ?: return@on
 
-            deathRegex.findThenNull(text, "player", "killer") { (player, killer) ->
+            deathRegex.findThenNull(stripped, "player", "killer") { (player, killer) ->
                 val p = tracked[player]
                 if (p?.entity != null) p.reset()
             }

@@ -7,8 +7,8 @@ import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.api.dungeon.DungeonAPI
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.events.ChatEvent
 import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.runWhen
@@ -152,9 +152,8 @@ object WatcherHelper : Module(
             }
         }.runWhen(DungeonAPI.bloodOpened)
 
-        on<ChatEvent> {
-            if (actionBar) return@on
-            if (message.stripped() != "[BOSS] The Watcher: Let's see how you can handle this.") return@on
+        on<MessageEvent.Chat> {
+            if (stripped != "[BOSS] The Watcher: Let's see how you can handle this.") return@on
             if (`blood$start` == 0L) return@on
 
             `blood$speak` = System.currentTimeMillis()

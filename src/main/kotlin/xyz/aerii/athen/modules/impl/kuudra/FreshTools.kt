@@ -8,12 +8,11 @@ import xyz.aerii.athen.api.kuudra.KuudraAPI
 import xyz.aerii.athen.api.kuudra.enums.KuudraPhase
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.events.ChatEvent
 import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.handlers.Smoothie.showTitle
 import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.toDurationFromMillis
@@ -49,11 +48,10 @@ object FreshTools : Module(
             fn()
         }
 
-        on<ChatEvent> {
-            if (actionBar) return@on
+        on<MessageEvent.Chat> {
             if (!timer.enabled && !alert) return@on
             if (KuudraAPI.phase != KuudraPhase.BUILD) return@on
-            if (message.stripped() != "Your Fresh Tools Perk bonus doubles your building speed for the next 10 seconds!") return@on
+            if (stripped != "Your Fresh Tools Perk bonus doubles your building speed for the next 10 seconds!") return@on
 
             time = System.currentTimeMillis()
 
