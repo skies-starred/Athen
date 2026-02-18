@@ -211,6 +211,8 @@ object KuudraAPI {
         buildProgress = 0
         buildPlayers = 0
 
+        supplies.clear()
+        fuels.clear()
         teammates.clear()
         KuudraSupply.reset()
     }
