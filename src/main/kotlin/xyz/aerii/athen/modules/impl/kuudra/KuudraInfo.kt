@@ -7,8 +7,10 @@ import xyz.aerii.athen.api.kuudra.KuudraAPI
 import xyz.aerii.athen.api.kuudra.enums.KuudraTier
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.events.TickEvent
+import xyz.aerii.athen.events.EntityEvent
+import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.WorldRenderEvent
+import xyz.aerii.athen.events.core.override
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
@@ -39,12 +41,16 @@ object KuudraInfo : Module(
     private var display: String? = null
 
     init {
-        on<TickEvent.Client> {
-            if (ticks % 2 != 0) return@on
+        on<LocationEvent.ServerConnect> {
+            display = null
+        }.override()
+
+        on<EntityEvent.Update.Health> {
             if (!hud.enabled) return@on
             if (!KuudraAPI.inRun) return@on
 
-            display = KuudraAPI.kuudra?.str()
+            val e = KuudraAPI.kuudra?.takeIf { it == entity } ?: return@on
+            display = e.str()
         }
 
         on<WorldRenderEvent.Extract> {
