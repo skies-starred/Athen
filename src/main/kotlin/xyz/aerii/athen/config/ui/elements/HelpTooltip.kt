@@ -87,41 +87,39 @@ class HelpTooltip {
         val titleX = if (collapsed && anim == 0f) x + (currentWidth - titleWidth) / 2f else x + padding
         NVGRenderer.drawText("Help", titleX, y + (headerHeight - 16f) / 2f, 16f, Mocha.Text.argb)
 
-        if (anim > 0f) {
-            val closeButtonX = x + currentWidth - 24f
-            val closeButtonY = y + 8f
-            val closeButtonSize = 16f
-            val isCloseHovered = isAreaHovered(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize)
+        if (anim <= 0f) return
+        val closeButtonX = x + currentWidth - 24f
+        val closeButtonY = y + 8f
+        val closeButtonSize = 16f
+        val isCloseHovered = isAreaHovered(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize)
 
-            `anim$closeBg`.value = if (isCloseHovered) Mocha.Red.argb else 0x00000000
-            `anim$closeScale`.value = if (isCloseHovered) 1.15f else 1f
+        `anim$closeBg`.value = if (isCloseHovered) Mocha.Red.argb else 0x00000000
+        `anim$closeScale`.value = if (isCloseHovered) 1.15f else 1f
 
-            val centerX = closeButtonX + closeButtonSize / 2f
-            val centerY = closeButtonY + closeButtonSize / 2f
-            val scaledSize = closeButtonSize * `anim$closeScale`.value
-            val scaledX = centerX - scaledSize / 2f
-            val scaledY = centerY - scaledSize / 2f
+        val centerX = closeButtonX + closeButtonSize / 2f
+        val centerY = closeButtonY + closeButtonSize / 2f
+        val scaledSize = closeButtonSize * `anim$closeScale`.value
+        val scaledX = centerX - scaledSize / 2f
+        val scaledY = centerY - scaledSize / 2f
 
-            NVGRenderer.globalAlpha(anim)
-            if (`anim$closeBg`.value != 0x00000000) NVGRenderer.drawRectangle(scaledX - 2f, scaledY - 2f, scaledSize + 4f, scaledSize + 4f, `anim$closeBg`.value, 3f)
+        NVGRenderer.globalAlpha(anim)
+        if (`anim$closeBg`.value != 0x00000000) NVGRenderer.drawRectangle(scaledX - 2f, scaledY - 2f, scaledSize + 4f, scaledSize + 4f, `anim$closeBg`.value, 3f)
 
-            NVGRenderer.drawImage(closeIcon, scaledX, scaledY, scaledSize, scaledSize)
-            NVGRenderer.globalAlpha(1f)
+        NVGRenderer.drawImage(closeIcon, scaledX, scaledY, scaledSize, scaledSize)
+        NVGRenderer.globalAlpha(1f)
 
-            if (contentHeight > 0) {
-                NVGRenderer.drawLine(x, y + headerHeight, x + currentWidth, y + headerHeight, 1f, Mocha.Surface0.argb)
+        if (contentHeight <= 0f) return
+        NVGRenderer.drawLine(x, y + headerHeight, x + currentWidth, y + headerHeight, 1f, Mocha.Surface0.argb)
 
-                if (anim < 1f) NVGRenderer.pushScissor(x, y + headerHeight, currentWidth, contentHeight)
+        if (anim < 1f) NVGRenderer.pushScissor(x, y + headerHeight, currentWidth, contentHeight)
 
-                var currentY = y + headerHeight + padding
-                for (h in helpItems) {
-                    NVGRenderer.drawTextWrapped(h, x + padding, currentY, 14f, currentWidth - padding * 2, NVGRenderer.defaultFont)
-                    currentY += itemHeight
-                }
-
-                if (anim < 1f) NVGRenderer.popScissor()
-            }
+        var currentY = y + headerHeight + padding
+        for (h in helpItems) {
+            NVGRenderer.drawTextWrapped(h, x + padding, currentY, 14f, currentWidth - padding * 2, NVGRenderer.defaultFont)
+            currentY += itemHeight
         }
+
+        if (anim < 1f) NVGRenderer.popScissor()
     }
 
     fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {

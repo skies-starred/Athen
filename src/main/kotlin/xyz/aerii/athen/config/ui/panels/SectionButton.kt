@@ -123,29 +123,32 @@ class SectionButton(
         var y = panel.y + Panel.HEADER_HEIGHT + panel.scrollOffset
         panel.sections.filter { it.visible }.takeWhile { it != this }.forEach { y += it.getHeight() }
 
-        if (isAreaHovered(x, y, Panel.WIDTH, HEIGHT)) {
-            return when (button) {
-                0 -> {
-                    isEnabled = !isEnabled
-                    onUpdate(feature.configKey, isEnabled)
-                    `anim$color`.value = if (isEnabled) ENABLED_COLOR else DISABLED_COLOR
-                    true
-                }
-                1 -> {
-                    if (elements.isNotEmpty()) {
-                        extended = !extended
-                        `anim$expand`.value = if (extended) 1f else 0f
-                        `anim$radius`.value = if (extended) 1f else 0f
-                        `anim$chevron`.value = if (extended) 1f else 0f
-                    }
-                    true
-                }
-                else -> false
-            }
-        } else if (extended) {
-            return elements.any { it.mouseClicked(mouseX, mouseY, button) }
+        if (!isAreaHovered(x, y, Panel.WIDTH, HEIGHT)) {
+            if (extended) return elements.any { it.mouseClicked(mouseX, mouseY, button) }
+            return false
         }
-        return false
+
+        return when (button) {
+            0 -> {
+                isEnabled = !isEnabled
+                onUpdate(feature.configKey, isEnabled)
+                `anim$color`.value = if (isEnabled) ENABLED_COLOR else DISABLED_COLOR
+                true
+            }
+
+            1 -> {
+                if (elements.isEmpty()) return true
+
+                extended = !extended
+                val animValue = if (extended) 1f else 0f
+                `anim$expand`.value = animValue
+                `anim$radius`.value = animValue
+                `anim$chevron`.value = animValue
+                true
+            }
+
+            else -> false
+        }
     }
 
     fun mouseReleased(button: Int) =

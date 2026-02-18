@@ -92,11 +92,12 @@ class Panel(
 
     fun applySearchFilter(query: String) {
         if (query.isEmpty()) {
-            for (s in sections) s.visible = true
+            sections.forEach { it.visible = true }
             visible = true
-        } else {
-            for (s in sections) s.visible = s.matchesSearch(query)
-            visible = sections.any { it.visible }
+            return
         }
+
+        sections.forEach { it.visible = it.matchesSearch(query) }
+        visible = sections.any { it.visible }
     }
 }
