@@ -50,7 +50,7 @@ object Texter {
         ChatFormatting.entries.mapNotNull { f -> net.minecraft.network.chat.TextColor.fromLegacyFormat(f)?.let { it to f } }.toMap()
 
     @JvmStatic
-    fun String.parse(): MutableComponent {
+    fun String.parse(whiteBase: Boolean = false): MutableComponent {
         val result = EMPTY_COMPONENT.copy()
         var currentColor = 0xFFFFFF
         var baseColor = 0xFFFFFF
@@ -72,7 +72,7 @@ object Texter {
             if (newColor != null) {
                 if (i > textStart) result.append(substring(textStart, i).literal { color = currentColor })
                 currentColor = newColor
-                if (tag != "r" && i == textStart) baseColor = newColor
+                if (tag != "r" && i == textStart && !whiteBase) baseColor = newColor
                 textStart = end + 1
             }
 
