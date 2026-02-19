@@ -68,7 +68,6 @@ import kotlin.math.sqrt
 //? >= 1.21.11 {
 /*import net.minecraft.gizmos.GizmoStyle
 import net.minecraft.gizmos.Gizmos
-import net.minecraft.gizmos.TextGizmo
 *///? }
 
 private data class QueuedLine(val start: Vec3, val end: Vec3, val color: Color, val width: Float)
@@ -148,7 +147,7 @@ object Render3D {
             if (lines.isEmpty()) return@forDepth
 
             for (l in lines) {
-                Gizmos.line(l.start, l.end, l.color.rgb).apply {
+                Gizmos.line(l.start, l.end, l.color.rgb, l.width).apply {
                     if (!depth) setAlwaysOnTop()
                 }
             }
