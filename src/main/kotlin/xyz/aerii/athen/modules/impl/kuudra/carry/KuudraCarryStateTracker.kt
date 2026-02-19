@@ -82,7 +82,7 @@ object KuudraCarryStateTracker : ICarryStateTracker<KuudraCarryStateTracker.Trac
     override fun s(carry: TrackedCarry): JsonObject {
         return JsonObject().apply {
             addProperty("total", carry.total)
-            addProperty("tier", carry.tier.tier)
+            addProperty("tier", carry.tier.int)
             addProperty("completed", carry.completed)
             addProperty("lastCompletion", carry.lastCompletionTime)
             addProperty("firstCompletion", carry.firstCompletionTime)

@@ -1,6 +1,6 @@
 package xyz.aerii.athen.api.kuudra.enums
 
-enum class KuudraTier(val tier: Int) {
+enum class KuudraTier(val int: Int) {
     BASIC(1),
     HOT(2),
     BURNING(3),
@@ -15,6 +15,6 @@ enum class KuudraTier(val tier: Int) {
 
     companion object {
         fun get(int: Int): KuudraTier? =
-            KuudraTier.entries.firstOrNull { it.tier == int }
+            KuudraTier.entries.firstOrNull { it.int == int }
     }
 }

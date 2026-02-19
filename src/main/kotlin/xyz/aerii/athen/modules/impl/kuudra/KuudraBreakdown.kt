@@ -59,8 +59,8 @@ object KuudraBreakdown : Module(
                 p.fuel++
             } ?: return@on
 
-            val tier = KuudraAPI.tier?.tier ?: return@on
-            if (tier < KuudraTier.BURNING.tier) return@on
+            val tier = KuudraAPI.tier?.int ?: return@on
+            if (tier < KuudraTier.BURNING.int) return@on
 
             stunRegex.findThenNull(stripped, "user") { (user) ->
                 val p = set.find { it.name == user } ?: return@findThenNull
