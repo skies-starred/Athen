@@ -12,6 +12,7 @@ import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.handlers.Smoothie.showTitle
 import xyz.aerii.athen.handlers.Texter.parse
+import xyz.aerii.athen.handlers.Typo.command
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
@@ -29,6 +30,8 @@ object FreshTools : Module(
     private val `alert$message$t` by config.textInput("Message", "<red>Fresh tools!").dependsOn { alert && `alert$message` }
     private val `alert$title` by config.switch("Alert title", true).dependsOn { alert }
     private val `alert$title$t` by config.textInput("Title", "<red>Fresh tools!").dependsOn { alert && `alert$title` }
+    private val notify by config.switch("Notify party", true)
+    private val `notify$message` by config.textInput("Notify message", "FRESH").dependsOn { notify }
 
     private val timer = config.hud("Fresh timer") {
         if (it) return@hud sizedText("Fresh: §c6.7s")
@@ -55,9 +58,10 @@ object FreshTools : Module(
 
             time = System.currentTimeMillis()
 
-            if (!alert) return@on
-            if (`alert$message`) `alert$message$t`.parse().modMessage()
-            if (`alert$title`) `alert$title$t`.parse().showTitle()
+            if (!alert && !notify) return@on
+            if (alert && `alert$message`) `alert$message$t`.parse().modMessage()
+            if (alert && `alert$title`) `alert$title$t`.parse().showTitle()
+            if (notify) "pc $`notify$message`".command()
         }
     }
 
