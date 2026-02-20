@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.aerii.athen.events.PacketEvent;
 
-@Mixin(targets = "net.minecraft.network.PacketProcessor$ListenerAndPacket")
+@Mixin(targets = "net.minecraft.network.PacketProcessor$ListenerAndPacket", priority = Integer.MIN_VALUE)
 public class PacketProcessorMixin {
 
     @Shadow

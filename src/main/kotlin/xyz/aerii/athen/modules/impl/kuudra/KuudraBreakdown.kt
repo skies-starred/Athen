@@ -33,7 +33,7 @@ object KuudraBreakdown : Module(
             for (t in KuudraAPI.teammates) set.add(Player(t.name))
         }
 
-        on<MessageEvent.Chat> {
+        on<MessageEvent.Chat.Receive> {
             if (stripped.isEmpty()) return@on
 
             if (stripped == "[NPC] Elle: Good job everyone. A hard fought battle come to an end. Let's get out of here before we run into any more trouble!") {

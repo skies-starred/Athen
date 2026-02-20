@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-@Mixin(BundlerInfo.class)
+@Mixin(value = BundlerInfo.class, priority = Integer.MIN_VALUE)
 public interface BundlerInfoMixin {
 
     @WrapMethod(method = "createForPacket")

@@ -2,7 +2,6 @@ package xyz.aerii.athen.handlers
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
@@ -13,6 +12,7 @@ import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.fabric.event.HypixelModAPICallback
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 import tech.thatgravyboat.skyblockapi.api.SkyBlockAPI
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.entity.ComponentAttachEvent
@@ -28,6 +28,8 @@ import tech.thatgravyboat.skyblockapi.api.events.screen.ItemTooltipEvent
 import tech.thatgravyboat.skyblockapi.api.events.screen.PlayerHotbarChangeEvent
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.*
+import xyz.aerii.athen.events.core.on
+import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
 import kotlin.jvm.optionals.getOrNull
 
@@ -53,13 +55,14 @@ object Signal {
             }
         }
 
-        SpecialGuiElementRegistry.register { graphics ->
-            NVGSpecialRenderer(graphics.vertexConsumers())
+        on<PacketEvent.Receive, ClientboundSystemChatPacket> {
+            mainThread {
+                if (this@on.overlay) MessageEvent.ActionBar(content) else MessageEvent.Chat.Receive(content)
+            }
         }
 
-        ClientReceiveMessageEvents.ALLOW_GAME.register { message, actionBar ->
-            val event = if (actionBar) MessageEvent.ActionBar(message) else MessageEvent.Chat(message)
-            !event.post()
+        SpecialGuiElementRegistry.register { graphics ->
+            NVGSpecialRenderer(graphics.vertexConsumers())
         }
 
         ClientLifecycleEvents.CLIENT_STARTED.register { _ ->

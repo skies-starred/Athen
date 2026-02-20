@@ -89,7 +89,7 @@ object KatReminder : Module(
             }
         }
 
-        on<MessageEvent.Chat> {
+        on<MessageEvent.Chat.Receive> {
             if ("[NPC] Kat: " !in stripped) return@on
 
             when (stripped) {

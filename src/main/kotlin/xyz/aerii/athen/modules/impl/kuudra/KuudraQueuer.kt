@@ -25,7 +25,7 @@ object KuudraQueuer : Module(
     private var disableRequeue: Boolean = false
 
     init {
-        on<MessageEvent.Chat> {
+        on<MessageEvent.Chat.Receive> {
             if (PartyAPI.leader?.name != Smoothie.playerName) return@on
 
             partyRegex.findOrNull(stripped, "message") { (message) ->

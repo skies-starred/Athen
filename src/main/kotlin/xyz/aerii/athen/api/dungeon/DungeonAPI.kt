@@ -176,7 +176,7 @@ object DungeonAPI {
             }
         }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
 
-        on<MessageEvent.Chat> {
+        on<MessageEvent.Chat.Receive> {
             playerGhostRegex.findThenNull(stripped, "name") { (name) ->
                 var name = name
                 if (name == "You") Smoothie.player?.let { name = it.name.stripped() }

@@ -117,7 +117,7 @@ object SlayerCarryTracker : Module(
             for (t in tracked.values) t.clean()
         }
 
-        on<MessageEvent.Chat> {
+        on<MessageEvent.Chat.Receive> {
             tradeCompleteRegex.findThenNull(stripped, "player") { (player) ->
                 recentTradeWith = player
             } ?: return@on

@@ -154,7 +154,7 @@ object KuudraAPI {
             }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
 
-        on<MessageEvent.Chat> {
+        on<MessageEvent.Chat.Receive> {
             when {
                 stripped == "[NPC] Elle: Okay adventurers, I will go and fish up Kuudra!" -> {
                     KuudraEvent.Start.post()

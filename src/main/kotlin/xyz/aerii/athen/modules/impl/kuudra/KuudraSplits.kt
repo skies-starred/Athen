@@ -142,7 +142,7 @@ object KuudraSplits : Module(
             display = list
         }
 
-        on<MessageEvent.Chat> {
+        on<MessageEvent.Chat.Receive> {
             if (!KuudraAPI.inRun) return@on
             val tier = KuudraAPI.tier?.int ?: return@on
 

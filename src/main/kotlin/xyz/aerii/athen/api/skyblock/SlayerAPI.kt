@@ -27,7 +27,7 @@ object SlayerAPI {
     private val questCompletedRegex = Regex("\\s+SLAYER QUEST COMPLETE!")
 
     init {
-        on<MessageEvent.Chat> {
+        on<MessageEvent.Chat.Receive> {
             when {
                 questStartedRegex.matches(stripped) -> {
                     "SlayerAPI: Quest started!".devMessage()

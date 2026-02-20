@@ -158,7 +158,7 @@ object PartyFinder : Module(
             }
         }
 
-        on<MessageEvent.Chat> {
+        on<MessageEvent.Chat.Receive> {
             if (!joinStats && !canKick) return@on
 
             val username = pfJoinRegex.findGroup(stripped, "name") ?: return@on

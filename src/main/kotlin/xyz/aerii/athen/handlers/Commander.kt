@@ -158,7 +158,7 @@ object Commander {
                                 val message = StringArgumentType.getString(this, "message")
 
                                 if (actionBar) MessageEvent.ActionBar(message.literal()).post()
-                                else MessageEvent.Chat(message.literal()).post()
+                                else MessageEvent.Chat.Receive(message.literal()).post()
 
                                 "<gray>Simulated (actionBar=$actionBar): <red>$message".parse().modMessage()
                             }
