@@ -61,7 +61,7 @@ object BlockPerks : Module(
 
         on<GuiEvent.Slots.Render.Pre> {
             if (!inGui) return@on
-            if (!key.isPressed()) return@on
+            if (key.isPressed()) return@on
 
             val name = slot.item?.hoverName?.stripped()?.substringBeforeLast(" ") ?: return@on
             if (name in blocked) cancel()
@@ -69,7 +69,7 @@ object BlockPerks : Module(
 
         on<GuiEvent.Slots.Click> {
             if (!inGui) return@on
-            if (!key.isPressed()) return@on
+            if (key.isPressed()) return@on
 
             val name = slot?.item?.hoverName?.stripped()?.substringBeforeLast(" ") ?: return@on
             if (name in blocked) cancel()
