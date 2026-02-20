@@ -1,13 +1,14 @@
 package xyz.aerii.athen.events.core
 
 import xyz.aerii.athen.handlers.React
+import java.util.concurrent.atomic.AtomicBoolean
 
 class Node<T : Event>(
     @JvmField val eventClass: Class<T>,
     @JvmField var handler: (T) -> Unit,
     @JvmField val priority: Int
 ) {
-    @Volatile var registered = false
+    private val state = AtomicBoolean(false)
     internal var overridden = false
     internal val conditions = mutableListOf<React<Boolean>>()
 
@@ -20,15 +21,13 @@ class Node<T : Event>(
     }
 
     fun register(): Boolean {
-        if (registered) return false
-        registered = true
+        if (!state.compareAndSet(false, true)) return false
         EventBus.add(this)
         return true
     }
 
     fun unregister(): Boolean {
-        if (!registered) return false
-        registered = false
+        if (!state.compareAndSet(true, false)) return false
         EventBus.remove(this)
         return true
     }

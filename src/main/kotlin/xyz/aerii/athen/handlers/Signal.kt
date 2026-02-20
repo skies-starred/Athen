@@ -57,7 +57,7 @@ object Signal {
 
         on<PacketEvent.Receive, ClientboundSystemChatPacket> {
             mainThread {
-                if (this@on.overlay) MessageEvent.ActionBar(content) else MessageEvent.Chat.Receive(content)
+                (if (this@on.overlay) MessageEvent.ActionBar(content) else MessageEvent.Chat.Receive(content)).post()
             }
         }
 
