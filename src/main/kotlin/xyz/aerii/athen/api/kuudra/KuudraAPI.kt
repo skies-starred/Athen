@@ -36,7 +36,7 @@ object KuudraAPI {
     private val completeRegex = Regex("^\\s+KUUDRA DOWN!")
     private val defeatRegex = Regex("^\\s+DEFEAT")
     private val buildRegex = Regex("Building Progress (?<progress>\\d+)% \\((?<players>\\d) Players Helping\\)")
-    private val progressRegex = Regex("^PROGRESS: \\d+%")
+    private val progressRegex = Regex("^PROGRESS: (?<progress>\\d+)%")
 
     private val set = setOf(KuudraPhase.SUPPLIES, KuudraPhase.FUEL)
     private val set0 = setOf(KuudraSupply.supply, KuudraSupply.fuel)
@@ -147,12 +147,12 @@ object KuudraAPI {
 
                 KuudraPhase.BUILD -> {
                     if (n == "PROGRESS: COMPLETE") {
-                        KuudraSupply.at(pos)?.built = true
+                        KuudraSupply.at(pos, 100)?.built = true
                         return@on
                     }
 
-                    progressRegex.findThenNull(n) {
-                        KuudraSupply.at(pos)?.built = false
+                    progressRegex.findThenNull(n, "progress") { (progress) ->
+                        KuudraSupply.at(pos, progress.toInt())?.built = false
                     } ?: return@on
 
                     buildRegex.findOrNull(n, "progress", "players") { (p0, p1) ->

@@ -1,4 +1,4 @@
-@file:Suppress("ObjectPrivatePropertyName")
+@file:Suppress("ObjectPrivatePropertyName", "Unused")
 
 package xyz.aerii.athen.modules.impl.kuudra
 
@@ -7,10 +7,12 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.kuudra.KuudraAPI
 import xyz.aerii.athen.api.kuudra.enums.KuudraPhase
+import xyz.aerii.athen.api.kuudra.enums.KuudraSupply
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.MessageEvent
+import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Smoothie.showTitle
 import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.command
@@ -32,7 +34,8 @@ object FreshTools : Module(
     private val `alert$title` by config.switch("Alert title", true).dependsOn { alert }
     private val `alert$title$t` by config.textInput("Title", "<red>Fresh tools!").dependsOn { alert && `alert$title` }
     private val notify by config.switch("Notify party", true)
-    private val `notify$message` by config.textInput("Notify message", "FRESH").dependsOn { notify }
+    private val `notify$message` by config.textInput("Notify message", "FRESH [#buildPerc]").dependsOn { notify }
+    private val `notify$unused` by config.textParagraph("Variable: <red>#buildPerc").dependsOn { notify }
     private val `notify$checkParty` by config.switch("Check party", true).dependsOn { notify }
 
     private val timer = config.hud("Fresh timer") {
@@ -63,12 +66,19 @@ object FreshTools : Module(
             if (!alert && !notify) return@on
             if (alert && `alert$message`) `alert$message$t`.parse().modMessage()
             if (alert && `alert$title`) `alert$title$t`.parse().showTitle()
-            if (notify && (!`notify$checkParty` || PartyAPI.inParty)) "pc $`notify$message`".command()
+            if (notify && (!`notify$checkParty` || PartyAPI.inParty)) fn0()
         }
     }
 
     private fun fn(): Pair<Int, Int>? {
         time = -1
         return null
+    }
+
+    private fun fn0() {
+        val vector = client.player?.blockPosition() ?: return
+        val int = KuudraSupply.every.minByOrNull { it.buildPos.distSqr(vector) }?.progress ?: return
+        val a = `notify$message`.replace("#buildPerc", "$int%")
+        "pc $a".command()
     }
 }

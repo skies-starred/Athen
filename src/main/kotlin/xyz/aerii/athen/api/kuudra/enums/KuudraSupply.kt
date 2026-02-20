@@ -23,16 +23,18 @@ object KuudraSupply {
     fun reset() =
         every.forEach(ISupply::reset)
 
-    fun at(pos: BlockPos): ISupply? =
-        every.find { it.buildPos == pos }
+    fun at(pos: BlockPos, progress: Int? = null): ISupply? =
+        every.find { it.buildPos == pos }?.also { it.progress = progress }
 
     open class ISupply(val buildPos: BlockPos) {
         val buildAABB = buildPos.markerAABB()
 
+        var progress: Int? = null
         var built = false
         var active = false
 
         fun reset() {
+            progress = null
             built = false
             active = false
         }
