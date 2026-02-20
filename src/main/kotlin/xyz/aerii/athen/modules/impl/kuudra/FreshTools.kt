@@ -2,6 +2,7 @@
 
 package xyz.aerii.athen.modules.impl.kuudra
 
+import tech.thatgravyboat.skyblockapi.api.profile.party.PartyAPI
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.kuudra.KuudraAPI
@@ -32,6 +33,7 @@ object FreshTools : Module(
     private val `alert$title$t` by config.textInput("Title", "<red>Fresh tools!").dependsOn { alert && `alert$title` }
     private val notify by config.switch("Notify party", true)
     private val `notify$message` by config.textInput("Notify message", "FRESH").dependsOn { notify }
+    private val `notify$checkParty` by config.switch("Check party", true).dependsOn { notify }
 
     private val timer = config.hud("Fresh timer") {
         if (it) return@hud sizedText("Fresh: §c6.7s")
@@ -61,7 +63,7 @@ object FreshTools : Module(
             if (!alert && !notify) return@on
             if (alert && `alert$message`) `alert$message$t`.parse().modMessage()
             if (alert && `alert$title`) `alert$title$t`.parse().showTitle()
-            if (notify) "pc $`notify$message`".command()
+            if (notify && (!`notify$checkParty` || PartyAPI.inParty)) "pc $`notify$message`".command()
         }
     }
 
