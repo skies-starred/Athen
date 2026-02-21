@@ -54,8 +54,6 @@ dependencies {
     shadow(libs.classgraph)
     shadow(libs.autoupdate)
     shadow("omnicore".mc(mc))
-    shadow("olympus".mc(mc))
-    shadow("rlib".mc(mc))
     shadow(libs.lwjgl.nanovg)
     for (p in platforms) shadow("${libs.lwjgl.nanovg.get()}:natives-$p")
 

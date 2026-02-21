@@ -7,10 +7,6 @@ import xyz.aerii.athen.handlers.Smoothie.client
 
 operator fun Vec3.unaryMinus(): Vec3 = Vec3(-x, -y, -z)
 
-fun Number.toScaleMC(): Float {
-    return (this.toFloat() / client.window.guiScale.toFloat())
-}
-
 inline val Entity.renderX: Double
     get() =
         xo + (x - xo) * client.deltaTracker.getGameTimeDeltaPartialTick(true)
