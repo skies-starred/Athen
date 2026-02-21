@@ -55,7 +55,7 @@ object BuildInfo : Module(
             if (it) return@hud sizedText("§7Builders: §c3\n§7Progress: §c47%")
             if (!render) return@hud null
 
-            sizedText("§7Builders: §c${KuudraAPI.buildPlayers}\n§7Progress: §c${KuudraAPI.buildProgress}%")
+            sizedText("§7Builders: §c${KuudraAPI.buildPlayers}\n§7Progress: §c${KuudraAPI.buildProgress.value}%")
         }
 
         on<KuudraEvent.Start> {
