@@ -15,12 +15,6 @@ fabric-api-1-21-11 = "0.140.2+1.21.11"
 modmenu-1-21-10 = "16.0.0-rc.1"
 modmenu-1-21-11 = "17.0.0-alpha.1"
 
-olympus-1-21-10 = "1.6.2"
-olympus-1-21-11 = "1.7.0"
-
-rlib-1-21-10 = "3.9.0"
-rlib-1-21-11 = "3.11.0"
-
 parchment-1-21-10 = "2025.10.12"
 parchment-1-21-11 = "2025.12.20"
 
@@ -50,12 +44,6 @@ modmenu-1-21-11 = { module = "com.terraformersmc:modmenu", version.ref = "modmen
 
 omnicore-1-21-10 = { module = "dev.deftu:omnicore-1.21.10-fabric", version.ref = "omnicore" }
 omnicore-1-21-11 = { module = "dev.deftu:omnicore-1.21.11-fabric", version.ref = "omnicore" }
-
-olympus-1-21-10 = { module = "earth.terrarium.olympus:olympus-fabric-1.21.9", version.ref = "olympus-1-21-10" }
-olympus-1-21-11 = { module = "earth.terrarium.olympus:olympus-fabric-1.21.11", version.ref = "olympus-1-21-11" }
-
-rlib-1-21-10 = { module = "com.teamresourceful.resourcefullib:resourcefullib-fabric-1.21.9", version.ref = "rlib-1-21-10" }
-rlib-1-21-11 = { module = "com.teamresourceful.resourcefullib:resourcefullib-fabric-1.21.11", version.ref = "rlib-1-21-11" }
 
 parchment-1-21-10 = { module = "org.parchmentmc.data:parchment-1.21.10", version.ref = "parchment-1-21-10" }
 parchment-1-21-11 = { module = "org.parchmentmc.data:parchment-1.21.11", version.ref = "parchment-1-21-11" }
