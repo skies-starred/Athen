@@ -32,11 +32,11 @@ enum class KuudraPhase(val tiers: IntRange = KuudraTier.BASIC.int..KuudraTier.IN
             return (endTick - startTick).coerceAtLeast(0)
         }
 
-    val str: String
-        get() {
-            if (this == Fuel && (KuudraAPI.tier?.int ?: 0) >= KuudraTier.BURNING.int) return "Eaten"
-            return name.lowercase().replaceFirstChar { it.uppercase() }
-        }
+    fun str(type: String? = null): String {
+        if (type?.lowercase() == "eaten") return "Eaten"
+        if (this == Fuel && (KuudraAPI.tier?.int ?: 0) >= KuudraTier.BURNING.int) return "Eaten"
+        return name.lowercase().replaceFirstChar { it.uppercase() }
+    }
 
     val active: Boolean
         get() = started && !ended

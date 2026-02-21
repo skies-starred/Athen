@@ -49,6 +49,7 @@ object Commander {
         "/${Athen.modId} clear chat" to "Clear the chat history",
         "/${Athen.modId} stats <name>" to "View stats for any player",
         "/${Athen.modId} times slayers" to "Shows the slayer kill times",
+        "/${Athen.modId} times kuudra <tier>" to "Shows the kuudra pbs",
         "/${Athen.modId} update [stream]" to "Install updates (release/beta/alpha)",
         "/${Athen.modId} checkupdate [stream]" to "Check for available updates"
     )

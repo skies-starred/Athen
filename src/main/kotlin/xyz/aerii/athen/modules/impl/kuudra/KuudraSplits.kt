@@ -2,8 +2,10 @@
 
 package xyz.aerii.athen.modules.impl.kuudra
 
+import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.serialization.Codec
 import net.minecraft.network.chat.Component
+import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.kuudra.KuudraAPI
@@ -11,6 +13,7 @@ import xyz.aerii.athen.api.kuudra.enums.KuudraPhase
 import xyz.aerii.athen.api.kuudra.enums.KuudraTier
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
+import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.TickEvent
@@ -18,6 +21,7 @@ import xyz.aerii.athen.events.core.override
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Texter.parse
+import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
@@ -70,6 +74,36 @@ object KuudraSplits : Module(
             display = null
         }.override()
 
+        on<CommandRegistration> {
+            event.register(Athen.modId) {
+                then("times") {
+                    then("kuudra") {
+                        thenCallback("tier", IntegerArgumentType.integer(1, 5)) {
+                            val tier = IntegerArgumentType.getInteger(this, "tier")
+                            val splits = KuudraPhase.entries.filter { tier in it.tiers }
+                            val pbs = splits.associateWith { PB.get(tier, it) }
+
+                            if (pbs.values.all { it == 0L }) {
+                                "<red>No Kuudra splits for tier $tier. Did you have \"Kuudra Splits\" enabled?".parse().modMessage(Typo.PrefixType.ERROR)
+                                return@thenCallback
+                            }
+
+                            "<yellow>PBs for <red>Kuudra T$tier:".parse().modMessage()
+
+                            for (s in splits) {
+                                val pb = pbs[s]?.toDurationFromMillis(secondsDecimals = 1) ?: continue
+                                val type = if (s == KuudraPhase.Fuel && tier >= KuudraTier.BURNING.int) "eaten" else null
+                                " <dark_gray>• <red>${s.str(type)}<r>: $pb".parse().lie()
+                            }
+
+                            val overall = PB.get(tier, null).toDurationFromMillis(secondsDecimals = 1)
+                            " <dark_gray>• <red>Overall<r>: $overall".parse().lie()
+                        }
+                    }
+                }
+            }
+        }
+
         on<KuudraEvent.End.Success> {
             val tier = KuudraAPI.tier?.int ?: return@on
             val splits = KuudraPhase.entries.filter { tier in it.tiers }
@@ -93,7 +127,7 @@ object KuudraSplits : Module(
                     val t1 = (s.durTicks / 20.0).toDuration(secondsDecimals = 1)
                     val delta = pBs[s].let { if (it != null && it > 0) s.durTime - it else Long.MAX_VALUE }.strD()
 
-                    " <dark_gray>• <red>${s.str}<r>: $t0 <gray>[$t1]$delta".parse().lie()
+                    " <dark_gray>• <red>${s.str()}<r>: $t0 <gray>[$t1]$delta".parse().lie()
                 }
 
                 val d0 = splits.sumOf { it.durTime }
@@ -109,6 +143,7 @@ object KuudraSplits : Module(
 
         on<TickEvent.Client> {
             if (!KuudraAPI.inRun) return@on
+            if (!_hud.enabled) return@on
             val tier = KuudraAPI.tier?.int ?: return@on
             val splits = KuudraPhase.entries.filter { tier in it.tiers }
             val list = mutableListOf<Component>()
@@ -118,7 +153,7 @@ object KuudraSplits : Module(
                 val d1 = (s.durTicks / 20.0).toDuration(secondsDecimals = 1)
                 val pb = PB.get(tier, s).toDurationFromMillis(secondsDecimals = 1)
 
-                list += s.style.prs(s.str, d0, d1, pb)
+                list += s.style.prs(s.str(), d0, d1, pb)
             }
 
             val d0 = splits.sumOf { it.durTime }.toDurationFromMillis(secondsDecimals = 1)
