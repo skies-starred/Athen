@@ -42,9 +42,16 @@ object ModUpdater {
             val local = Athen.modVersion.parse()
             val remote = element.asString.parse()
 
-            return local
-                .zip(remote + List(maxOf(0, local.size - remote.size)) { 0 })
-                .any { (l, r) -> l < r }
+            val maxLength = maxOf(local.size, remote.size)
+            val l = local + List(maxLength - local.size) { 0 }
+            val r = remote + List(maxLength - remote.size) { 0 }
+
+            for (i in 0 until maxLength) {
+                if (l[i] < r[i]) return true
+                if (l[i] > r[i]) return false
+            }
+
+            return false
         }
     }
 
@@ -52,7 +59,7 @@ object ModUpdater {
         return context.checkUpdate(stream)
     }
 
-    fun checkAndNotify(stream: String = "release") {
+    fun checkAndNotify(stream: String = "release", silent: Boolean = true) {
         checkForUpdate(stream).thenAccept { update ->
             if (update.isUpdateAvailable) {
                 val newVersion = update.update.versionName
@@ -73,6 +80,9 @@ object ModUpdater {
                     }
                 }
             }
+
+            if (silent) return@thenAccept
+            "No update available!".modMessage()
         }.exceptionally {
             Athen.LOGGER.error("Failed to check for updates: ${it.message}")
             null
