@@ -106,6 +106,16 @@ object KuudraAPI {
             else if (phase == KuudraPhase.Fuel) for (f in fuels) f.nearby = players.any { f.radAABB.contains(it.position()) }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
 
+        // Elle sometimes does not send the end dialogue if another dialogue sequence is active,
+        // that is when she is eaten by Kuudra and the run ends. Love hypixel and their bugs.
+        on<EntityEvent.Update.Health> {
+            if (!inRun) return@on
+            if ((tier?.int ?: 0) < KuudraTier.BURNING.int) return@on
+            if (phase != KuudraPhase.DPS) return@on
+            if (entity != kuudra) return@on
+            if (new <= 2f) phase = KuudraPhase.Kill.start()
+        }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
+
         on<EntityEvent.Update.Equipment> {
             if (!inRun) return@on
             val phase = phase ?: return@on
