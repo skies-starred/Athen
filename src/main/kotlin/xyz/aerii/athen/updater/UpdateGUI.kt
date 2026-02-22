@@ -101,7 +101,7 @@ class UpdateGUI(
         NVGRenderer.drawRectangle(scaledX, scaledY, scaledW, scaledH, color, 8f)
 
         val textWidth = NVGRenderer.getTextWidth(text, 16f, NVGRenderer.defaultFont)
-        NVGRenderer.drawText(text, centerX - textWidth / 2f, centerY - 8f, 16f, Mocha.Text.argb, NVGRenderer.defaultFont)
+        NVGRenderer.drawText(text, centerX - textWidth / 2f, centerY - 8f, 16f, Mocha.Base.argb, NVGRenderer.defaultFont)
     }
 
     override fun onScramMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {
