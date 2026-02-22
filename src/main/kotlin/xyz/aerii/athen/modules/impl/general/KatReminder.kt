@@ -16,9 +16,9 @@ import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Commander
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Smoothie.showTitle
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.modMessage
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.fromLongDuration
 import xyz.aerii.athen.utils.toDurationFromMillis

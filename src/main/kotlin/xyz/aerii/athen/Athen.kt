@@ -14,8 +14,6 @@ import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.*
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Texter.onHover
-import xyz.aerii.athen.handlers.Texter.onUrl
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.centeredText
 import xyz.aerii.athen.handlers.Typo.devMessage
 import xyz.aerii.athen.handlers.Typo.lie
@@ -86,11 +84,7 @@ object Athen : ClientModInitializer {
         "  §b/$modId help §7- View all commands".lie()
         "".lie()
 
-        "§7Need help? Click to join our Discord!"
-            .literal()
-            .onUrl(discordUrl)
-            .onHover("Click to join!".literal().withColor(Mocha.Lavender.argb))
-            .lie()
+        "<hover:<${Mocha.Lavender.argb}>Click to join!><click:url:$discordUrl><gray>Need help? Click to join our Discord!".parse().lie()
 
         divider.lie()
     }

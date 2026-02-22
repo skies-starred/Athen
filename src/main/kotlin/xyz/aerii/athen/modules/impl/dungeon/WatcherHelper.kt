@@ -16,9 +16,9 @@ import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Smoothie.alert
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.onHover
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.hud.HUDElement
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText

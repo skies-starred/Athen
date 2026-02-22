@@ -12,9 +12,9 @@ import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.handlers.Smoothie.alert
 import xyz.aerii.athen.handlers.Smoothie.level
 import xyz.aerii.athen.handlers.Smoothie.mainThread
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 
 @Load

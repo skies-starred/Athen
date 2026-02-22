@@ -36,11 +36,11 @@ import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Texter.onHover
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.command
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.repeatBreak
 import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.*

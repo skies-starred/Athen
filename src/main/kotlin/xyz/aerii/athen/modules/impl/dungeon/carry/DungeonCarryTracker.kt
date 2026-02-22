@@ -19,12 +19,12 @@ import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.DungeonEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.handlers.Texter.literal
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.centeredText
 import xyz.aerii.athen.handlers.Typo.command
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.Typo.repeatBreak
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.dungeon.carry.DungeonCarryStateTracker.tracked
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha

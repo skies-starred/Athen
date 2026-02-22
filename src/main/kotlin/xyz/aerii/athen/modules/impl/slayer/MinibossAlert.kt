@@ -10,9 +10,9 @@ import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Smoothie.alert
 import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Toaster.toast
 import xyz.aerii.athen.handlers.Typo.modMessage
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 
 @Load

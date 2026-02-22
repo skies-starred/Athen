@@ -10,11 +10,10 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.handlers.Smoothie
-import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Texter.onHover
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 
 @Load
@@ -56,7 +55,7 @@ object KuudraBreakdown : Module(
 
                 "<red>Run breakdown:".parse().modMessage()
                 for (p in set) {
-                    if (p.fresh > 0) fresh.add("§c${p.name}§f: ${p.fresh}")
+                    if (p.fresh > 0) fresh.add("<red>${p.name}<white>: ${p.fresh}")
 
                     " • <yellow>${p.name} <gray>- <red>${p.supply} <r>Supplies <gray>| <red>${p.fuel} <r>Fuels <gray>| <red>${p.deaths ?: "???"} <r>Deaths".parse().apply {
                         if (p.stun > 0) onHover("<red>${p.stun} <r>Stuns".parse())
@@ -64,9 +63,9 @@ object KuudraBreakdown : Module(
                 }
 
                 val total = set.sumOf { it.fresh }
-                " • <orange>Freshens: <red>$total".parse().apply {
-                    if (fresh.isNotEmpty()) onHover(fresh.joinToString("\n").literal())
-                }.lie()
+
+                if (fresh.isNotEmpty()) " • <hover:${fresh.joinToString("\n")}><orange>Freshens: <red>$total".parse().lie()
+                else " • <orange>Freshens: <red>$total".parse().lie()
 
                 return@on
             }

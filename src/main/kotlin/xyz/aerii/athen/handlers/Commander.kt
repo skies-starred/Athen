@@ -14,7 +14,6 @@ import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.literal
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Toaster.toast
 import xyz.aerii.athen.handlers.Typo.centeredText
 import xyz.aerii.athen.handlers.Typo.lie

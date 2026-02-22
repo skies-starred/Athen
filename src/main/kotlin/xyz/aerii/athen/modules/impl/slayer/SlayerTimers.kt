@@ -12,10 +12,10 @@ import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Texter.onHover
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.Typo.repeatBreak
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.toDuration

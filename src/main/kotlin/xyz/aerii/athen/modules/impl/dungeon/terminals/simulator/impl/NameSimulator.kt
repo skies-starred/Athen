@@ -7,9 +7,9 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
 import xyz.aerii.athen.handlers.Texter.literal
-import xyz.aerii.athen.handlers.Texter.parse
 import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.modMessage
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.ITerminalSim
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.SimulatorMenu
 import xyz.aerii.athen.utils.glint

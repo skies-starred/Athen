@@ -7,17 +7,13 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
-import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.command
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.hover
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.suggest
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.url
-import xyz.aerii.athen.utils.EMPTY_COMPONENT
 import java.util.*
 
 object Texter {
-    private val COLOR_PATTERN = Regex("<(#?[0-9a-fA-F]{6}|0x[0-9a-fA-F]{6})>")
-    private val RESET_PATTERN = Regex("<r>")
     val COLORS = mapOf(
         "black" to TextColor.BLACK,
         "dark_blue" to TextColor.DARK_BLUE,
@@ -38,50 +34,13 @@ object Texter {
         "white" to TextColor.WHITE
     )
 
-    const val RESET = "§r"
-    const val BOLD = "§l"
-    const val ITALIC = "§o"
-    const val UNDERLINE = "§n"
-    const val STRIKETHROUGH = "§m"
-    const val OBFUSCATED = "§k"
-
     @JvmStatic
     val colorToFormat: Map<net.minecraft.network.chat.TextColor, ChatFormatting> =
         ChatFormatting.entries.mapNotNull { f -> net.minecraft.network.chat.TextColor.fromLegacyFormat(f)?.let { it to f } }.toMap()
 
     @JvmStatic
-    fun String.parse(whiteBase: Boolean = false): MutableComponent {
-        val result = EMPTY_COMPONENT.copy()
-        var currentColor = 0xFFFFFF
-        var baseColor = 0xFFFFFF
-
-        val len = length
-        var textStart = 0
-        var i = 0
-
-        while (i < len) {
-            if (this[i] != '<') {
-                i++
-                continue
-            }
-
-            val end = indexOf('>', i + 1).takeIf { it != -1 } ?: break
-            val tag = substring(i + 1, end).trim().lowercase()
-            val newColor = if (tag == "r") baseColor else COLORS[tag] ?: tag.toIntOrNull()
-
-            if (newColor != null) {
-                if (i > textStart) result.append(substring(textStart, i).literal { color = currentColor })
-                currentColor = newColor
-                if (tag != "r" && i == textStart && !whiteBase) baseColor = newColor
-                textStart = end + 1
-            }
-
-            i = end + 1
-        }
-
-        if (textStart < len) result.append(substring(textStart).literal { color = currentColor })
-        return result
-    }
+    @Deprecated("Use ParserKt.parse()")
+    fun String.parse(): MutableComponent = parse(false)
 
     @JvmStatic
     fun Component.colorCoded(): String {
@@ -124,8 +83,6 @@ object Texter {
         url = string
     }
 
-    private fun String.toColor(): Int? = COLORS[trim().lowercase()]
-
     private fun Component.parse(sb: StringBuilder) {
         contents.visit({ style, text ->
             sb.appender(style)
@@ -135,13 +92,12 @@ object Texter {
     }
 
     private fun StringBuilder.appender(style: Style) {
-        append(RESET)
+        append("§r")
         style.color?.let { colorToFormat[it] }?.let { append("§${it.char}") }
-
-        if (style.isBold) append(BOLD)
-        if (style.isItalic) append(ITALIC)
-        if (style.isUnderlined) append(UNDERLINE)
-        if (style.isStrikethrough) append(STRIKETHROUGH)
-        if (style.isObfuscated) append(OBFUSCATED)
+        if (style.isBold) append("§l")
+        if (style.isItalic) append("§o")
+        if (style.isUnderlined) append("§n")
+        if (style.isStrikethrough) append("§m")
+        if (style.isObfuscated) append("§k")
     }
 }
