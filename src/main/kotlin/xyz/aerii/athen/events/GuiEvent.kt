@@ -52,6 +52,12 @@ sealed class GuiEvent {
                 val graphics: GuiGraphics,
                 val slot: Slot
             ) : Event()
+
+            data class Update(
+                val graphics: GuiGraphics,
+                val slot: Slot,
+                val renders: MutableList<(GuiGraphics, Slot) -> Unit>
+            ) : CancellableEvent()
         }
 
         data class Click (
@@ -60,6 +66,10 @@ sealed class GuiEvent {
             val mouseButton: Int,
             val clickType: ClickType
         ) : CancellableEvent()
+
+        data class Hover(
+            val slot: Slot
+        ) : Event()
     }
 
     sealed class Tooltip {

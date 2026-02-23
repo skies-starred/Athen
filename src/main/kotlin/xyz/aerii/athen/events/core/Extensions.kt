@@ -1,8 +1,9 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package xyz.aerii.athen.events.core
 
 import net.minecraft.network.protocol.Packet
-import xyz.aerii.athen.events.CommandRegistration
-import xyz.aerii.athen.events.PacketEvent
+import xyz.aerii.athen.events.*
 import xyz.aerii.athen.handlers.React
 
 inline fun <reified T : Event> on(

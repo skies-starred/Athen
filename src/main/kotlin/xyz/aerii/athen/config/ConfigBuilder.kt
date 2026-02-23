@@ -101,6 +101,7 @@ class ConfigBuilder(
         private val data: ConfigManager.ElementData
     ) {
         private val dependencies = mutableListOf<() -> Boolean>()
+        private val calls = mutableListOf<(OptionHandler<T>) -> Unit>()
         private var parentKey: String? = null
         private var uniqueKey: String? = null
 
@@ -117,6 +118,10 @@ class ConfigBuilder(
             uniqueKey = key
         }
 
+        fun resolve(block: (OptionHandler<T>) -> Unit) = apply {
+            calls.add(block)
+        }
+
         fun custom(key: String): OptionHandler<T> {
             val fullKey = "$configKey.$key"
             feature.option(fullKey.data())
@@ -126,7 +131,7 @@ class ConfigBuilder(
         operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): OptionHandler<T> {
             val fullKey = "$configKey.${uniqueKey ?: property.name}"
             feature.option(fullKey.data())
-            return OptionHandler(fullKey, default)
+            return OptionHandler(fullKey, default).also { for (c in calls) c.invoke(it) }
         }
 
         private fun String.data(): ConfigManager.ElementData {

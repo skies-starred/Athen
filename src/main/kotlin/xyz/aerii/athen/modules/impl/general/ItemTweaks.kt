@@ -2,7 +2,6 @@
 
 package xyz.aerii.athen.modules.impl.general
 
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
@@ -12,17 +11,15 @@ import tech.thatgravyboat.skyblockapi.api.item.calculator.getItemValue
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.translate
 import tech.thatgravyboat.skyblockapi.utils.extentions.format
-import tech.thatgravyboat.skyblockapi.utils.extentions.getHoveredSlot
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
-import xyz.aerii.athen.accessors.invalidate
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.athen.handlers.Itemizer.`watch$tooltip`
 import xyz.aerii.athen.handlers.Texter.colorCoded
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
@@ -65,16 +62,18 @@ object ItemTweaks : Module(
     private val `showItemHex$style` by config.textInput("Style", "&7Color: #hex").dependsOn { showItemHex.value }.childOf { tooltipExpandable }
     private val `showItemHex$color` by config.switch("Color the hex").dependsOn { showItemHex.value }.childOf { tooltipExpandable }
     private val `showItemHex$box` by config.switch("Display color box", true).dependsOn { showItemHex.value }.childOf { tooltipExpandable }
-    private val `showItemHex$keybind` by config.keybind("Keybind").dependsOn { showItemHex.value }.childOf { tooltipExpandable }
+    private val `showItemHex$keybind` by config.keybind("Keybind").`watch$tooltip`().dependsOn { showItemHex.value }.childOf { tooltipExpandable }
 
     init {
-        on<GuiEvent.Slots.Render.Post> {
+        on<GuiEvent.Slots.Render.Update> {
             if (slot.item.item != Items.CAKE) return@on
 
             cakeRegex.findOrNull(slot.item.displayName.stripped(), "year") {
-                graphics.pushPop {
-                    graphics.translate(slot.x, slot.y + 8)
-                    graphics.sizedText("§b${it.component1()}")
+                renders.add { graphics, slot ->
+                    graphics.pushPop {
+                        graphics.translate(slot.x, slot.y + 8)
+                        graphics.sizedText("§b${it.component1()}")
+                    }
                 }
             }
         }.runWhen(cakeNumbers.state)
@@ -118,16 +117,6 @@ object ItemTweaks : Module(
 
             tooltip.add(str.price().literal())
         }
-
-        on<GuiEvent.Input.Key.Press> {
-            if (`showItemHex$keybind` == -1) return@on
-            if (`showItemHex$keybind` == keyEvent.key()) (client.screen as? AbstractContainerScreen<*>)?.getHoveredSlot()?.item?.invalidate()
-        }.runWhen(showItemHex.state)
-
-        on<GuiEvent.Input.Key.Release> {
-            if (`showItemHex$keybind` == -1) return@on
-            if (`showItemHex$keybind` == keyEvent.key()) (client.screen as? AbstractContainerScreen<*>)?.getHoveredSlot()?.item?.invalidate()
-        }.runWhen(showItemHex.state)
 
         on<GuiEvent.Tooltip.Update> {
             if (`showItemHex$keybind`.isBound() && !`showItemHex$keybind`.isPressed()) return@on

@@ -1,18 +1,16 @@
+@file:Suppress("Unused")
+
 package xyz.aerii.athen.modules.impl.general
 
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import dev.deftu.omnicore.api.client.input.OmniKeys
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
-import tech.thatgravyboat.skyblockapi.utils.extentions.getHoveredSlot
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.italic
-import xyz.aerii.athen.accessors.invalidate
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.handlers.Beacon
-import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.athen.handlers.Itemizer.`watch$tooltip`
 import xyz.aerii.athen.handlers.Texter.colorCoded
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
@@ -30,8 +28,8 @@ object MissingEnchants : Module(
     "Shows missing enchants on the item you hover over.",
     Category.GENERAL
 ) {
-    private val alwaysShow: Boolean by config.switch("Always show")
-    private val keybind: Int by config.keybind("Keybind", OmniKeys.KEY_LEFT_SHIFT.code).dependsOn { !alwaysShow }
+    private val keybind: Int by config.keybind("Keybind", OmniKeys.KEY_LEFT_SHIFT.code).`watch$tooltip`()
+    private val _unused by config.textParagraph("You can unbind the keybind to always show.")
 
     private val typeRegex = Regex("""\b(?:COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC|DIVINE|VERY SPECIAL)\b\s+(?:DUNGEON\s+)?([A-Z]+(?: [A-Z]+)*)""") // https://regex101.com/r/MOQHMf/1
     private val romans = setOf("I","II","III","IV","V","VI","VII","VIII","IX","X")
@@ -50,14 +48,6 @@ object MissingEnchants : Module(
                     pool.asJsonArray.map { it.asString.lowercase() }
                 }
             }
-        }
-
-        on<GuiEvent.Input.Key.Press> {
-            if (keybind == keyEvent.key) (client.screen as? AbstractContainerScreen<*>)?.getHoveredSlot()?.item?.invalidate()
-        }
-
-        on<GuiEvent.Input.Key.Release> {
-            if (keybind == keyEvent.key) (client.screen as? AbstractContainerScreen<*>)?.getHoveredSlot()?.item?.invalidate()
         }
 
         on<GuiEvent.Tooltip.Update> {
