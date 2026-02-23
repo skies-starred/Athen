@@ -15,11 +15,12 @@ import xyz.aerii.athen.utils.render.animations.easeInOutCubic
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.linear
 import xyz.aerii.athen.utils.render.animations.timedValue
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.min
 
 @Priority
 object Notifier {
-    private val notifications = mutableListOf<Notification>()
+    private val notifications = CopyOnWriteArrayList<Notification>()
     lateinit var closeIcon: Image
 
     @JvmStatic
