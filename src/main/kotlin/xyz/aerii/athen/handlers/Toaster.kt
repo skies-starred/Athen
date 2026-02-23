@@ -10,10 +10,11 @@ import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
 import xyz.aerii.athen.utils.render.animations.easeInOutCubic
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.timedValue
+import java.util.concurrent.CopyOnWriteArrayList
 
 @Priority
 object Toaster {
-    private val notifications = mutableListOf<Toast>()
+    private val notifications = CopyOnWriteArrayList<Toast>()
 
     @JvmStatic
     @JvmOverloads
