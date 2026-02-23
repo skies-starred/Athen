@@ -229,6 +229,7 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
 
         fun render(graphics: GuiGraphics): Unit = with (graphics) {
             if (w == 0 || h == 0) fn()
+            val font = client.font ?: return@with
 
             if (dragging) {
                 x = Scurry.x - x0
