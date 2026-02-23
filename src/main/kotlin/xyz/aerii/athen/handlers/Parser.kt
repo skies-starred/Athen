@@ -17,7 +17,6 @@ private class ParseState(val whiteBase: Boolean) {
     var current: MutableComponent = EMPTY_COMPONENT.copy()
     var currentColor = 0xFFFFFF
     var baseColor = 0xFFFFFF
-    var first = false
     var bold = false
     var italic = false
     var underline = false
@@ -113,10 +112,7 @@ fun String.parse(whiteBase: Boolean = false): MutableComponent {
             val colorVal = if (lower == "r") state.baseColor else namedColor ?: numericColor!!
             state.currentColor = colorVal
 
-            if (lower != "r" && !state.whiteBase && !state.first) {
-                state.baseColor = colorVal
-                state.first = true
-            }
+            if (lower != "r" && !state.whiteBase && i == 0) state.baseColor = colorVal
 
             textStart = end + 1
             i = end + 1
