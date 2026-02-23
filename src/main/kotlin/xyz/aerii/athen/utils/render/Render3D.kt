@@ -63,6 +63,9 @@ import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.utils.markerAABB
 import xyz.aerii.athen.utils.render.pipelines.StarredPipelines
 import java.awt.Color
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 //? >= 1.21.11 {
@@ -75,6 +78,8 @@ private data class QueuedBox(val aabb: AABB, val color: Color, val width: Float)
 private data class QueuedFilledBox(val aabb: AABB, val color: Color)
 private data class QueuedBeaconBeam(val pos: BlockPos, val color: Int)
 private data class QueuedText(val text: String, val pos: Vec3, val color: Int, val bgColor: Int, val scale: Float, val shadow: Boolean, val depth: Boolean)
+private data class QueuedCircle(val center: Vec3, val radius: Double, val segments: Int, val color: Color, val width: Float, val normal: Vec3)
+private data class QueuedFilledCircle(val center: Vec3, val radius: Double, val segments: Int, val color: Color, val normal: Vec3)
 
 private class RenderQueue {
     val linesDepth = mutableListOf<QueuedLine>()
@@ -83,6 +88,10 @@ private class RenderQueue {
     val boxesNoDepth = mutableListOf<QueuedBox>()
     val filledBoxesDepth = mutableListOf<QueuedFilledBox>()
     val filledBoxesNoDepth = mutableListOf<QueuedFilledBox>()
+    val circlesDepth = mutableListOf<QueuedCircle>()
+    val circlesNoDepth = mutableListOf<QueuedCircle>()
+    val filledCirclesDepth = mutableListOf<QueuedFilledCircle>()
+    val filledCirclesNoDepth = mutableListOf<QueuedFilledCircle>()
     val beaconBeams = mutableListOf<QueuedBeaconBeam>()
     val texts = mutableListOf<QueuedText>()
 
@@ -93,6 +102,10 @@ private class RenderQueue {
         boxesNoDepth.clear()
         filledBoxesDepth.clear()
         filledBoxesNoDepth.clear()
+        circlesDepth.clear()
+        circlesNoDepth.clear()
+        filledCirclesDepth.clear()
+        filledCirclesNoDepth.clear()
         beaconBeams.clear()
         texts.clear()
     }
@@ -122,6 +135,8 @@ object Render3D {
             flushLines(poseStack)
             flushBoxes(poseStack)
             flushFilledBoxes(poseStack)
+            flushCircles(poseStack)
+            flushFilledCircles(poseStack)
 
             flushBeaconBeams(pose, camera, consumers)
             flushTexts(pose, consumers)
@@ -139,6 +154,28 @@ object Render3D {
     ) {
         if (depthList.isNotEmpty()) block(true, depthList)
         if (noDepthList.isNotEmpty()) block(false, noDepthList)
+    }
+
+    private fun tangentsFor(normal: Vec3): Pair<Vec3, Vec3> {
+        val n = normal.normalize()
+        val arbitrary = if (abs(n.x) < 0.9) Vec3(1.0, 0.0, 0.0) else Vec3(0.0, 1.0, 0.0)
+        val u = n.cross(arbitrary).normalize()
+        val v = n.cross(u).normalize()
+        return u to v
+    }
+
+    private fun circlePoints(center: Vec3, radius: Double, segments: Int, normal: Vec3): Array<Vec3> {
+        val (u, v) = tangentsFor(normal)
+        return Array(segments + 1) { i ->
+            val angle = 2.0 * Math.PI * i / segments
+            val cos = cos(angle)
+            val sin = sin(angle)
+            Vec3(
+                center.x + radius * (u.x * cos + v.x * sin),
+                center.y + radius * (u.y * cos + v.y * sin),
+                center.z + radius * (u.z * cos + v.z * sin)
+            )
+        }
     }
 
     //? >= 1.21.11 {
@@ -304,6 +341,92 @@ object Render3D {
     }
     //? }
 
+    //? >= 1.21.11 {
+    /*private fun flushCircles(poseStack: OmniPoseStack) {
+        forDepth(queue.circlesDepth, queue.circlesNoDepth) { depth, circles ->
+            if (circles.isEmpty()) return@forDepth
+
+            for (c in circles) {
+                Gizmos.circle(c.center, c.radius.toFloat(), GizmoStyle.stroke(c.color.rgb, c.width))
+            }
+        }
+    }
+    *///? } else {
+    private fun flushCircles(poseStack: OmniPoseStack) {
+        forDepth(queue.circlesDepth, queue.circlesNoDepth) { depth, circles ->
+            if (circles.isEmpty()) return@forDepth
+
+            val pipeline = if (depth) StarredPipelines.lines else StarredPipelines.linesNoDepth
+
+            for (circle in circles) {
+                val buffer = pipeline.createBufferBuilder()
+                val pts = circlePoints(circle.center, circle.radius, circle.segments, circle.normal)
+
+                for (i in 0 until circle.segments) {
+                    addLineVertices(
+                        buffer, poseStack,
+                        pts[i].x, pts[i].y, pts[i].z,
+                        pts[i + 1].x, pts[i + 1].y, pts[i + 1].z,
+                        circle.color
+                    )
+                }
+
+                buffer.buildOrThrow().drawAndClose(pipeline) { setLineWidth(circle.width) }
+            }
+        }
+    }
+    //? }
+
+    //? >= 1.21.11 {
+    /*private fun flushFilledCircles(poseStack: OmniPoseStack) {
+        forDepth(queue.filledCirclesDepth, queue.filledCirclesNoDepth) { depth, circles ->
+            if (circles.isEmpty()) return@forDepth
+
+            for (c in circles) {
+                Gizmos.circle(c.center, c.radius.toFloat(), GizmoStyle.fill(c.color.rgb))
+            }
+        }
+    }
+    *///? } else {
+    private fun flushFilledCircles(poseStack: OmniPoseStack) {
+        forDepth(queue.filledCirclesDepth, queue.filledCirclesNoDepth) { depth, circles ->
+            if (circles.isEmpty()) return@forDepth
+
+            val pipeline = if (depth) StarredPipelines.triangleStrip else StarredPipelines.triangleStripNoDepth
+            val buffer = pipeline.createBufferBuilder()
+
+            for (circle in circles) {
+                val pts = circlePoints(circle.center, circle.radius, circle.segments, circle.normal)
+                val n = circle.segments
+
+                val indices = buildList {
+                    var lo = 0
+                    var hi = n - 1
+                    while (lo <= hi) {
+                        add(lo++)
+                        if (lo <= hi) add(hi--)
+                    }
+                }
+
+                val first = pts[indices[0]]
+                buffer.vertex(poseStack, first.x, first.y, first.z).color(circle.color).next()
+                buffer.vertex(poseStack, first.x, first.y, first.z).color(circle.color).next()
+
+                for (idx in indices) {
+                    val p = pts[idx]
+                    buffer.vertex(poseStack, p.x, p.y, p.z).color(circle.color).next()
+                }
+
+                val last = pts[indices.last()]
+                buffer.vertex(poseStack, last.x, last.y, last.z).color(circle.color).next()
+                buffer.vertex(poseStack, last.x, last.y, last.z).color(circle.color).next()
+            }
+
+            buffer.buildOrThrow().drawAndClose(pipeline)
+        }
+    }
+    //? }
+
     /**
      * @see net.minecraft.client.renderer.blockentity.BeaconRenderer
      */
@@ -426,8 +549,15 @@ object Render3D {
         backgroundColor: Int = 0,
         scale: Float = 1f,
         depthTest: Boolean = true,
-        shadow: Boolean = true
+        shadow: Boolean = true,
+        increase: Boolean = false
     ) {
+        var scale = scale
+        if (increase) {
+            val p = client.gameRenderer.mainCamera.position/*? >= 1.21.11 { *//*()*//*? }*/
+            scale *= p.distanceTo(pos).toFloat() / 3f
+        }
+
         queue.texts.add(QueuedText(text, pos, color, backgroundColor, scale, shadow, depthTest))
     }
 
@@ -535,7 +665,65 @@ object Render3D {
         }
     }
 
+    @JvmStatic
+    @JvmOverloads
+    fun drawCircle(
+        center: Vec3,
+        radius: Double,
+        color: Color,
+        segments: Int = 64,
+        normal: Vec3 = Vec3(0.0, 1.0, 0.0),
+        lineWidth: Float = 2f,
+        depthTest: Boolean = true
+    ) {
+        val circleQueue = if (depthTest) queue.circlesDepth else queue.circlesNoDepth
+        circleQueue.add(QueuedCircle(center, radius, segments, color, lineWidth, normal))
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun drawFilledCircle(
+        center: Vec3,
+        radius: Double,
+        color: Color,
+        segments: Int = 64,
+        normal: Vec3 = Vec3(0.0, 1.0, 0.0),
+        depthTest: Boolean = true
+    ) {
+        val filledQueue = if (depthTest) queue.filledCirclesDepth else queue.filledCirclesNoDepth
+        filledQueue.add(QueuedFilledCircle(center, radius, segments, color, normal))
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun drawStyledCircle(
+        center: Vec3,
+        radius: Double,
+        color: Color,
+        style: CircleStyle = CircleStyle.BOTH,
+        segments: Int = 64,
+        normal: Vec3 = Vec3(0.0, 1.0, 0.0),
+        lineWidth: Float = 2f,
+        depthTest: Boolean = true
+    ) {
+        when (style) {
+            CircleStyle.FILLED -> drawFilledCircle(center, radius, color, segments, normal, depthTest)
+            CircleStyle.OUTLINED -> drawCircle(center, radius, color, segments, normal, lineWidth, depthTest)
+            CircleStyle.BOTH -> {
+                val filledColor = Color(color.red, color.green, color.blue, (color.alpha * 0.5f).toInt())
+                drawFilledCircle(center, radius, filledColor, segments, normal, depthTest)
+                drawCircle(center, radius, color, segments, normal, lineWidth, depthTest)
+            }
+        }
+    }
+
     enum class BoxStyle {
+        FILLED,
+        OUTLINED,
+        BOTH
+    }
+
+    enum class CircleStyle {
         FILLED,
         OUTLINED,
         BOTH
