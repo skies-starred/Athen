@@ -22,6 +22,7 @@ import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.mixin.accessors.KeyMappingAccessor
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.athen.utils.isBound
 import xyz.aerii.athen.utils.isPressed
 
 @Load
@@ -120,7 +121,7 @@ object WardrobeKeybinds : Module(
     }
 
     private fun CancellableEvent.fn(key: Int) {
-        if (cancelAll && (override == -1 || !override.isPressed()) && key != (client.options.keyInventory as KeyMappingAccessor).boundKey.value && key != GLFW.GLFW_KEY_ESCAPE) cancel()
+        if (cancelAll && (!override.isBound() || !override.isPressed()) && key != (client.options.keyInventory as KeyMappingAccessor).boundKey.value && key != GLFW.GLFW_KEY_ESCAPE) cancel()
 
         if (System.currentTimeMillis() - lastClick < ping) return
         val player = client.player ?: return

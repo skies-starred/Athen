@@ -12,6 +12,7 @@ import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.athen.utils.isBound
 import xyz.aerii.athen.utils.isPressed
 
 @Load
@@ -69,7 +70,7 @@ object BlockPerks : Module(
 
         on<GuiEvent.Slots.Click> {
             if (!inGui) return@on
-            if (key.isPressed()) return@on
+            if (!key.isBound() || key.isPressed()) return@on
 
             val name = slot?.item?.hoverName?.stripped()?.substringBeforeLast(" ") ?: return@on
             if (name in blocked) cancel()

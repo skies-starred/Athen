@@ -15,12 +15,13 @@ operator fun Pair<Float, Float>.times(k: Number): Pair<Float, Float> =
 operator fun Pair<Double, Double>.times(k: Number): Pair<Double, Double> =
     first * k.toDouble() to second * k.toDouble()
 
-private val ignoreSet = setOf(0, -1)
-
-fun Int.isPressed(): Boolean {
-    if (this in ignoreSet) return true
-    return if (this > 0) OmniKeyboard.isPressed(this) else OmniMouse.isPressed(this)
+fun Int.isPressed(): Boolean = when {
+    this == -1 -> false
+    this > 0 -> OmniKeyboard.isPressed(this)
+    else -> OmniMouse.isPressed(this)
 }
+
+fun Int.isBound(): Boolean = this != -1
 
 /**
  * Abbreviates large numbers with K, M, B suffixes.

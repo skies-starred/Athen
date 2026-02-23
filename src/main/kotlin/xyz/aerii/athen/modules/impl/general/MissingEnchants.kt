@@ -20,6 +20,8 @@ import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.EMPTY_COMPONENT
 import xyz.aerii.athen.utils.enchants
+import xyz.aerii.athen.utils.isBound
+import xyz.aerii.athen.utils.isPressed
 
 @Load
 @OnlyIn(skyblock = true)
@@ -59,7 +61,7 @@ object MissingEnchants : Module(
         }
 
         on<GuiEvent.Tooltip.Update> {
-            if (!alwaysShow && !OmniKeyboard.isPressed(keybind)) return@on
+            if (keybind.isBound() && !keybind.isPressed()) return@on
 
             val a = allEnchants ?: return@on
             val b = enchantPools ?: return@on

@@ -29,6 +29,7 @@ import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.abbreviate
 import xyz.aerii.athen.utils.formatted
+import xyz.aerii.athen.utils.isBound
 import xyz.aerii.athen.utils.isPressed
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.toDurationFromMillis
@@ -129,7 +130,7 @@ object ItemTweaks : Module(
         }.runWhen(showItemHex.state)
 
         on<GuiEvent.Tooltip.Update> {
-            if (!`showItemHex$keybind`.isPressed()) return@on
+            if (`showItemHex$keybind`.isBound() && !`showItemHex$keybind`.isPressed()) return@on
 
             val rgb = item.get(DataComponents.DYED_COLOR)?.rgb ?: return@on
             tooltip.add(1, rgb.hex())
