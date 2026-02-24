@@ -1,3 +1,5 @@
+@file:Suppress("Unused")
+
 package xyz.aerii.athen.modules.impl.kuudra
 
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
@@ -28,14 +30,19 @@ object SupplyWaypoints : Module(
 ) {
     private val dropOff by config.switch("Drop off", true)
     private val dropOffColor by config.colorPicker("Drop off color", Color(Catppuccin.Mocha.Green.argb, true)).dependsOn { dropOff }
+
     private val pickup by config.switch("Pick up", true)
     private val pickupColor by config.colorPicker("Pick up color", Color(Catppuccin.Mocha.Teal.argb, true)).dependsOn { pickup }
+
     private val fuel by config.switch("Fuel", true)
-    private val fuelColor by config.colorPicker("Fuel color", Color(Catppuccin.Mocha.Blue.argb, true))
-    private val changeColor by config.switch("Change color when player nearby", true)
-    private val playerColor by config.colorPicker("Player nearby color", Color(Catppuccin.Mocha.Peach.argb, true)).dependsOn { changeColor }
+    private val fuelColor by config.colorPicker("Fuel color", Color(Catppuccin.Mocha.Blue.argb, true)).dependsOn { fuel }
+
+    private val changeColor by config.switch("Detect player proximity", true)
+    private val playerColor by config.colorPicker("Nearby color", Color(Catppuccin.Mocha.Peach.argb, true)).dependsOn { changeColor }
+
     private val customMessages = config.switch("Custom supply messages", true).custom("customMessages")
-    private val textStyle by config.textInput("Supply text style", "<gray>➤ <red>#user <r>recovered a supply in <red>#time <gray>(#cur/#max)")
+    private val textStyle by config.textInput("Supply text style", "<gray>➤ <red>#user <r>recovered a supply in <red>#time <gray>(#cur/#max)").dependsOn { customMessages.value }
+    private val _unused by config.textParagraph("Variable: <red>#user<r>, <red>#time<r>, <red>#cur<r>, <red>#max").dependsOn { customMessages.value }
 
     private val supplyRegex = Regex("(?:\\[[^]]*] )?(?<user>\\w+) recovered one of Elle's supplies! \\((?<cur>\\d+)/(?<max>\\d+)\\)")
 
