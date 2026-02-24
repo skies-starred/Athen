@@ -103,7 +103,7 @@ fun String.parse(whiteBase: Boolean = false): MutableComponent {
             continue
         }
 
-        val numericColor = lower.toIntOrNull()
+        val numericColor = if (lower.startsWith('#')) lower.drop(1).toIntOrNull(16) else lower.toIntOrNull()
         val namedColor = COLORS[lower]
 
         if (lower == "r" || namedColor != null || numericColor != null) {
