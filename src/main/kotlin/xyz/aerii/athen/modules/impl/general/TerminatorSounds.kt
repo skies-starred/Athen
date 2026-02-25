@@ -25,6 +25,7 @@ object TerminatorSounds : Module(
     Category.GENERAL
 ) {
     private var real: SoundEvent? = null
+    private val wall by config.switch("Wall hit sound", true)
     private val s = config.textInput("Sound", "block.note_block.bit").custom("sound")
     private val p by config.slider("Pitch", 1f, 0f, 1f, showDouble = true)
     private val v by config.slider("Volume", 1f, 0f, 1f, showDouble = true)
@@ -48,6 +49,7 @@ object TerminatorSounds : Module(
             val r = real ?: return@on
 
             if (sound == SoundEvents.ARROW_SHOOT) return@on cancel()
+            if (sound == SoundEvents.ARROW_HIT && !wall) return@on cancel()
             if (sound != SoundEvents.ARROW_HIT && sound != SoundEvents.ARROW_HIT_PLAYER) return@on
 
             val i = heldItem ?: return@on

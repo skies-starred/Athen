@@ -7,6 +7,7 @@ import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.api.dungeon.DungeonAPI
 import xyz.aerii.athen.config.Category
+import xyz.aerii.athen.config.ConfigBuilder
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.PacketEvent
@@ -19,7 +20,6 @@ import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.handlers.parse
-import xyz.aerii.athen.hud.HUDElement
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.toDuration
@@ -37,7 +37,7 @@ object WatcherHelper : Module(
     private val speak by config.switch("Show alert on speak", true)
     private val move by config.switch("Show alert on move", true)
 
-    private val hud: HUDElement = config.hud("Blood timers") {
+    private val hud: ConfigBuilder.HUDElementBuilder = config.hud("Blood timers") {
         if (it) return@hud if (showTicks) sizedText("Speak: §c23.4s §7(23.2s)\nMove: §c25.6s §7(24.6s)\nTotal: §c57.3s §7(54.2s)") else sizedText("Speak: §c23.4s\nMove: §c25.6s\nTotal: §c57.3s")
         val display = display ?: return@hud null
         sizedText(display)
