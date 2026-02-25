@@ -56,6 +56,17 @@ object Render2D {
 
     @JvmStatic
     @JvmOverloads
+    fun GuiGraphics.sizedText(
+        component: Component,
+        color: Int = 0xFFFFFFFF.toInt(),
+        shadow: Boolean = true
+    ): Pair<Int, Int> {
+        drawString(client.font, component, 0, 0, color, shadow)
+        return client.font.width(component) to client.font.lineHeight
+    }
+
+    @JvmStatic
+    @JvmOverloads
     @JvmName("drawRectangleColor")
     fun GuiGraphics.drawRectangle(x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
         fill(x, y, x + width, y + height, color.rgb)
