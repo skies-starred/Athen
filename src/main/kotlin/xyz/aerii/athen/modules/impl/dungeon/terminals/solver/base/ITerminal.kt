@@ -63,7 +63,7 @@ abstract class ITerminal(val terminalType: TerminalType) {
         if (slot >= slots) return
 
         val c = forSlot(slot) ?: return
-        if (c.button != mouseButton) return
+        if (c.button != mouseButton && !(terminalType == TerminalType.RUBIX && TerminalSolver.`rubix$left`)) return
         c.click()
     }
 

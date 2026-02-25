@@ -34,6 +34,7 @@ object TerminalSolver : Module(
     val dropKey by config.switch("Allow using drop key", true).childOf { settingsExpandable }
     val keybindL by config.keybind("Keybind left click").childOf { settingsExpandable }
     val keybindR by config.keybind("Keybind right click").childOf { settingsExpandable }
+    val `rubix$left` by config.switch("Rubix: left click only").childOf { settingsExpandable }
 
     private val guiExpandable by config.expandable("GUI")
     val `ui$scale` by config.slider("Scale", 1f, 0.1f, 2f, showDouble = true).childOf { guiExpandable }
