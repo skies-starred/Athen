@@ -12,12 +12,22 @@ object RenderOptimiser :  Module(
     "Cleans up rendering stuff, and maybe optimizes a bit.",
     Category.RENDER
 ) {
+    private val _fog by config.switch("Hide fog", true)
+    private val lavaOverlay by config.switch("Hide lava overlay", true)
     private val fireOverlay by config.switch("Hide fire overlay", true)
     private val entityFire = config.switch("Hide fire on entity", true).dependsOn { fireOverlay }.custom("hideEntityFire")
 
     @JvmStatic
     val fire: Boolean
         get() = react.value && fireOverlay
+
+    @JvmStatic
+    val lava: Boolean
+        get() = react.value && lavaOverlay
+
+    @JvmStatic
+    val fog: Boolean
+        get() = react.value && _fog
 
     init {
         on<WorldRenderEvent.Entity.Pre> {
