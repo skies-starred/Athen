@@ -11,13 +11,13 @@ import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.override
-import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.abbreviate
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.Render3D
 import xyz.aerii.athen.utils.render.renderBoundingBox
+import xyz.aerii.athen.utils.render.renderPos
 import java.awt.Color
 
 @Load
@@ -27,9 +27,10 @@ object KuudraInfo : Module(
     "Displays information about kuudra and highlights him, nicely :3",
     Category.KUUDRA
 ) {
-    private val highlight = config.switch("Highlight", true).custom("highlight")
-    private val lineWidth by config.slider("Line width", 2f, 1f, 10f).dependsOn { highlight.value }
-    private val color by config.colorPicker("Color", Color(Catppuccin.Mocha.Peach.argb, true)).dependsOn { highlight.value }
+    private val highlight by config.switch("Highlight", true)
+    private val lineWidth by config.slider("Line width", 2f, 1f, 10f).dependsOn { highlight }
+    private val color by config.colorPicker("Color", Color(Catppuccin.Mocha.Peach.argb, true)).dependsOn { highlight }
+    private val hpOnKuudra by config.switch("Draw hp on boss", true)
 
     private val hud = config.hud("Kuudra HP") {
         if (it) return@hud sizedText("§a46.5m§7/§4240m §c❤")
@@ -46,7 +47,7 @@ object KuudraInfo : Module(
         }.override()
 
         on<EntityEvent.Update.Health> {
-            if (!hud.enabled) return@on
+            if (!hud.enabled && !hpOnKuudra) return@on
             if (!KuudraAPI.inRun) return@on
 
             val e = KuudraAPI.kuudra?.takeIf { it == entity } ?: return@on
@@ -55,7 +56,7 @@ object KuudraInfo : Module(
 
         on<WorldRenderEvent.Extract> {
             render()
-        }.runWhen(highlight.state)
+        }
     }
 
     private fun LivingEntity.str(): String {
@@ -78,6 +79,7 @@ object KuudraInfo : Module(
     private fun render() {
         if (!KuudraAPI.inRun) return
         val k = KuudraAPI.kuudra ?: return
-        Render3D.drawBox(k.renderBoundingBox, color, lineWidth)
+        if (highlight) Render3D.drawBox(k.renderBoundingBox, color, lineWidth)
+        if (hpOnKuudra) Render3D.drawString(display ?: return, k.renderPos.add(0.0, 10.0, 0.0), increase = true)
     }
 }
