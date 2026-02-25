@@ -40,9 +40,10 @@ object KuudraAPI {
     private val progressRegex = Regex("^PROGRESS: (?<progress>\\d+)%")
     private val eatRegex = Regex("^(?<user>\\w+) has been eaten by Kuudra!$")
     private val stunRegex = Regex("^\\w+ destroyed one of Kuudra's pods!$")
+    private val supplyProgressRegex = Regex("^\\[[| ]+]\\s*(?<progress>\\d+)%$")
 
-    private val set = setOf(KuudraPhase.Supply, KuudraPhase.Fuel)
     private val set0 = setOf(KuudraSupply.supply, KuudraSupply.fuel)
+    val set = setOf(KuudraPhase.Supply, KuudraPhase.Fuel)
 
     private val _k = Schrodinger(::fn) { !it.isAlive }
 
@@ -210,6 +211,18 @@ object KuudraAPI {
                     phase = if (tier?.int in KuudraPhase.Skip.tiers) KuudraPhase.Skip.start() else KuudraPhase.Kill.start()
                 }
 
+                stripped == "You retrieved some of Elle's supplies from the Lava!" -> {
+                    KuudraEvent.Supply.Pickup.post()
+                }
+
+                stripped == "You retrieved a Ballista Fuel Cell from the Lava!" -> {
+                    KuudraEvent.Supply.Pickup.post()
+                }
+
+                stripped == "You moved and the Chest slipped out of your hands!" -> {
+                    KuudraEvent.Supply.Drop.post()
+                }
+
                 completeRegex.matches(stripped) -> {
                     KuudraEvent.End.Success.post()
                     KuudraEvent.End.Any.post()
@@ -246,6 +259,15 @@ object KuudraAPI {
                         } ?: return@on
                     }
                 }
+            }
+        }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
+
+        on<MessageEvent.Title.Main> {
+            if (phase !in set) return@on
+            val message = message.stripped().takeIf { it.isNotEmpty() } ?: return@on
+
+            supplyProgressRegex.findOrNull(message, "progress") { (progress) ->
+                if (KuudraEvent.Supply.Progress(progress.toInt(), message).post()) cancel()
             }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
     }
