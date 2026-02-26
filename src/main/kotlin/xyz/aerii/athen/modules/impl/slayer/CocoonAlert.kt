@@ -1,6 +1,6 @@
 @file:Suppress("ObjectPrivatePropertyName")
 
-package xyz.aerii.athen.modules.impl.kuudra
+package xyz.aerii.athen.modules.impl.slayer
 
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
