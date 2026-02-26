@@ -26,6 +26,7 @@ import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.render.Render3D
+import xyz.aerii.athen.utils.render.renderPos
 import java.awt.Color
 
 @Load
@@ -36,6 +37,8 @@ object StunHelper : Module(
     Category.KUUDRA
 ) {
     private val highlightPod by config.switch("Highlight pods", true)
+    private val highlightSpecific by config.switch("Highlight exact block")
+    private val pod by config.dropdown("Exact pod", listOf("Left", "Middle", "Right")).dependsOn { highlightSpecific }
     private val boxColor by config.colorPicker("Color", Color(Catppuccin.Mocha.Sapphire.argb, true)).dependsOn { highlightPod }
     private val depthTest by config.switch("Depth test", true).dependsOn { highlightPod }
     private val blockAbility by config.switch("Block pickaxe ability", true)
@@ -87,15 +90,12 @@ object StunHelper : Module(
             val tier = KuudraAPI.tier?.int ?: return@on
             if (tier < KuudraTier.BURNING.int) return@on
 
-            if (stunning && belly) {
+            if (stunning) {
                 stunRegex.findOrNull(stripped) { reset() }
                 return@on
             }
 
-            if (!stunning &&
-                KuudraAPI.inRun &&
-                stripped == "You purchased Human Cannonball!"
-            ) {
+            if (KuudraAPI.inRun && stripped == "You purchased Human Cannonball!") {
                 stunning = true
                 fn()
             }
@@ -110,12 +110,34 @@ object StunHelper : Module(
         }
 
         on<WorldRenderEvent.Extract> {
-            if (!highlightPod) return@on
+            if (!highlightPod && !highlightSpecific) return@on
             if (!stunning) return@on
-            if (!belly) return@on
+            val player = client.player ?: return@on
+            val selected = fn0()
+            val offset =
+                if (!belly) player.renderPos.subtract(-161.0, 49.0, -186.0)
+                else null
 
-            for (p in KuudraPod.entries) Render3D.drawBox(p.aabb, boxColor, depthTest = depthTest)
+            for (p in KuudraPod.entries) {
+                if (highlightPod && belly) Render3D.drawBox(p.aabb, boxColor, depthTest = depthTest)
+
+                if (!highlightSpecific) continue
+                if (p != selected) continue
+
+                val aabb =
+                    if (offset != null) p.aabb0.move(offset.x, offset.y, offset.z)
+                    else p.aabb0
+
+                Render3D.drawBox(aabb, boxColor, depthTest = false)
+            }
         }
+    }
+
+    private fun fn0(): KuudraPod? = when (pod) {
+        0 -> KuudraPod.Left
+        1 -> KuudraPod.Middle
+        2 -> KuudraPod.Right
+        else -> null
     }
 
     private fun CancellableEvent.ccl() {
