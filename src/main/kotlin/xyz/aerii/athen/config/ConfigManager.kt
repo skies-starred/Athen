@@ -156,14 +156,20 @@ object ConfigManager {
                 is ElementData.MultiCheckbox -> ensureDefault(data.key, data.default.toList())
                 is ElementData.HUDElement -> ensureDefault(data.key, data.default)
                 is ElementData.Expandable -> ensureDefault(data.key, false)
+                is ElementData.Sound -> {
+                    ensureDefault(data.key, data.default)
+                    ensureDefault("${data.key}.pitch", 1.0)
+                    ensureDefault("${data.key}.volume", 1.0)
+                }
                 else -> {}
             }
         }
 
-        fun all(): List<String> = listOf(configKey) + options.mapNotNull {
+        fun all(): List<String> = listOf(configKey) + options.flatMap {
             when (it) {
-                is ElementData.Button, is ElementData.TextParagraph, is ElementData.Expandable -> null
-                else -> it.key
+                is ElementData.Button, is ElementData.TextParagraph, is ElementData.Expandable -> emptyList()
+                is ElementData.Sound -> listOf(it.key, "${it.key}.pitch", "${it.key}.volume")
+                else -> listOf(it.key)
             }
         }
     }
@@ -185,5 +191,6 @@ object ConfigManager {
         data class Button(override val name: String, override val key: String, val onClick: () -> Unit, override val visibilityDependency: (() -> Boolean)? = null, override val parentKey: String? = null) : ElementData()
         data class TextParagraph(override val name: String, override val key: String, val text: String, override val visibilityDependency: (() -> Boolean)? = null, override val parentKey: String? = null) : ElementData()
         data class Expandable(override val name: String, override val key: String, override val visibilityDependency: (() -> Boolean)? = null, override val parentKey: String? = null) : ElementData()
+        data class Sound(override val name: String, override val key: String, val default: String, override val visibilityDependency: (() -> Boolean)? = null, override val parentKey: String? = null) : ElementData()
     }
 }

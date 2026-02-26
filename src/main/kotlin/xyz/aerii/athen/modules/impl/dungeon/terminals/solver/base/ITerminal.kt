@@ -5,7 +5,6 @@ import net.minecraft.world.item.ItemStack
 import xyz.aerii.athen.api.dungeon.terminals.TerminalAPI
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
 import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Smoothie.play
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.TerminalSimulator
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.ITerminalSim
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.TerminalSolver
@@ -83,11 +82,11 @@ abstract class ITerminal(val terminalType: TerminalType) {
             val screen = client.screen as? ITerminalSim ?: return
             val slot0 = screen.menu?.slots?.getOrNull(slot) ?: return
             screen.slotClicked(slot0, slot, button, if (button == 0) ClickType.CLONE else ClickType.PICKUP)
-            if (TerminalSolver.`sound$enabled`) TerminalSolver.`sound$click`?.play(TerminalSolver.`sound$volume`, TerminalSolver.`sound$pitch`)
+            if (TerminalSolver.`sound$enabled`) TerminalSolver.clickSound.play()
             return
         }
 
-        if (TerminalSolver.`sound$enabled`) TerminalSolver.`sound$click`?.play(TerminalSolver.`sound$volume`, TerminalSolver.`sound$pitch`)
+        if (TerminalSolver.`sound$enabled`) TerminalSolver.clickSound.play()
         client.gameMode?.handleInventoryMouseClick(
             TerminalAPI.lastId,
             slot,

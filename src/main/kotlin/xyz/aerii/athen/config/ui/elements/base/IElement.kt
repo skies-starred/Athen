@@ -30,6 +30,7 @@ class IElement(private val data: ConfigManager.ElementData, onUpdate: (String, A
         is ConfigManager.ElementData.TextParagraph -> TextParagraphElement(data.text)
         is ConfigManager.ElementData.HUDElement -> HUDElement(data.name, data.hudElement, data.key, onUpdate)
         is ConfigManager.ElementData.Expandable -> ExpandableElement(data.name, data.key, onUpdate)
+        is ConfigManager.ElementData.Sound -> SoundElement(data.name, ConfigManager.getValue(data.key) as? String ?: data.default, (ConfigManager.getValue("${data.key}.pitch") as? Number)?.toDouble() ?: 1.0, (ConfigManager.getValue("${data.key}.volume") as? Number)?.toDouble() ?: 1.0, data.key, onUpdate)
     }
 
     fun draw(x: Float, y: Float, mouseX: Float, mouseY: Float): Float {

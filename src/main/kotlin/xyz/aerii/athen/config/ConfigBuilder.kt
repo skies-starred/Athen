@@ -1,12 +1,15 @@
 package xyz.aerii.athen.config
 
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.sounds.SoundEvent
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.handlers.React
+import xyz.aerii.athen.handlers.Smoothie.play
 import xyz.aerii.athen.hud.HUDElement
 import xyz.aerii.athen.hud.HUDElementContext
 import xyz.aerii.athen.hud.HUDManager
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.athen.utils.sound
 import java.awt.Color
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -64,6 +67,8 @@ class ConfigBuilder(
     fun button(text: String, onClick: () -> Unit) = option(text, ConfigManager.ElementData.Button(text, "$configKey.button_${text.hashCode()}", onClick))
 
     fun textParagraph(text: String) = option(text, ConfigManager.ElementData.TextParagraph(text, "$configKey.paragraph_${text.hashCode()}", text))
+
+    fun sound(name: String, default: String = "block.note_block.pling") = SoundBuilder(name, default)
 
     fun <T : Any> option(default: T, data: ConfigManager.ElementData) = OptionBuilder(default, data)
 
@@ -166,6 +171,7 @@ class ConfigBuilder(
                 is ConfigManager.ElementData.MultiCheckbox -> data.copy(key = this, visibilityDependency = visibility, parentKey = parentKey)
                 is ConfigManager.ElementData.TextParagraph -> data.copy(key = this, visibilityDependency = visibility, parentKey = parentKey)
                 is ConfigManager.ElementData.Button -> data.copy(key = this, visibilityDependency = visibility, parentKey = parentKey)
+                is ConfigManager.ElementData.Sound -> data.copy(key = this, visibilityDependency = visibility, parentKey = parentKey)
                 else -> data
             }
         }
@@ -185,5 +191,51 @@ class ConfigBuilder(
         }
 
         override fun getValue(thisRef: Any?, property: KProperty<*>): T = state.value
+    }
+
+    inner class SoundBuilder(
+        private val name: String,
+        private val default: String
+    ) {
+        private val dependencies = mutableListOf<() -> Boolean>()
+        private var parentKey: String? = null
+
+        fun dependsOn(condition: () -> Boolean) = apply { dependencies.add(condition) }
+
+        fun childOf(parent: () -> ExpandableHandle) = apply {
+            dependencies.add { parent().invoke() }
+            parentKey = parent().key
+        }
+
+        operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): ReadOnlyProperty<Any?, SoundHandle> {
+            val fullKey = "$configKey.${property.name}"
+            val visibility = if (dependencies.isEmpty()) null else { { dependencies.all { it() } } }
+            feature.option(ConfigManager.ElementData.Sound(name, fullKey, default, visibility, parentKey))
+
+            val handle = SoundHandle(fullKey, default)
+            return ReadOnlyProperty { _, _ -> handle }
+        }
+    }
+
+    class SoundHandle(
+        key: String,
+        default: String
+    ) {
+        var soundEvent: SoundEvent? = default.sound()
+            private set
+        var pitch: Float = 1f
+            private set
+        var volume: Float = 1f
+            private set
+
+        init {
+            ConfigManager.observe(key) { soundEvent = (it as? String)?.sound() }
+            ConfigManager.observe("$key.pitch") { pitch = (it as? Number)?.toFloat() ?: 1f }
+            ConfigManager.observe("$key.volume") { volume = (it as? Number)?.toFloat() ?: 1f }
+        }
+
+        fun play() {
+            soundEvent?.play(volume, pitch)
+        }
     }
 }

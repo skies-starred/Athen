@@ -3,7 +3,6 @@
 package xyz.aerii.athen.modules.impl.dungeon.terminals.solver
 
 import dev.deftu.omnicore.api.client.input.OmniKeyboard
-import net.minecraft.sounds.SoundEvent
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.api.dungeon.terminals.TerminalAPI
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
@@ -13,14 +12,11 @@ import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Scurry
 import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Smoothie.play
 import xyz.aerii.athen.mixin.accessors.KeyMappingAccessor
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.impl.*
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
-import xyz.aerii.athen.utils.sound
-import xyz.aerii.athen.utils.url
 import java.awt.Color
 
 @Load
@@ -48,12 +44,7 @@ object TerminalSolver : Module(
 
     private val soundExpandable by config.expandable("Sounds")
     val `sound$enabled` by config.switch("Enable sounds").childOf { soundExpandable }
-    private val clickSound = config.textInput("Sound", "block.note_block.pling").childOf { soundExpandable }.custom($$"sound$click")
-    private val _unused by config.button("Play") { `sound$click`?.play(`sound$volume`, `sound$pitch`) }.childOf { soundExpandable }
-    private val _unused0 by config.button("Open sounds list") { "https://www.digminecraft.com/lists/sound_list_pc.php".url() }.childOf { soundExpandable }
-    val `sound$pitch` by config.slider("Pitch", 1f, 0f, 1f, showDouble = true).childOf { soundExpandable }
-    val `sound$volume` by config.slider("Volume", 1f, 0f, 1f, showDouble = true).childOf { soundExpandable }
-    var `sound$click`: SoundEvent? = null
+    val clickSound by config.sound("Click sound", "block.note_block.pling").childOf { soundExpandable }
 
     private val colorExpandable by config.expandable("Colors")
     val `colors$correct` by config.colorPicker("Colors: Solution", Color(0, 255, 0, 180)).childOf { colorExpandable }
@@ -79,12 +70,6 @@ object TerminalSolver : Module(
     )
 
     init {
-        `sound$click` = clickSound.value.sound()
-
-        clickSound.state.onChange {
-            `sound$click` = it.sound()
-        }
-
         on<GuiEvent.Container.Render.Pre> {
             val term = TerminalAPI.currentTerminal ?: return@on
             val solver = solvers[term] ?: return@on
