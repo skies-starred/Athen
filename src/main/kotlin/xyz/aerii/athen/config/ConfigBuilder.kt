@@ -2,6 +2,7 @@ package xyz.aerii.athen.config
 
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.handlers.React
 import xyz.aerii.athen.handlers.Smoothie.play
@@ -219,7 +220,7 @@ class ConfigBuilder(
 
     class SoundHandle(
         key: String,
-        default: String
+        private val default: String
     ) {
         var soundEvent: SoundEvent? = default.sound()
             private set
@@ -227,6 +228,9 @@ class ConfigBuilder(
             private set
         var volume: Float = 1f
             private set
+
+        val sound: SoundEvent
+            get() = soundEvent ?: default.sound() ?: SoundEvents.CAT_PURR
 
         init {
             ConfigManager.observe(key) { soundEvent = (it as? String)?.sound() }
