@@ -133,10 +133,11 @@ object WatcherHelper : Module(
 
         on<TickEvent.Client> {
             if (DungeonAPI.bloodKilledAll.value) return@on
-            if (!hud.enabled) return@on
 
             `display$total` = (System.currentTimeMillis() - `blood$start`).toDurationFromMillis(secondsDecimals = 1, secondsOnly = true)
             `display$total$t` = ((Chronos.Ticker.tickServer - `blood$start$t`) / 20.0).toDuration(secondsDecimals = 1, secondsOnly = true)
+
+            if (!hud.enabled) return@on
 
             display = buildString {
                 append("Speak: §c$`display$speak`")
