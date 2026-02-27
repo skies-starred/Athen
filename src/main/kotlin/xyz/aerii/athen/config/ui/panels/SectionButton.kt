@@ -5,7 +5,6 @@ package xyz.aerii.athen.config.ui.panels
 import xyz.aerii.athen.config.ConfigManager
 import xyz.aerii.athen.config.ui.ClickGUI
 import xyz.aerii.athen.config.ui.elements.base.IElement
-import xyz.aerii.athen.handlers.Roulette
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.brighten
@@ -26,7 +25,7 @@ class SectionButton(
         const val CHEVRON_SIZE = 16f
         val ENABLED_COLOR = Mocha.Mauve.withAlpha(0.5f)
         val DISABLED_COLOR = Mocha.Base.withAlpha(0.5f)
-        private val chevronIcon = NVGRenderer.createImage(Roulette.file("elements/chevron.svg").path, Mocha.Text.argb)
+        private val chevronIcon = NVGRenderer.createImage("/assets/athen/elements/chevron.svg", Mocha.Text.argb)
     }
 
     private var extended = false

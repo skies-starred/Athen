@@ -5,7 +5,6 @@ package xyz.aerii.athen.config.ui.elements
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
 import xyz.aerii.athen.config.ui.elements.base.ISwitch
-import xyz.aerii.athen.handlers.Roulette
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.hud.HUDEditor
 import xyz.aerii.athen.hud.HUDElement
@@ -20,7 +19,7 @@ class HUDElement(
 ) : IBaseUI(name, configKey, onUpdate) {
 
     companion object {
-        private val moveIcon = NVGRenderer.createImage(Roulette.file("elements/move.svg").path)
+        private val moveIcon = NVGRenderer.createImage("/assets/athen/elements/move.svg")
     }
 
     private val switch = ISwitch(hudElement.enabled)

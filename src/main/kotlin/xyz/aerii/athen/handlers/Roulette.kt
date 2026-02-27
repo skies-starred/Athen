@@ -4,19 +4,17 @@ package xyz.aerii.athen.handlers
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser
-import com.mojang.blaze3d.platform.NativeImage
 import kotlinx.coroutines.*
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.resources.ResourceLocation
 import tech.thatgravyboat.skyblockapi.utils.json.Json
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.core.on
-import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.impl.Dev
+import xyz.aerii.athen.utils.asJsonObjectOrNull
 import java.io.File
 import java.util.zip.ZipInputStream
 
@@ -65,44 +63,6 @@ object Roulette {
 
     @JvmStatic
     fun file(path: String): File = File(cacheDir, path)
-
-    @JvmStatic
-    @JvmOverloads
-    fun texture(path: String, namespace: String = Athen.modId): ResourceLocation =
-        loaded.getOrPut(path) {
-            val resourcePath = "dynamic/${path.replace("/", "_")}"
-            val location = ResourceLocation.fromNamespaceAndPath(namespace, resourcePath)
-            texture(path, location)
-            location
-        }
-
-    private fun texture(path: String, location: ResourceLocation) {
-        val cachedFile = file(path)
-
-        if (cachedFile.exists()) {
-            registerTexture(cachedFile, location, path)
-            return
-        }
-
-        Athen.LOGGER.warn("Texture $path not found in cache, will register after download")
-
-        pending.getOrPut(path) { mutableListOf() }.add {
-            registerTexture(cachedFile, location, path)
-            Athen.LOGGER.info("Registered downloaded texture: $path")
-        }
-    }
-
-    private fun registerTexture(cachedFile: File, location: ResourceLocation, path: String) = mainThread {
-        runCatching {
-            val texture = DynamicTexture(
-                { cachedFile.path },
-                NativeImage.read(cachedFile.inputStream())
-            )
-            textureManager.register(location, texture)
-        }.onFailure {
-            Athen.LOGGER.error("Failed to register texture $location", it)
-        }
-    }
 
     private suspend fun fetchManifest() {
         val deferred = CompletableDeferred<Unit>()
@@ -186,21 +146,20 @@ object Roulette {
             }
         }
 
-        if (deferred.await()) {
-            try {
-                if (replaceAll && cacheDir.exists()) cacheDir.deleteRecursively()
-                cacheDir.mkdirs()
+        if (!deferred.await()) return
+        try {
+            if (replaceAll && cacheDir.exists()) cacheDir.deleteRecursively()
+            cacheDir.mkdirs()
 
-                val extractedFiles = tempZip.unzip(onlyFiles).also { it.save() }
-                localHash = newHash
+            val extractedFiles = tempZip.unzip(onlyFiles).also { it.save() }
+            localHash = newHash
 
-                Athen.LOGGER.info("Assets extracted successfully (${extractedFiles.size} files)")
-            } catch (e: Exception) {
-                Athen.LOGGER.error("Failed to extract assets", e)
-                loadSuccess = false
-            } finally {
-                tempZip.delete()
-            }
+            Athen.LOGGER.info("Assets extracted successfully (${extractedFiles.size} files)")
+        } catch (e: Exception) {
+            Athen.LOGGER.error("Failed to extract assets", e)
+            loadSuccess = false
+        } finally {
+            tempZip.delete()
         }
     }
 
@@ -243,41 +202,38 @@ object Roulette {
     }
 
     private fun File.unzip(onlyFiles: Set<String> = emptySet()): List<String> {
-        val extractedFiles = mutableListOf<String>()
-        val filterMode = onlyFiles.isNotEmpty()
+        val all = mutableListOf<String>()
+        val empty = onlyFiles.isNotEmpty()
 
         ZipInputStream(inputStream()).use { zis ->
             var rootDir: String? = null
 
-            generateSequence { zis.nextEntry }.forEach { entry ->
-                if (rootDir == null) rootDir = entry.name.substringBefore('/') + "/"
-                val entryName = entry.name.removePrefix(rootDir)
+            for (e in generateSequence { zis.nextEntry }) {
+                if (rootDir == null) rootDir = e.name.substringBefore('/') + "/"
+                val str = e.name.removePrefix(rootDir).takeIf { it.isNotEmpty() && !it.exclude() } ?: continue
 
-                if (entryName.isNotEmpty() && !entryName.exclude()) {
-                    if (filterMode && entryName !in onlyFiles) return@forEach
+                if (empty && str !in onlyFiles) continue
+                val file = File(cacheDir, str)
 
-                    val targetFile = File(cacheDir, entryName)
-
-                    if (entry.isDirectory) {
-                        targetFile.mkdirs()
-                    } else {
-                        targetFile.parentFile?.mkdirs()
-                        targetFile.outputStream().use { output -> zis.copyTo(output) }
-                        extractedFiles.add(entryName)
-                    }
+                if (e.isDirectory) {
+                    file.mkdirs()
+                    continue
                 }
+
+                file.parentFile?.mkdirs()
+                file.outputStream().use { zis.copyTo(it) }
+                all.add(str)
             }
         }
 
-        return extractedFiles
+        return all
     }
 
     private fun List<String>.save() {
         try {
-            val existingFiles = if (manifestFile.exists()) {
-                val manifest = JsonParser.parseString(manifestFile.readText()).asJsonObject
-                manifest.getAsJsonArray("files")?.map { it.asString }?.toMutableSet() ?: mutableSetOf()
-            } else mutableSetOf()
+            val existingFiles =
+                if (manifestFile.exists()) JsonParser.parseString(manifestFile.readText()).asJsonObjectOrNull?.getAsJsonArray("files")?.map { it.asString }?.toMutableSet() ?: mutableSetOf()
+                else mutableSetOf()
 
             existingFiles.addAll(this)
             val manifest = JsonArray().apply { for (e in existingFiles) add(e) }

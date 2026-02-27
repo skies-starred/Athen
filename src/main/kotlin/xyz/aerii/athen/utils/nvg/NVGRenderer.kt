@@ -41,7 +41,7 @@ import org.lwjgl.nanovg.NanoVGGL3.*
 import org.lwjgl.stb.STBImage.stbi_load_from_memory
 import org.lwjgl.system.MemoryUtil.memAlloc
 import org.lwjgl.system.MemoryUtil.memFree
-import xyz.aerii.athen.handlers.Roulette
+import xyz.aerii.athen.handlers.Jsoniser
 import xyz.aerii.athen.handlers.Texter
 import xyz.aerii.athen.utils.alpha
 import xyz.aerii.athen.utils.blue
@@ -67,7 +67,7 @@ object NVGRenderer {
     private var drawing: Boolean = false
     private var vg = -1L
     
-    val defaultFont = Font("Default", Roulette.file("core/inter.ttf").inputStream())
+    val defaultFont = Font("Default", Jsoniser.stream("inter.ttf"))
 
     init {
         vg = nvgCreate(NVG_ANTIALIAS or NVG_STENCIL_STROKES)

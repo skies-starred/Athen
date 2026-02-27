@@ -113,23 +113,14 @@ object Athen : ClientModInitializer {
 
     private fun broadcast() {
         val broadcastFile = Roulette.file("broadcast_text.txt")
-
-        if (!broadcastFile.exists()) {
-            "Broadcast file not found".devMessage()
-            return
-        }
+        if (!broadcastFile.exists()) return "Broadcast file not found".devMessage()
 
         runCatching {
             val message = broadcastFile.readText().trim().takeIf { it.isNotBlank() } ?: return
+            if (message == Dev.lastBroadcast) return
 
-            if (message != Dev.lastBroadcast) {
-                message
-                    .parse()
-                    .onHover("Broadcasted message!".literal().withColor(Mocha.Lavender.argb))
-                    .modMessage()
-
-                Dev.lastBroadcast = message
-            }
+            message.parse().onHover("Broadcasted message!".literal().withColor(Mocha.Lavender.argb)).modMessage()
+            Dev.lastBroadcast = message
         }.onFailure {
             "Failed to read broadcast: ${it.message}".devMessage()
         }

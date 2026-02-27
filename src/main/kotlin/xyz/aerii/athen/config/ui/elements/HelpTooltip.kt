@@ -3,7 +3,6 @@
 package xyz.aerii.athen.config.ui.elements
 
 import xyz.aerii.athen.Athen
-import xyz.aerii.athen.handlers.Roulette
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.modules.impl.Dev
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
@@ -14,7 +13,7 @@ import xyz.aerii.athen.utils.render.animations.timedValue
 
 class HelpTooltip {
     companion object {
-        private val closeIcon = NVGRenderer.createImage(Roulette.file("elements/close.svg").path, Mocha.Text.argb)
+        private val closeIcon = NVGRenderer.createImage("/assets/athen/elements/close.svg", Mocha.Text.argb)
         private val titleWidth = NVGRenderer.getTextWidth("Help", 16f, NVGRenderer.defaultFont)
         private val helpItems = listOf(
             "<yellow>Left click<r> to toggle features on/off",

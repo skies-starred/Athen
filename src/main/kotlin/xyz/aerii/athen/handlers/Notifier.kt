@@ -4,6 +4,7 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.GuiEvent
+import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Smoothie.play
@@ -36,6 +37,10 @@ object Notifier {
     }
 
     init {
+        on<TickEvent.Client> {
+            closeIcon = NVGRenderer.createImage("/assets/athen/elements/close.svg", Mocha.Subtext0.argb)
+        }.once()
+
         on<GuiEvent.Render.Post> {
             notifications.removeIf { it.eat() }
             if (notifications.isEmpty()) return@on
