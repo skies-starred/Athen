@@ -9,6 +9,7 @@ import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.override
 import xyz.aerii.athen.modules.Module
@@ -40,18 +41,32 @@ object KuudraInfo : Module(
     }
 
     private var display: String? = null
+    private var health: Float = 0f
 
     init {
         on<LocationEvent.ServerConnect> {
             display = null
+            health = 0f
         }.override()
 
         on<EntityEvent.Update.Health> {
             if (!hud.enabled && !hpOnKuudra) return@on
             if (!KuudraAPI.inRun) return@on
-
+            if (health == new) return@on
             val e = KuudraAPI.kuudra?.takeIf { it == entity } ?: return@on
+
             display = e.str()
+            health = new
+        }
+
+        on<TickEvent.Client> {
+            if (ticks % 10 != 0) return@on
+            if (!hud.enabled && !hpOnKuudra) return@on
+            if (!KuudraAPI.inRun) return@on
+            val kuudra = KuudraAPI.kuudra?.takeIf { it.health != health } ?: return@on
+
+            display = kuudra.str()
+            health = kuudra.health
         }
 
         on<WorldRenderEvent.Extract> {
@@ -80,6 +95,6 @@ object KuudraInfo : Module(
         if (!KuudraAPI.inRun) return
         val k = KuudraAPI.kuudra ?: return
         if (highlight) Render3D.drawBox(k.renderBoundingBox, color, lineWidth)
-        if (hpOnKuudra) Render3D.drawString(display ?: return, k.renderPos.add(0.0, 10.0, 0.0), increase = true)
+        if (hpOnKuudra) Render3D.drawString(display ?: return, k.renderPos.add(0.0, 10.0, 0.0), increase = true, depthTest = false)
     }
 }
