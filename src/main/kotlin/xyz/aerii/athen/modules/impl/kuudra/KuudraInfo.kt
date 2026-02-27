@@ -12,6 +12,7 @@ import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.override
+import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.abbreviate
@@ -20,6 +21,7 @@ import xyz.aerii.athen.utils.render.Render3D
 import xyz.aerii.athen.utils.render.renderBoundingBox
 import xyz.aerii.athen.utils.render.renderPos
 import java.awt.Color
+import kotlin.math.abs
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])
@@ -94,7 +96,24 @@ object KuudraInfo : Module(
     private fun render() {
         if (!KuudraAPI.inRun) return
         val k = KuudraAPI.kuudra ?: return
-        if (highlight) Render3D.drawBox(k.renderBoundingBox, color, lineWidth)
-        if (hpOnKuudra) Render3D.drawString(display ?: return, k.renderPos.add(0.0, 10.0, 0.0), increase = true, depthTest = false)
+
+        if (highlight)
+            Render3D.drawBox(k.renderBoundingBox, color, lineWidth)
+
+        if (hpOnKuudra) {
+            val text = display ?: return
+            val hw = k.bbWidth * 0.5
+            val hh = k.bbHeight * 0.5
+
+            val c = k.renderPos.add(0.0, hh, 0.0)
+            val d = client.gameRenderer.mainCamera.position/*? >= 1.21.11 { *//*()*//*? }*/.subtract(c)
+
+            val t = minOf(fn(d.x, hw), fn(d.y, hh), fn(d.z, hw))
+
+            Render3D.drawString(text, c.add(d.scale(t + 0.1)), increase = true)
+        }
     }
+
+    private fun fn(d: Double, b: Double) =
+        if (d == 0.0) Double.POSITIVE_INFINITY else b / abs(d)
 }
