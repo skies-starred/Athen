@@ -12,8 +12,7 @@ import xyz.aerii.athen.utils.nvg.NVGRenderer
 
 object NumbersSolver : ITerminal(TerminalType.NUMBERS) {
     override fun render(ox: Float, oy: Float, headerH: Float, uiScale: Float) {
-        val l = list.toList().withIndex()
-        for ((i, c) in l) {
+        for ((i, c) in list.withIndex()) {
             if (i > 2) break
 
             val sx = (c.slot % 9 * 18f + ox + 1f) * uiScale

@@ -11,8 +11,7 @@ import xyz.aerii.athen.utils.glint
 
 object NameSolver : ITerminal(TerminalType.NAME) {
     override fun render(ox: Float, oy: Float, headerH: Float, uiScale: Float) {
-        val l = list.toList()
-        for (c in l) {
+        for (c in list) {
             val sx = (c.slot % 9 * 18f + ox + 1f) * uiScale
             val sy = ((c.slot / 9) * 18f + oy + headerH + 1f) * uiScale
             drawSlot(sx, sy, 16f * uiScale, 16f * uiScale, TerminalSolver.`names$correct`.rgb, uiScale)

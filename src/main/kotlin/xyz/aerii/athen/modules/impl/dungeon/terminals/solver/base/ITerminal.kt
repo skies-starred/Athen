@@ -10,9 +10,10 @@ import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.ITerminalSi
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.TerminalSolver
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
+import java.util.concurrent.CopyOnWriteArrayList
 
 abstract class ITerminal(val terminalType: TerminalType) {
-    protected val list = mutableListOf<Click>()
+    protected val list = CopyOnWriteArrayList<Click>()
 
     open fun onOpen() {}
 
