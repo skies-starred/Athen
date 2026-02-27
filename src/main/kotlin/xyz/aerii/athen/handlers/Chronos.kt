@@ -7,6 +7,7 @@ import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.on
+import xyz.aerii.athen.handlers.Smoothie.mainThread
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -103,6 +104,11 @@ object Chronos {
 
         inner class ScheduleBuilder(private val delay: Long) {
             infix fun then(action: () -> Unit): Task {
+                if (delay <= 0) {
+                    mainThread { runSafely(action) }
+                    return TaskImpl {}
+                }
+
                 val id = "tick_once_${nextKey.incrementAndGet()}"
                 val task = TaskImpl { oneShots.remove(id) }
                 oneShots[id] = task
