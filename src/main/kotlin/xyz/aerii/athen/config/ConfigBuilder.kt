@@ -5,6 +5,7 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.handlers.React
+import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.handlers.Smoothie.play
 import xyz.aerii.athen.hud.HUDElement
 import xyz.aerii.athen.hud.HUDElementContext
@@ -239,7 +240,7 @@ class ConfigBuilder(
         }
 
         fun play() {
-            soundEvent?.play(volume, pitch)
+            mainThread { soundEvent?.play(volume, pitch) }
         }
     }
 }
