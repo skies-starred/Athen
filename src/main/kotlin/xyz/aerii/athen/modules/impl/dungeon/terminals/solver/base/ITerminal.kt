@@ -34,13 +34,14 @@ abstract class ITerminal(val terminalType: TerminalType) {
 
         val gridW = 9 * 18f
         val gridH = (terminalType.slots / 9) * 18f
-        val headerH = 20f
-        val padding = 6f
+        val headerH = if (TerminalSolver.`ui$hideHeader`) 0f else 20f
+        val padding = if (TerminalSolver.`ui$hideHeader`) 0f else 6f
         val totalH = gridH + headerH + padding
 
         val ox = w / 2 - gridW / 2
         val oy = h / 2 - totalH / 2
 
+        NVGRenderer.drawOutlinedRectangle(ox * uiScale, (oy + headerH + padding) * uiScale, gridW * uiScale, gridH * uiScale, TerminalSolver.`ui$bg`.rgb, TerminalSolver.`ui$border`.rgb, uiScale / 2f, TerminalSolver.`ui$roundness` * uiScale)
         main(ox, oy, gridW, headerH, uiScale)
         render(ox, oy + headerH + padding, 0f, uiScale)
     }
@@ -49,8 +50,8 @@ abstract class ITerminal(val terminalType: TerminalType) {
         val slots = terminalType.slots
         val gridW = 9 * 18f
         val gridH = (slots / 9) * 18f
-        val headerH = 20f
-        val padding = 6f
+        val headerH = if (TerminalSolver.`ui$hideHeader`) 0f else 20f
+        val padding = if (TerminalSolver.`ui$hideHeader`) 0f else 6f
 
         val ox = width / 2 - gridW / 2
         val oy = height / 2 - (gridH + headerH + padding) / 2
@@ -99,12 +100,13 @@ abstract class ITerminal(val terminalType: TerminalType) {
 
     private fun main(ox: Float, oy: Float, gridW: Float, headerH: Float, uiScale: Float) {
         val titleText = terminalType.name.lowercase().replaceFirstChar { it.uppercase() }
-        val gridH = (terminalType.slots / 9) * 18f
-        val padding = 6f
+
+        if (TerminalSolver.`ui$hideHeader`) {
+            NVGRenderer.drawText(titleText, (ox + 1f) * uiScale, (oy + (terminalType.slots / 9) * 18f - 8f) * uiScale, 8f * uiScale, TerminalSolver.`ui$titleColor`.rgb)
+            return
+        }
 
         NVGRenderer.drawOutlinedRectangle(ox * uiScale, oy * uiScale, gridW * uiScale, headerH * uiScale, TerminalSolver.`ui$header`.rgb, TerminalSolver.`ui$border`.rgb, uiScale / 2f, TerminalSolver.`ui$roundness` * uiScale)
-        NVGRenderer.drawOutlinedRectangle(ox * uiScale, (oy + headerH + padding) * uiScale, gridW * uiScale, gridH * uiScale, TerminalSolver.`ui$bg`.rgb, TerminalSolver.`ui$border`.rgb, uiScale / 2f, TerminalSolver.`ui$roundness` * uiScale)
-
         val titleWidth = NVGRenderer.getTextWidth(titleText, 11f * uiScale, NVGRenderer.defaultFont)
         val titleX = ox + gridW / 2 - titleWidth / uiScale / 2
         NVGRenderer.drawText(titleText, titleX * uiScale, (oy + headerH / 2 - 5.5f) * uiScale, 11f * uiScale, Mocha.Text.rgba)
