@@ -31,7 +31,7 @@ object MissingEnchants : Module(
     private val keybind: Int by config.keybind("Keybind", OmniKeys.KEY_LEFT_SHIFT.code).`watch$tooltip`()
     private val _unused by config.textParagraph("You can unbind the keybind to always show.")
 
-    private val typeRegex = Regex("""\b(?:COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC|DIVINE|VERY SPECIAL)\b\s+(?:DUNGEON\s+)?([A-Z]+(?: [A-Z]+)*)""") // https://regex101.com/r/MOQHMf/1
+    private val typeRegex = Regex("""\b(?:COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC|DIVINE|SPECIAL|VERY SPECIAL)\b\s+(?:DUNGEON\s+)?([A-Z]+(?: [A-Z]+)*)""") // https://regex101.com/r/MOQHMf/1
     private val romans = setOf("I","II","III","IV","V","VI","VII","VIII","IX","X")
 
     private var allEnchants: Map<String, List<String>>? = null
