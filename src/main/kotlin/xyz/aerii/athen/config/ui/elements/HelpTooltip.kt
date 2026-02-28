@@ -13,7 +13,7 @@ import xyz.aerii.athen.utils.render.animations.timedValue
 
 class HelpTooltip {
     companion object {
-        private val closeIcon = NVGRenderer.createImage("/assets/athen/elements/close.svg", Mocha.Text.argb)
+        private val closeIcon = NVGRenderer.createImage("/assets/athen/close.svg", Mocha.Text.argb)
         private val titleWidth = NVGRenderer.getTextWidth("Help", 16f, NVGRenderer.defaultFont)
         private val helpItems = listOf(
             "<yellow>Left click<r> to toggle features on/off",

@@ -38,7 +38,7 @@ object Notifier {
 
     init {
         on<TickEvent.Client> {
-            closeIcon = NVGRenderer.createImage("/assets/athen/elements/close.svg", Mocha.Subtext0.argb)
+            closeIcon = NVGRenderer.createImage("/assets/athen/close.svg", Mocha.Subtext0.argb)
         }.once()
 
         on<GuiEvent.Render.Post> {

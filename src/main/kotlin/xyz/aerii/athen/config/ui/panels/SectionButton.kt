@@ -25,7 +25,7 @@ class SectionButton(
         const val CHEVRON_SIZE = 16f
         val ENABLED_COLOR = Mocha.Mauve.withAlpha(0.5f)
         val DISABLED_COLOR = Mocha.Base.withAlpha(0.5f)
-        private val chevronIcon = NVGRenderer.createImage("/assets/athen/elements/chevron.svg", Mocha.Text.argb)
+        private val chevronIcon = NVGRenderer.createImage("/assets/athen/chevron.svg", Mocha.Text.argb)
     }
 
     private var extended = false

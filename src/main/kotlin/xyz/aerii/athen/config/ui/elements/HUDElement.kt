@@ -19,7 +19,7 @@ class HUDElement(
 ) : IBaseUI(name, configKey, onUpdate) {
 
     companion object {
-        private val moveIcon = NVGRenderer.createImage("/assets/athen/elements/move.svg")
+        private val moveIcon = NVGRenderer.createImage("/assets/athen/move.svg")
     }
 
     private val switch = ISwitch(hudElement.enabled)

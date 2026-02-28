@@ -20,7 +20,7 @@ class ExpandableElement(
 ) : IBaseUI(name, configKey, onUpdate) {
 
     companion object {
-        private val chevronIcon = NVGRenderer.createImage("/assets/athen/elements/chevron.svg", Mocha.Text.argb)
+        private val chevronIcon = NVGRenderer.createImage("/assets/athen/chevron.svg", Mocha.Text.argb)
     }
 
     private var expanded = ConfigManager.getValue(configKey) as? Boolean ?: false
