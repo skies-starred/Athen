@@ -57,26 +57,26 @@ object WardrobeKeybinds : Module(
     var inMenu: Boolean = false
 
     val wardrobeSlots = listOf(
-        WardrobeSlot(36, { acc(0) }, key0),
-        WardrobeSlot(37, { acc(1) }, key1),
-        WardrobeSlot(38, { acc(2) }, key2),
-        WardrobeSlot(39, { acc(3) }, key3),
-        WardrobeSlot(40, { acc(4) }, key4),
-        WardrobeSlot(41, { acc(5) }, key5),
-        WardrobeSlot(42, { acc(6) }, key6),
-        WardrobeSlot(43, { acc(7) }, key7),
-        WardrobeSlot(44, { acc(8) }, key8)
+        WardrobeSlot(36, { acc(0) }, { key0 }),
+        WardrobeSlot(37, { acc(1) }, { key1 }),
+        WardrobeSlot(38, { acc(2) }, { key2 }),
+        WardrobeSlot(39, { acc(3) }, { key3 }),
+        WardrobeSlot(40, { acc(4) }, { key4 }),
+        WardrobeSlot(41, { acc(5) }, { key5 }),
+        WardrobeSlot(42, { acc(6) }, { key6 }),
+        WardrobeSlot(43, { acc(7) }, { key7 }),
+        WardrobeSlot(44, { acc(8) }, { key8 })
     )
 
     data class WardrobeSlot(
         val idx: Int,
-        val supp: () -> Int,
-        val keybind: Int
+        val acc: () -> KeyMappingAccessor,
+        val keybind: () -> Int
     ) {
-        val hotbar by lazy(supp)
+        val hotbar by lazy(acc)
 
         val value: Int
-            get() = if (useHotbar) hotbar else keybind
+            get() = if (useHotbar) hotbar.boundKey.value else keybind()
 
         val slot: Slot?
             get() = client.player?.containerMenu?.slots?.getOrNull(idx)
@@ -139,8 +139,8 @@ object WardrobeKeybinds : Module(
     private fun cl(id: Int, idx: Int, player: LocalPlayer) =
         client.gameMode?.handleInventoryMouseClick(id, idx, 0, ClickType.PICKUP, player)
 
-    private fun acc(idx: Int): Int =
-        (client.options.keyHotbarSlots[idx] as KeyMappingAccessor).boundKey.value
+    private fun acc(idx: Int): KeyMappingAccessor =
+        client.options.keyHotbarSlots[idx] as KeyMappingAccessor
 
     private fun reset() {
         inMenu = false
