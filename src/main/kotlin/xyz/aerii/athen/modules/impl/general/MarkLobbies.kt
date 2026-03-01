@@ -7,7 +7,7 @@ import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
 
 @Load
-object MarkingLobbies: Module(
+object MarkLobbies: Module(
     "Mark lobbies",
     "Marks lobbies and alerts you if you have already been inside that lobby.",
     Category.GENERAL
