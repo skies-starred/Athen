@@ -2,8 +2,11 @@
 
 package xyz.aerii.athen.modules.impl.general
 
+import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
@@ -20,6 +23,7 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Itemizer.`watch$tooltip`
+import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.colorCoded
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
@@ -44,6 +48,9 @@ object ItemTweaks : Module(
     private val cakeRegex = Regex("New Year Cake \\(Year (?<year>\\d+)\\)") // https://regex101.com/r/lMIQJm/1
     private val enchants = hashSetOf("Aqua Affinity", "Depth Strider")
     private val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm").withZone(ZoneId.systemDefault())
+
+    private val showItemStars by config.switch("Item stars as stack size")
+    private val starColor by config.colorPicker("Star Color", java.awt.Color(0xFFFF0000.toInt(), true)).dependsOn { showItemStars }
 
     private val cakeNumbers = config.switch("Cake numbers").custom("cakeNumbers")
 
@@ -77,6 +84,23 @@ object ItemTweaks : Module(
                 }
             }
         }.runWhen(cakeNumbers.state)
+
+        on<GuiEvent.Slots.Render.Update> {
+            if (!showItemStars || slot.item.isEmpty) return@on
+
+            val starCount = slot.item.getData(DataTypes.STAR_COUNT) ?: return@on
+            if (starCount <= 0) return@on
+
+            renders.add { graphics, slotData ->
+                graphics.pushPop {
+                    graphics.translate(slotData.x, slotData.y)
+                    val starText = starCount.toString()
+                    val textX = 17 - client.font.width(starText)
+                    val textY = 18 - client.font.lineHeight
+                    graphics.drawString(client.font, starText, textX, textY, starColor.rgb, true)
+                }
+            }
+        }
 
         on<GuiEvent.Tooltip.Update> {
             if (removeGearScore || removeEnchants) {
@@ -144,4 +168,17 @@ object ItemTweaks : Module(
             .literal()
             .append(String.format("#%06X", this).literal { color = if (`showItemHex$color`) this@hex else TextColor.DARK_GRAY })
             .apply { if (`showItemHex$box`) append("⬛".literal { color = this@hex }) }
+
+    @JvmStatic
+    fun renderStarCount(guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int) {
+        if (!showItemStars || stack.isEmpty) return
+
+        val starCount = stack.getData(DataTypes.STAR_COUNT) ?: return
+        if (starCount <= 0) return
+
+        val starText = starCount.toString()
+        val textX = x + 17 - font.width(starText)
+        val textY = y + 18 - font.lineHeight
+        guiGraphics.drawString(font, starText, textX, textY, starColor.rgb, true)
+    }
 }
