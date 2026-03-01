@@ -4,11 +4,12 @@ package xyz.aerii.athen.modules.impl.general.keybinds
 
 import com.mojang.blaze3d.platform.InputConstants
 import dev.deftu.omnicore.api.client.input.OmniKeyboard
+import kotlinx.coroutines.launch
 import net.minecraft.client.gui.GuiGraphics
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.api.location.SkyBlockIsland
-import xyz.aerii.athen.events.TickEvent
-import xyz.aerii.athen.events.core.on
+import xyz.aerii.athen.handlers.Roulette
+import xyz.aerii.athen.handlers.Roulette.scope
 import xyz.aerii.athen.handlers.Scram
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.handlers.Smoothie.client
@@ -47,11 +48,12 @@ object KeybindsGUI : Scram("Keybinds Manager [Athen]") {
     private var width2 = 0f
 
     init {
-        on<TickEvent.Client> {
+        scope.launch {
+            Roulette.download.await()
             width0 = NVGRenderer.getWrappedTextWidth(str0, 14f, 300f)
             width1 = NVGRenderer.getTextWidth(str1, 16f, NVGRenderer.defaultFont)
             width2 = NVGRenderer.getTextWidth(str2, 13f, NVGRenderer.defaultFont)
-        }.once()
+        }
     }
 
     override fun onScramInit() {

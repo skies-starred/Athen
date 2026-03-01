@@ -41,6 +41,7 @@ object Commander {
         "/${Athen.modId} config" to "Open the configuration menu",
         "/${Athen.modId} hud" to "Open the HUD editor",
         "/${Athen.modId} simulate terminals" to "Terminal simulator",
+        "/${Athen.modId} visuals help" to "Info about visual words replacement",
         "/${Athen.modId} carry help" to "Info about slayer carry commands",
         "/${Athen.modId} dcarry help" to "Info about dungeon carry commands",
         "/${Athen.modId} kcarry help" to "Info about kuudra carry commands",

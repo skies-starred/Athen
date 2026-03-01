@@ -3,6 +3,7 @@
 package xyz.aerii.athen.config.ui
 
 import dev.deftu.omnicore.api.client.input.OmniKeyboard
+import kotlinx.coroutines.launch
 import net.minecraft.client.gui.GuiGraphics
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Priority
@@ -11,11 +12,14 @@ import xyz.aerii.athen.config.ConfigManager.updateConfig
 import xyz.aerii.athen.config.ui.elements.FeatureTooltip
 import xyz.aerii.athen.config.ui.elements.HelpTooltip
 import xyz.aerii.athen.config.ui.panels.Panel
+import xyz.aerii.athen.handlers.Notifier.closeIcon
+import xyz.aerii.athen.handlers.Roulette
 import xyz.aerii.athen.handlers.Scram
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.handlers.Scurry.rawX
 import xyz.aerii.athen.handlers.Scurry.rawY
 import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
@@ -34,6 +38,15 @@ object ClickGUI : Scram("Config [Click UI - Athen]") {
         private set
 
     private lateinit var helpTooltip: HelpTooltip
+
+    init {
+        Roulette.scope.launch {
+            Roulette.download.await()
+            mainThread {
+                closeIcon = NVGRenderer.createImage("/assets/athen/close.svg", Mocha.Subtext0.argb)
+            }
+        }
+    }
 
     override fun onScramInit() {
         panels.clear()
