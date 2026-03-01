@@ -21,7 +21,7 @@ parchment-1-21-11 = "2025.12.20"
 entityculling-1-21-10 = "zwBaFdjH"
 entityculling-1-21-11 = "Dx3xsUER"
 
-skyblock-api = "4.0.7"
+skyblock-api = "4.0.9"
 classgraph = "4.8.184"
 lwjgl-nanovg = "3.3.3"
 omnicore = "1.0.0-beta.40"
