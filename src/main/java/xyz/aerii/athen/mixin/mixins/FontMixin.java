@@ -9,7 +9,11 @@ import xyz.aerii.athen.modules.impl.render.VisualWords;
 
 @Mixin(Font.class)
 public class FontMixin {
+    //? if >= 1.21.11 {
+    /*@ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
+    *///? } else {
     @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
+    //? }
     private FormattedCharSequence athen$prepareSequence(FormattedCharSequence seq) {
         return VisualWords.fn(seq);
     }
