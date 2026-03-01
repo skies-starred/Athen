@@ -128,15 +128,17 @@ object VisualWords : Module(
 
         return FormattedCharSequence { sink ->
             var i = 0
+            var si = 0
             while (i < len) {
                 val cp = input.codePointAt(i)
                 val cpLen = Character.charCount(cp)
-                val style = styles[i]
+                val style = styles[si]
 
                 val skip = style.insertion == SKIP || (!react.value && replace.keys.any { it !in remote })
                 if (skip || cp !in f) {
                     sink.accept(0, style, cp)
                     i += cpLen
+                    si += 1
                     continue
                 }
 
@@ -144,11 +146,18 @@ object VisualWords : Module(
                 if (match == null) {
                     sink.accept(0, style, cp)
                     i += cpLen
+                    si += 1
                     continue
                 }
 
-                match.value.accept { _, repStyle, repCp -> sink.accept(0, style.applyTo(repStyle), repCp) }
+                match.value.accept { _, repStyle, repCp ->
+                    sink.accept(0, style.applyTo(repStyle), repCp)
+                    true
+                }
+
+                val advance = match.key.codePointCount(0, match.key.length)
                 i += match.key.length
+                si += advance
             }
             true
         }
