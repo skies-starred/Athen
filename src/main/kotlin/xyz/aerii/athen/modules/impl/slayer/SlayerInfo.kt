@@ -113,6 +113,8 @@ object SlayerInfo : Module(
         }
 
         on<WorldRenderEvent.Entity.Pre> {
+            if (entities.isEmpty()) return@on
+
             val entity = entity as? ArmorStand ?: return@on
             if (entity in hideCache) return@on cancel()
             if (entity.getAttachedTo() !in entities) return@on
@@ -122,6 +124,8 @@ object SlayerInfo : Module(
         }.runWhen(hideOriginal.state)
 
         on<WorldRenderEvent.Extract> {
+            if (entities.isEmpty()) return@on
+
             for ((e, i) in entities) {
                 val l = i.renderText
                 val b = e.renderPos.add(0.0, 0.5 + (l.size - 1) * 0.25 / 2, 0.0)

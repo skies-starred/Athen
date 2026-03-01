@@ -171,6 +171,8 @@ object SlayerCarryTracker : Module(
         }
 
         on<SlayerEvent.Boss.Spawn> {
+            if (tracked.isEmpty()) return@on
+
             val owner = slayerInfo.owner ?: return@on
             val slayerType = slayerInfo.type as? SlayerType ?: return@on
             val carry = tracked[owner] ?: return@on
@@ -185,6 +187,8 @@ object SlayerCarryTracker : Module(
         }
 
         on<SlayerEvent.Boss.Death> {
+            if (tracked.isEmpty()) return@on
+
             val slayerType = slayerInfo.type as? SlayerType ?: return@on
             val player = bossToPlayer.remove(entity) ?: return@on
             val carry = tracked[player] ?: return@on
