@@ -1,9 +1,11 @@
 package xyz.aerii.athen.modules.impl
 
 import com.google.gson.JsonParser
+import kotlinx.coroutines.launch
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.handlers.Roulette
+import xyz.aerii.athen.handlers.Roulette.scope
 import xyz.aerii.athen.handlers.Scribble
 
 @Load
@@ -39,22 +41,19 @@ object Dev {
     var remoteAssetsVersion: String by file.string("remoteAssetsVersion")
 
     init {
-        val peopleFile = Roulette.file("people.json")
-
-        if (peopleFile.exists()) {
-            runCatching {
-                val jsonObject = JsonParser.parseString(peopleFile.readText()).asJsonObject
-
-                jsonObject.getAsJsonArray("cool")?.forEach {
-                    people.cool.add(it.asString)
+        scope.launch {
+            Roulette.download.await()
+            Roulette.file("people.json").takeIf { it.exists() }?.readText()?.let(JsonParser::parseString)?.asJsonObject?.let {
+                it.getAsJsonArray("cool")?.forEach { name ->
+                    people.cool.add(name.asString)
                 }
 
-                jsonObject.getAsJsonObject("bad")?.entrySet()?.forEach { (name, reason) ->
+                it.getAsJsonObject("bad")?.entrySet()?.forEach { (name, reason) ->
                     people.bad[name] = reason.asString
                 }
-            }.onFailure {
-                Athen.LOGGER.error("Failed to load people.json: ${it.message}")
-            }
+            } ?: return@launch
+        }.invokeOnCompletion {
+            it?.let { Athen.LOGGER.error("Failed to load people.json: ${it.message}") }
         }
     }
 }

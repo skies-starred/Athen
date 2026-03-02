@@ -19,4 +19,7 @@ object ModSettings : Module(
 
     @JvmStatic
     val commandConfig by config.switch("\'/athen\' opens config")
+
+    @JvmStatic
+    val upsideDown by config.switch("Upside down", true)
 }
