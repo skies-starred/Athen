@@ -151,7 +151,7 @@ object VisualWords : Module(
                 }
 
                 match.value.accept { _, repStyle, repCp ->
-                    sink.accept(0, style.applyTo(repStyle), repCp)
+                    sink.accept(0, repStyle.applyTo(style), repCp)
                     true
                 }
 
