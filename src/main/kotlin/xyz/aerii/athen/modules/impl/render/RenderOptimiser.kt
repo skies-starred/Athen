@@ -16,10 +16,16 @@ object RenderOptimiser :  Module(
     private val lavaOverlay by config.switch("Hide lava overlay", true)
     private val fireOverlay by config.switch("Hide fire overlay", true)
     private val entityFire = config.switch("Hide fire on entity", true).dependsOn { fireOverlay }.custom("hideEntityFire")
+    private val playerArm by config.switch("Hide player arm", false)
 
     @JvmStatic
     val fire: Boolean
         get() = react.value && fireOverlay
+
+    @JvmStatic
+    val arm: Boolean
+        get() = react.value && playerArm
+
 
     @JvmStatic
     val lava: Boolean
