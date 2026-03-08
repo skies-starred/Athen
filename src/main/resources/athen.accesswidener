@@ -1,1 +1,3 @@
 accessWidener v2 named
+
+accessible field net/minecraft/client/gui/screens/inventory/tooltip/ClientTextTooltip text Lnet/minecraft/util/FormattedCharSequence;
