@@ -2,6 +2,7 @@
 
 package xyz.aerii.athen.utils
 
+import net.minecraft.network.chat.Component
 import net.minecraft.world.phys.AABB
 import xyz.aerii.athen.handlers.React
 import xyz.aerii.athen.handlers.Texter.literal
@@ -11,7 +12,7 @@ import java.util.*
 val EMPTY_UUID = UUID(0, 0)
 
 @JvmField
-val EMPTY_COMPONENT = "".literal()
+val EMPTY_COMPONENT = "".literal() as Component
 
 @JvmField
 val ALWAYS_TRUE = React(true).immutable()
