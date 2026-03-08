@@ -103,7 +103,7 @@ object TerminalAPI {
         on<PacketEvent.Send, ServerboundContainerClickPacket> {
             if (!terminalOpen.value) return@on
             if (currentTerminal == TerminalType.MELODY) return@on
-            if (containerId == lastId) return@on
+            if (containerId != lastId) return@on it.cancel()
             if (System.currentTimeMillis() - openTime >= TerminalSolver.fcDelay) return@on
 
             it.cancel()
