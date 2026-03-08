@@ -320,8 +320,6 @@ class ColorPickerElement(
         hexCaret = hexValue.length
         hexCaretBlink = System.currentTimeMillis()
 
-        hexValue.java()?.set(false)
-
         return true
     }
 
@@ -335,12 +333,12 @@ class ColorPickerElement(
                 hexCaret = hexValue.length
                 hexCaretBlink = System.currentTimeMillis()
 
-                hexValue.java()?.set(false)
                 true
             }
 
             GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER -> {
                 hexFocused = false
+                hexValue.java()?.set(false)
                 if (hexColorOnFocus.sig(selectedColor)) selectedColor.add()
                 true
             }
