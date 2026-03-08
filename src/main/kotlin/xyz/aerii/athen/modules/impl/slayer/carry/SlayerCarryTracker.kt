@@ -16,7 +16,6 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.*
-import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.literal
@@ -112,8 +111,8 @@ object SlayerCarryTracker : Module(
             })
         }
 
-        Chronos.Tick every 40 repeat {
-            if (!react.value) return@repeat
+        on<TickEvent.Client> {
+            if (ticks % 40 != 0) return@on
             for (t in tracked.values) t.clean()
         }
 
