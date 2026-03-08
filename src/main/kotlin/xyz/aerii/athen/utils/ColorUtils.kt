@@ -23,6 +23,12 @@ fun Int.brighten(factor: Float): Int {
     return argb(r, g, b, alpha)
 }
 
+fun Int.rgba(): Int =
+    (this shl 8) or (this ushr 24)
+
+fun Int.argb(): Int =
+    (this ushr 8) or (this shl 24)
+
 @JvmOverloads
 fun argb(r: Int, g: Int, b: Int, a: Int = 255): Int =
     (a shl 24) or (r shl 16) or (g shl 8) or b
