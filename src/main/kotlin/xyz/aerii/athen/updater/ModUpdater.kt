@@ -61,28 +61,25 @@ object ModUpdater {
 
     fun checkAndNotify(stream: String = "release", silent: Boolean = true) {
         checkForUpdate(stream).thenAccept { update ->
-            if (update.isUpdateAvailable) {
-                val newVersion = update.update.versionName
-                if (skippedVersion == newVersion && trulySkip == newVersion) return@thenAccept
+            if (!silent && !update.isUpdateAvailable) return@thenAccept "No update available!".modMessage()
+            if (!update.isUpdateAvailable) return@thenAccept
 
-                "Update available: $newVersion".modMessage()
-                "Run /${Athen.modId} update to install".modMessage()
+            val newVersion = update.update.versionName
+            if (skippedVersion == newVersion && trulySkip == newVersion) return@thenAccept
 
-                if (newVersion != skippedVersion) {
-                    mainThread {
-                        McClient.setScreen(UpdateGUI(
-                            Athen.modVersion,
-                            newVersion,
-                            onUpdate = { installUpdate(stream) },
-                            onSkip = { skippedVersion = newVersion },
-                            onRemind = {}
-                        ))
-                    }
-                }
+            "Update available: $newVersion".modMessage()
+            "Run /${Athen.modId} update to install".modMessage()
+
+            if (newVersion == skippedVersion) return@thenAccept
+            mainThread {
+                McClient.setScreen(UpdateGUI(
+                    Athen.modVersion,
+                    newVersion,
+                    onUpdate = { installUpdate(stream) },
+                    onSkip = { skippedVersion = newVersion },
+                    onRemind = {}
+                ))
             }
-
-            if (silent) return@thenAccept
-            "No update available!".modMessage()
         }.exceptionally {
             Athen.LOGGER.error("Failed to check for updates: ${it.message}")
             null
