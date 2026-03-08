@@ -4,6 +4,8 @@ package xyz.aerii.athen.modules.impl.general
 
 import dev.deftu.omnicore.api.client.input.OmniKeys
 import net.minecraft.network.chat.Component
+import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.bold
+import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.italic
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
@@ -11,7 +13,6 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.handlers.Beacon
 import xyz.aerii.athen.handlers.Itemizer.`watch$tooltip`
-import xyz.aerii.athen.handlers.Texter.colorCoded
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
@@ -92,8 +93,12 @@ object MissingEnchants : Module(
 
                 if (!se) {
                     if (':' in s) continue
+                    if ("◆" in s) continue
                     if (!s.r()) continue
-                    if (l.colorCoded().contains("§7")) continue
+
+                    val ls = l.siblings?.lastOrNull() ?: continue
+                    if (ls.color == 11184810 && !ls.bold) continue
+
                     se = true
                     continue
                 }
