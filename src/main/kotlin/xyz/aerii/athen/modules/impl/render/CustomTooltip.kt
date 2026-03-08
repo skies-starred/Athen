@@ -43,7 +43,7 @@ object CustomTooltip : Module(
     private val `scroll$scale$key` by config.keybind("Scale keybind", GLFW.GLFW_KEY_LEFT_CONTROL).dependsOn { `scroll$scale` }.childOf { customisation }
 
     private val renderExpandable by config.expandable("Custom rendering")
-    private val `header$style` by config.dropdown("Header style", listOf("Combined", "Separated")).childOf { renderExpandable }
+    private val `header$style` by config.dropdown("Header style", listOf("Combined", "Separated"), 1).childOf { renderExpandable }
     private val `header$centered` by config.switch("Centered header", true).dependsOn { `header$style` == 1 }.childOf { renderExpandable }
 
     private val border by config.switch("Border", true).childOf { renderExpandable }
