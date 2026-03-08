@@ -9,7 +9,7 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
-import xyz.aerii.athen.handlers.Chronos
+import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Texter.onHover
@@ -60,9 +60,8 @@ object SlayerStats : Module(
             }
         }
 
-        Chronos.Tick every 2 repeat {
-            if (!react.value) return@repeat
-            displayString = str()
+        on<TickEvent.Client> {
+            if (ticks % 2 == 0) displayString = str()
         }
 
         on<SlayerEvent.Quest.Start> {
