@@ -14,9 +14,9 @@ import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.core.on
-import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.impl.Dev
+import xyz.aerii.athen.utils.mainThread
 import java.io.File
 import java.util.zip.ZipInputStream
 

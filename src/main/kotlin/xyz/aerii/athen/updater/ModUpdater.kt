@@ -9,10 +9,10 @@ import net.minecraft.SharedConstants
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Priority
-import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.handlers.Typo.PrefixType
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.impl.Dev
+import xyz.aerii.athen.utils.mainThread
 import java.util.concurrent.CompletableFuture
 
 @Priority(-6)

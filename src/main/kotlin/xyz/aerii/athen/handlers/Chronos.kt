@@ -7,7 +7,7 @@ import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.on
-import xyz.aerii.athen.handlers.Smoothie.mainThread
+import xyz.aerii.athen.utils.mainThread
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture

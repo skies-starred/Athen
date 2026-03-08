@@ -30,7 +30,6 @@ import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Smoothie
 import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Typo.command
@@ -41,6 +40,7 @@ import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.*
+import xyz.aerii.athen.utils.mainThread
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
 import java.awt.Color
 import kotlin.time.Duration.Companion.hours

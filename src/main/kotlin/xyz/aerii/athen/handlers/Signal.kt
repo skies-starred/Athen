@@ -34,8 +34,8 @@ import tech.thatgravyboat.skyblockapi.api.events.screen.ItemTooltipEvent
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.*
 import xyz.aerii.athen.events.core.on
-import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.utils.EMPTY_COMPONENT
+import xyz.aerii.athen.utils.mainThread
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
 import kotlin.jvm.optionals.getOrNull
 

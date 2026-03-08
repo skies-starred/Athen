@@ -5,12 +5,12 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.handlers.React
-import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.handlers.Smoothie.play
 import xyz.aerii.athen.hud.HUDElement
 import xyz.aerii.athen.hud.HUDElementContext
 import xyz.aerii.athen.hud.HUDManager
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.athen.utils.mainThread
 import xyz.aerii.athen.utils.sound
 import java.awt.Color
 import kotlin.properties.ReadOnlyProperty

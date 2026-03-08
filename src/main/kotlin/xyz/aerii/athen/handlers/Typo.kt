@@ -4,9 +4,9 @@ import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.modules.impl.Dev
+import xyz.aerii.athen.utils.mainThread
 import kotlin.math.roundToInt
 
 object Typo {

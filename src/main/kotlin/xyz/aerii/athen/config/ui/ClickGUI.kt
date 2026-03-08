@@ -19,8 +19,8 @@ import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.handlers.Scurry.rawX
 import xyz.aerii.athen.handlers.Scurry.rawY
 import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Smoothie.mainThread
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
+import xyz.aerii.athen.utils.mainThread
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
 import xyz.aerii.athen.utils.render.animations.easeOutQuad

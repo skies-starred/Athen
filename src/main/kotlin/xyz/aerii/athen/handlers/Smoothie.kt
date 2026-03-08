@@ -33,6 +33,7 @@ object Smoothie {
     val heldItem: ItemStack?
         get() = player?.mainHandItem
 
+    @Deprecated("Use ThreadUtilsKt.mainThread")
     inline fun mainThread(crossinline block: Minecraft.() -> Unit) {
         client.execute { client.block() }
     }
@@ -65,9 +66,10 @@ object Smoothie {
 
     @JvmStatic
     @JvmOverloads
-    fun Component.showTitle(subTitle: Component? = null, fadeIn: Int = 5, stay: Int = 20, fadeOut: Int = 5) {
-        client.gui.setTimes(fadeIn, stay, fadeOut)
-        client.gui.setTitle(this)
-        client.gui.setSubtitle(subTitle ?: CommonText.EMPTY)
+    @Suppress("Deprecation")
+    fun Component.showTitle(subTitle: Component? = null, fadeIn: Int = 5, stay: Int = 20, fadeOut: Int = 5) = mainThread {
+        gui.setTimes(fadeIn, stay, fadeOut)
+        gui.setTitle(this@showTitle)
+        gui.setSubtitle(subTitle ?: CommonText.EMPTY)
     }
 }
