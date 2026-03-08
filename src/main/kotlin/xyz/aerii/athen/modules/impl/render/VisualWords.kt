@@ -77,7 +77,7 @@ object VisualWords : Module(
                                 save()
 
                                 "Added the word <red>\"$word\" <gray>-> ".parse().skip().append(seq.toComponent()).modMessage()
-                                if (!react.value) "Feature not enabled!".modMessage(Typo.PrefixType.ERROR)
+                                if (!enabled) "Feature not enabled!".modMessage(Typo.PrefixType.ERROR)
                             }
                         }
                     }
@@ -93,7 +93,7 @@ object VisualWords : Module(
                                 save()
 
                                 "Set the word <red>\"$word\" <gray>-> ".parse().skip().append(seq.toComponent()).modMessage()
-                                if (!react.value) "Feature not enabled!".modMessage(Typo.PrefixType.ERROR)
+                                if (!enabled) "Feature not enabled!".modMessage(Typo.PrefixType.ERROR)
                             }
                         }
                     }
@@ -105,7 +105,7 @@ object VisualWords : Module(
                             replace.remove(word)
                             save()
                             "Removed the word <red>\"$word\"".parse().skip().modMessage()
-                            if (!react.value) "Feature not enabled!".modMessage(Typo.PrefixType.ERROR)
+                            if (!enabled) "Feature not enabled!".modMessage(Typo.PrefixType.ERROR)
                         }
                     }
 
@@ -134,7 +134,7 @@ object VisualWords : Module(
                 val cpLen = Character.charCount(cp)
                 val style = styles[si]
 
-                val skip = style.insertion == SKIP || (!react.value && replace.keys.any { it !in remote })
+                val skip = style.insertion == SKIP || (!enabled && replace.keys.any { it !in remote })
                 if (skip || cp !in f) {
                     sink.accept(0, style, cp)
                     i += cpLen

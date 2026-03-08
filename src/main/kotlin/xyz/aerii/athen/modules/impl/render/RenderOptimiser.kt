@@ -19,15 +19,15 @@ object RenderOptimiser :  Module(
 
     @JvmStatic
     val fire: Boolean
-        get() = react.value && fireOverlay
+        get() = enabled && fireOverlay
 
     @JvmStatic
     val lava: Boolean
-        get() = react.value && lavaOverlay
+        get() = enabled && lavaOverlay
 
     @JvmStatic
     val fog: Boolean
-        get() = react.value && _fog
+        get() = enabled && _fog
 
     init {
         on<WorldRenderEvent.Entity.Pre> {

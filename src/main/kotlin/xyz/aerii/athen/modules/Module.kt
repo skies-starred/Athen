@@ -10,6 +10,7 @@ import xyz.aerii.athen.config.ConfigBuilder
 import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.core.Event
 import xyz.aerii.athen.events.core.runWhen
+import xyz.aerii.athen.handlers.Initializer
 import xyz.aerii.athen.handlers.React
 import xyz.aerii.athen.handlers.React.Companion.and
 import xyz.aerii.athen.utils.ALWAYS_TRUE
@@ -23,8 +24,17 @@ open class Module(
     category: Category? = null,
     default: Boolean = false
 ) {
-    private var _config: ConfigBuilder? = null
-    private val _location = run {
+    private val _config: ConfigBuilder? by lazy {
+        ConfigBuilder(
+            configKey ?: return@lazy null,
+            name ?: return@lazy null,
+            description ?: return@lazy null,
+            category ?: return@lazy null,
+            default
+        ).also { it.module = this }
+    }
+
+    private val _location: React<Boolean> = run {
         val onlyIn = this::class.findAnnotation<OnlyIn>() ?: return@run ALWAYS_TRUE
         when {
             onlyIn.floors.isNotEmpty() -> DungeonAPI.floor.map { it in onlyIn.floors }
@@ -35,23 +45,19 @@ open class Module(
         }
     }
 
-    val configKey = name?.toCamelCase()
-    val redstone = this::class.hasAnnotation<Redstone>()
-    val react: React<Boolean> by lazy { if (redstone) ALWAYS_TRUE else config.state and _location }
+    val react: React<Boolean> by Initializer(::fn0) { if (redstone) ALWAYS_TRUE else config.state and _location }
+
+    val configKey: String? =
+        name?.toCamelCase()
+
+    val redstone: Boolean =
+        this::class.hasAnnotation<Redstone>()
+
     val config: ConfigBuilder
         get() = _config ?: error("Config not initialized")
 
-    init {
-        run {
-            _config = ConfigBuilder(
-                configKey ?: return@run,
-                name ?: return@run,
-                description ?: return@run,
-                category ?: return@run,
-                default
-            ).also { it.module = this }
-        }
-    }
+    var enabled: Boolean = false
+        private set
 
     protected inline fun <reified T : Event> on(
         priority: Int = 0,
@@ -62,4 +68,9 @@ open class Module(
         priority: Int = 0,
         noinline handler: P.(E) -> Unit
     ) = xyz.aerii.athen.events.core.on<E, P>(priority, handler).runWhen(react)
+
+    private fun fn0() {
+        enabled = react.value
+        react.onChange { enabled = it }
+    }
 }

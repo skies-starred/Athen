@@ -29,7 +29,7 @@ data class HUDElement(
         get() = config() && enabled
 
     val render0: Boolean
-        get() = (config.module?.react?.value ?: config()) && enabled && renderOutsidePreview
+        get() = (config.module?.enabled ?: config()) && enabled && renderOutsidePreview
 
     init {
         ConfigManager.observe(id) { enabled = it as? Boolean ?: false }

@@ -32,7 +32,7 @@ public abstract class GuiMixin {
             )
     )
     private void athen$renderSelectedItemName(Args args) {
-        if (!ItemNamePosition.INSTANCE.getReact().getValue()) return;
+        if (!ItemNamePosition.INSTANCE.getEnabled()) return;
 
         int width = args.get(4);
 

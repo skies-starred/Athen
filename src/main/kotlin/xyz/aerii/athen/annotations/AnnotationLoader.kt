@@ -1,6 +1,10 @@
 package xyz.aerii.athen.annotations
 
 import io.github.classgraph.ClassGraph
+import xyz.aerii.athen.events.GameEvent
+import xyz.aerii.athen.events.core.on
+import xyz.aerii.athen.modules.Module
+import xyz.aerii.athen.utils.safely
 
 object AnnotationLoader {
     fun load() {
@@ -19,6 +23,8 @@ object AnnotationLoader {
                     .getClassesWithAnnotation(Load::class.java.name)
                     .loadClasses()
 
+                val modules = scanResult.getSubclasses(Module::class.java.name)
+
                 sortedPriority.forEach { klass ->
                     try {
                         Class.forName(klass.name)
@@ -30,6 +36,10 @@ object AnnotationLoader {
                         Class.forName(klass.name)
                     } catch (_: Exception) {}
                 }
+
+                on<GameEvent.Start> {
+                    for (m in modules) safely { (m.loadClass().kotlin.objectInstance as? Module)?.react }
+                }.once()
             }
     }
 }
