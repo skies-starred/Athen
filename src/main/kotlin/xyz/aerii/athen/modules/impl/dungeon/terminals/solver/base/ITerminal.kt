@@ -84,11 +84,9 @@ abstract class ITerminal(val terminalType: TerminalType) {
             val screen = client.screen as? ITerminalSim ?: return
             val slot0 = screen.menu?.slots?.getOrNull(slot) ?: return
             screen.slotClicked(slot0, slot, button, if (button == 0) ClickType.CLONE else ClickType.PICKUP)
-            if (TerminalSolver.`sound$enabled`) TerminalSolver.clickSound.play()
             return
         }
 
-        if (TerminalSolver.`sound$enabled`) TerminalSolver.clickSound.play()
         client.gameMode?.handleInventoryMouseClick(
             TerminalAPI.lastId,
             slot,

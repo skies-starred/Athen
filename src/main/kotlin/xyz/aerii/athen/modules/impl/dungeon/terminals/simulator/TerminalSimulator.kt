@@ -44,7 +44,7 @@ object TerminalSimulator : Module(
             SimulatorMenu.a()
             if (it) {
                 "Run \"/${Athen.modId} simulate terminals ping <ping>\" to change ping!".modMessage()
-                if (configKey != null) ConfigManager.updateConfig(configKey, false)
+                ConfigManager.updateConfig(configKey ?: return@onChange, false)
             }
         }
 

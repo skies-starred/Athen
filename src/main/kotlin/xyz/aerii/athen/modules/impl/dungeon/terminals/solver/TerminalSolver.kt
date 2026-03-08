@@ -3,12 +3,15 @@
 package xyz.aerii.athen.modules.impl.dungeon.terminals.solver
 
 import dev.deftu.omnicore.api.client.input.OmniKeyboard
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
+import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.api.dungeon.terminals.TerminalAPI
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.DungeonEvent
 import xyz.aerii.athen.events.GuiEvent
+import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Scurry
 import xyz.aerii.athen.handlers.Smoothie.client
@@ -72,6 +75,14 @@ object TerminalSolver : Module(
     )
 
     init {
+        on<PacketEvent.Receive, ClientboundSoundPacket> {
+            if (!`sound$enabled`) return@on
+            if (sound.value() != SoundEvents.EXPERIENCE_ORB_PICKUP) return@on
+
+            it.cancel()
+            clickSound.play()
+        }.runWhen(TerminalAPI.terminalOpen)
+
         on<GuiEvent.Container.Render.Pre> {
             val term = TerminalAPI.currentTerminal ?: return@on
             val solver = solvers[term] ?: return@on
