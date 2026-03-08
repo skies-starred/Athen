@@ -78,4 +78,13 @@ object Render2D {
     fun GuiGraphics.drawRectangle(x: Int, y: Int, width: Int, height: Int, color: Int = TextColor.WHITE) {
         fill(x, y, x + width, y + height, color)
     }
+
+    @JvmStatic
+    @JvmOverloads
+    fun GuiGraphics.drawOutline(x: Int, y: Int, width: Int, height: Int, border: Int, color: Int = TextColor.WHITE) {
+        fill(x - border, y - border, x + width + border, y, color)
+        fill(x - border, y + height, x + width + border, y + height + border, color)
+        fill(x - border, y, x, y + height, color)
+        fill(x + width, y, x + width + border, y + height, color)
+    }
 }
