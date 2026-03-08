@@ -34,6 +34,7 @@ object TerminalSolver : Module(
     val keybindL by config.keybind("Keybind left click").childOf { settingsExpandable }
     val keybindR by config.keybind("Keybind right click").childOf { settingsExpandable }
     val `rubix$left` by config.switch("Rubix: left click only").childOf { settingsExpandable }
+    val solve by config.multiCheckbox("Enabled solvers", listOf("Colors", "Melody", "Name", "Numbers", "Panes", "Rubix"), listOf(0, 1, 2, 3, 4, 5)).childOf { settingsExpandable }
 
     private val guiExpandable by config.expandable("GUI")
     val `ui$scale` by config.slider("Scale", 1f, 0.1f, 2f, showDouble = true).childOf { guiExpandable }

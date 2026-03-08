@@ -68,7 +68,7 @@ object TerminalAPI {
 
         on<PacketEvent.Process.Pre, ClientboundOpenScreenPacket> {
             val title = title.stripped()
-            val type = TerminalType.get(title) ?: return@on reset()
+            val type = TerminalType.get(title)?.takeIf { it.solver } ?: return@on reset()
 
             if (!terminalOpen.value) openTime = System.currentTimeMillis()
             terminalOpen.value = true
