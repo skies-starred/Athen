@@ -48,7 +48,7 @@ object CustomTooltip : Module(
 
     private val border by config.switch("Border", true).childOf { renderExpandable }
     private val `border$width` by config.slider("Border width", 1, 0, 5).dependsOn { border }.childOf { renderExpandable }
-    private val `border$rarity` by config.switch("Use rarity color").dependsOn { border }.childOf { renderExpandable }
+    private val `border$rarity` by config.switch("Use rarity color", true).dependsOn { border }.childOf { renderExpandable }
     private val `border$color` by config.colorPicker("Border color", Color(Catppuccin.Mocha.Sky.argb, true)).dependsOn { border }.childOf { renderExpandable }
 
     private val background by config.switch("Background", true).childOf { renderExpandable }
