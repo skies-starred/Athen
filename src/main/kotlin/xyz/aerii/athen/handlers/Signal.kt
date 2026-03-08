@@ -136,6 +136,10 @@ object Signal {
                 !GuiEvent.Input.Mouse.Release(event).post()
             }
 
+            ScreenMouseEvents.allowMouseScroll(screen).register { _, _, _, _, amount ->
+                !GuiEvent.Input.Mouse.Scroll(amount).post()
+            }
+
             ScreenKeyboardEvents.allowKeyPress(screen).register { _, event ->
                 !GuiEvent.Input.Key.Press(event).post()
             }

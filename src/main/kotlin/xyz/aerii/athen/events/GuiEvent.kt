@@ -103,6 +103,10 @@ sealed class GuiEvent {
             data class Release(
                 val keyEvent: MouseButtonEvent
             ) : Event()
+
+            data class Scroll(
+                val amount: Double
+            ) : CancellableEvent()
         }
     }
 }
