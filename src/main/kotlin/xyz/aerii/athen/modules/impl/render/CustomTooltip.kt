@@ -94,13 +94,13 @@ object CustomTooltip : Module(
             if (hover?.item?.isEmpty != false) return@on
             if (name) return@on
 
-            if (`scroll$scale$key`.isBound() && `scroll$scale$key`.isPressed()) {
+            if (`scroll$scale` && `scroll$scale$key`.isBound() && `scroll$scale$key`.isPressed()) {
                 scale += amount * 0.1
                 scale = scale.coerceIn(0.5, 3.0)
                 return@on
             }
 
-            if (`scroll$horizontal$key`.isBound() && `scroll$horizontal$key`.isPressed()) xo += amount * `scroll$horizontal$speed`
+            if (`scroll$horizontal` && `scroll$horizontal$key`.isBound() && `scroll$horizontal$key`.isPressed()) xo += amount * `scroll$horizontal$speed`
             else yo += amount * `scroll$vertical$speed`
         }
     }
