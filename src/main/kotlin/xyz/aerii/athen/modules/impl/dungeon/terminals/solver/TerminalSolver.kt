@@ -37,7 +37,7 @@ object TerminalSolver : Module(
     val solve by config.multiCheckbox("Enabled solvers", listOf("Colors", "Melody", "Name", "Numbers", "Panes", "Rubix"), listOf(0, 1, 2, 3, 4, 5)).childOf { settingsExpandable }
 
     private val guiExpandable by config.expandable("GUI")
-    val `ui$scale` by config.slider("Scale", 1f, 0.1f, 2f, showDouble = true).childOf { guiExpandable }
+    val `ui$scale` by config.slider("Scale", 1f, 0.1f, 3f, showDouble = true).childOf { guiExpandable }
     val `ui$roundness` by config.slider("Roundness", 0f, 0f, 10f, showDouble = true).childOf { guiExpandable }
     val `ui$bg` by config.colorPicker("Background", Color(0, 0, 0, 150)).childOf { guiExpandable }
     val `ui$hideHeader` by config.switch("Hide header").childOf { guiExpandable }
