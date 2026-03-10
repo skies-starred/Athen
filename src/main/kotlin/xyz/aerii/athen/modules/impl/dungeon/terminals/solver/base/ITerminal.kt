@@ -100,7 +100,7 @@ abstract class ITerminal(val terminalType: TerminalType) {
         val titleText = terminalType.name.lowercase().replaceFirstChar { it.uppercase() }
 
         if (TerminalSolver.`ui$hideHeader`) {
-            NVGRenderer.drawText(titleText, (ox + 1f) * uiScale, (oy + (terminalType.slots / 9) * 18f - 8f) * uiScale, 8f * uiScale, TerminalSolver.`ui$titleColor`.rgb)
+            if (!TerminalSolver.`ui$hideTitle`) NVGRenderer.drawText(titleText, (ox + 1f) * uiScale, (oy + (terminalType.slots / 9) * 18f - 8f) * uiScale, 8f * uiScale, TerminalSolver.`ui$titleColor`.rgb)
             return
         }
 
