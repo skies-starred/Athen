@@ -10,14 +10,11 @@ import xyz.aerii.athen.handlers.Scribble
 
 @Load
 object Dev {
-    @Suppress("ClassName") // people > People :p
-    object people {
-        @JvmStatic
-        val cool: MutableSet<String> = mutableSetOf()
+    @JvmField
+    var cool: Set<String> = setOf()
 
-        @JvmStatic
-        val bad: MutableMap<String, String> = mutableMapOf()
-    }
+    @JvmField
+    var bad: Map<String, String> = mapOf()
 
     @JvmStatic
     val file = Scribble("main/Dev")
@@ -44,13 +41,19 @@ object Dev {
         scope.launch {
             Roulette.download.await()
             Roulette.file("people.json").takeIf { it.exists() }?.readText()?.let(JsonParser::parseString)?.asJsonObject?.let {
+                val c = HashSet<String>()
+                val b = HashMap<String, String>()
+
                 it.getAsJsonArray("cool")?.forEach { name ->
-                    people.cool.add(name.asString)
+                    c.add(name.asString)
                 }
 
                 it.getAsJsonObject("bad")?.entrySet()?.forEach { (name, reason) ->
-                    people.bad[name] = reason.asString
+                    b[name] = reason.asString
                 }
+
+                cool = c
+                bad = b
             } ?: return@launch
         }.invokeOnCompletion {
             it?.let { Athen.LOGGER.error("Failed to load people.json: ${it.message}") }

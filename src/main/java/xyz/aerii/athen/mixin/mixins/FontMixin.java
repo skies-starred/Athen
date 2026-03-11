@@ -15,11 +15,11 @@ public class FontMixin {
     @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
     //? }
     private FormattedCharSequence athen$prepareSequence(FormattedCharSequence seq) {
-        return VisualWords.fn(seq);
+        return VisualWords.INSTANCE.getEnabled() ? VisualWords.fn(seq) : seq;
     }
 
     @ModifyVariable(method = "width(Lnet/minecraft/util/FormattedCharSequence;)I", at = @At("HEAD"), argsOnly = true)
     private FormattedCharSequence athen$widthSequence(FormattedCharSequence seq) {
-        return VisualWords.fn(seq);
+        return VisualWords.INSTANCE.getEnabled() ? VisualWords.fn(seq) : seq;
     }
 }
