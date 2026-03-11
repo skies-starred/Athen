@@ -33,15 +33,19 @@ object VisualWords : Module(
     "Visually modify words!",
     Category.RENDER
 ) {
+    private class Entry(val cps: IntArray, val len: Int, val seq: FormattedCharSequence)
+
     private val unused by config.textParagraph("Use the command \"/athen visuals help\" to learn more about the available commands!")
 
     private const val SKIP = "\u0000vw_bypass"
+
     private val replace = CopyOnWriteMap<String, FormattedCharSequence>()
+    private val prefix = HashMap<Int, MutableList<Entry>>()
+
     private val scribble = Scribble("features/visualWords")
     private var words by scribble.map("words", Codec.STRING, ComponentSerialization.CODEC.xmap({ it.visualOrderText }, { seq -> seq.toComponent() }))
 
     private val remote = mutableSetOf<String>()
-    private var f = HashSet<Int>()
 
     init {
         Beacon.get("https://raw.githubusercontent.com/skies-starred/athen-assets/refs/heads/main/cool.json") {
@@ -122,49 +126,89 @@ object VisualWords : Module(
     fun fn(seq: FormattedCharSequence): FormattedCharSequence {
         if (replace.isEmpty()) return seq
 
-        val input = seq.str()
-        val styles = seq.style()
-        val len = input.length
+        val chars = IntArray(256)
+        val styles = ArrayList<Style>(256)
+        var size = 0
+
+        seq.accept { _, style, cp ->
+            if (size >= chars.size) return@accept false
+            chars[size] = cp
+            styles.add(style)
+            size++
+            true
+        }
 
         return FormattedCharSequence { sink ->
             var i = 0
-            var si = 0
-            while (i < len) {
-                val cp = input.codePointAt(i)
-                val cpLen = Character.charCount(cp)
-                val style = styles[si]
 
-                val skip = style.insertion == SKIP || (!enabled && replace.keys.any { it !in remote })
-                if (skip || cp !in f) {
+            while (i < size) {
+                val cp = chars[i]
+                val style = styles[i]
+
+                if (style.insertion == SKIP) {
                     sink.accept(0, style, cp)
-                    i += cpLen
-                    si += 1
+                    i++
                     continue
                 }
 
-                val match = replace.entries.firstOrNull { input.regionMatches(i, it.key, 0, it.key.length) }
-                if (match == null) {
+                val bucket = prefix[cp]
+                if (bucket == null) {
                     sink.accept(0, style, cp)
-                    i += cpLen
-                    si += 1
+                    i++
                     continue
                 }
 
-                match.value.accept { _, repStyle, repCp ->
+                var matched: Entry? = null
+                for (entry in bucket) {
+                    val len = entry.len
+                    if (i + len > size) continue
+
+                    val cps = entry.cps
+                    var j = 0
+                    var ok = true
+
+                    while (j < len) {
+                        if (chars[i + j] != cps[j]) {
+                            ok = false
+                            break
+                        }
+
+                        j++
+                    }
+
+                    if (ok) {
+                        matched = entry
+                        break
+                    }
+                }
+
+                if (matched == null) {
+                    sink.accept(0, style, cp)
+                    i++
+                    continue
+                }
+
+                val seq2 = matched.seq
+                seq2.accept { _, repStyle, repCp ->
                     sink.accept(0, repStyle.applyTo(style), repCp)
                     true
                 }
 
-                val advance = match.key.codePointCount(0, match.key.length)
-                i += match.key.length
-                si += advance
+                i += matched.len
             }
+
             true
         }
     }
 
     private fun c() {
-        f = replace.keys.mapNotNullTo(HashSet(replace.size)) { str -> str.codePointAt(0).takeIf { it >= 0 } }
+        prefix.clear()
+
+        for ((k, v) in replace) {
+            val cps = k.codePoints().toArray()
+            val entry = Entry(cps, cps.size, v)
+            prefix.computeIfAbsent(cps[0]) { mutableListOf() }.add(entry)
+        }
     }
 
     private fun help() {
@@ -204,27 +248,5 @@ object VisualWords : Module(
         }
 
         return builder
-    }
-
-    private fun FormattedCharSequence.str(): String {
-        val builder = StringBuilder()
-
-        accept { _, _, cp ->
-            builder.appendCodePoint(cp)
-            true
-        }
-
-        return builder.toString()
-    }
-
-    private fun FormattedCharSequence.style(): List<Style> {
-        val list = mutableListOf<Style>()
-
-        accept { _, style, _ ->
-            list.add(style)
-            true
-        }
-
-        return list
     }
 }
