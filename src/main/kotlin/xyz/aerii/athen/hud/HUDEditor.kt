@@ -7,7 +7,6 @@ import tech.thatgravyboat.skyblockapi.platform.scale
 import tech.thatgravyboat.skyblockapi.platform.translate
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.handlers.Scram
-import xyz.aerii.athen.handlers.Scurry
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.Dev
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
@@ -18,6 +17,8 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
     private var grid = false
     private var snappy = false
     private var dragging: HUDElement? = null
+    private var mx = 0f
+    private var my = 0f
     private var x0 = 0f
     private var y0 = 0f
 
@@ -26,12 +27,15 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
     }
 
     private val active: HUDElement?
-        get() = dragging ?: _act.filter { it.render }.asReversed().firstOrNull { it.isHovered(Scurry.x, Scurry.y) }
+        get() = dragging ?: _act.filter { it.render }.asReversed().firstOrNull { it.isHovered(mx, my) }
 
     override fun onScramRender(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+        mx = Resolute.mx
+        my = Resolute.my
+
         dragging?.apply {
-            x = Scurry.x - x0
-            y = Scurry.y - y0
+            x = mx - x0
+            y = my - y0
 
             if (!snappy) return@apply
 
@@ -41,20 +45,23 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
             y = (((y - pad) / 8f).roundToInt() * 8f) + pad
         }
 
-        guiGraphics.fill(0, 0, width, height, Mocha.Mauve.withAlpha(0.1f))
+        Resolute.push(guiGraphics)
+        guiGraphics.fill(0, 0, Resolute.width.toInt(), Resolute.height.toInt(), Mocha.Mauve.withAlpha(0.1f))
 
         if (grid) {
             val color = Mocha.Surface0.withAlpha(0.35f)
+            val rw = Resolute.width.toInt()
+            val rh = Resolute.height.toInt()
 
             var gx = 0
-            while (gx <= width) {
-                guiGraphics.fill(gx, 0, gx + 1, height, color)
+            while (gx <= rw) {
+                guiGraphics.fill(gx, 0, gx + 1, rh, color)
                 gx += 8
             }
 
             var gy = 0
-            while (gy <= height) {
-                guiGraphics.fill(0, gy, width, gy + 1, color)
+            while (gy <= rh) {
+                guiGraphics.fill(0, gy, rw, gy + 1, color)
                 gy += 8
             }
         }
@@ -80,7 +87,7 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
             val textHeight = client.font.lineHeight
 
             guiGraphics.pose().pushMatrix()
-            guiGraphics.translate(Scurry.x + 12, Scurry.y - textHeight / 2)
+            guiGraphics.translate(mx + 12, my - textHeight / 2)
 
             guiGraphics.fill(-6, -6, textWidth + 6, textHeight + 6, Mocha.Base.withAlpha(0.8f))
             guiGraphics.drawOutline(-6, -6, textWidth + 12, textHeight + 12, Mocha.Text.argb)
@@ -89,21 +96,22 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
         }
 
         Help.render(guiGraphics)
+        Resolute.pop(guiGraphics)
     }
 
     override fun onScramMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {
-        if (Help.hovered(Scurry.x, Scurry.y)) {
+        if (Help.hovered(mx, my)) {
             Help.dragging = true
-            Help.x0 = Scurry.x - Help.x
-            Help.y0 = Scurry.y - Help.y
+            Help.x0 = mx - Help.x
+            Help.y0 = my - Help.y
             return true
         }
 
         val hovered = active ?: return false
 
         dragging = hovered
-        x0 = Scurry.x.toInt() - hovered.x
-        y0 = Scurry.y.toInt() - hovered.y
+        x0 = mx - hovered.x
+        y0 = my - hovered.y
         return true
     }
 
@@ -134,13 +142,13 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
         when (keyCode) {
             GLFW.GLFW_KEY_H -> {
                 val e = active ?: return false
-                e.x = (width - e.width * e.scale) / 2f
+                e.x = (Resolute.width - e.width * e.scale) / 2f
                 return true
             }
 
             GLFW.GLFW_KEY_V -> {
                 val e = active ?: return false
-                e.y = (height - e.height * e.scale) / 2f
+                e.y = (Resolute.height - e.height * e.scale) / 2f
                 return true
             }
 
@@ -232,8 +240,8 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
             val font = client.font ?: return@with
 
             if (dragging) {
-                x = Scurry.x - x0
-                y = Scurry.y - y0
+                x = mx - x0
+                y = my - y0
             }
 
             pose().pushMatrix()

@@ -21,6 +21,8 @@ object HUDManager {
         on<GuiEvent.Render.Pre> {
             if (client.screen is HUDEditor) return@on
 
+            Resolute.push(graphics)
+
             for (element in elements.values) {
                 if (!element.render0) continue
 
@@ -30,6 +32,8 @@ object HUDManager {
                     graphics.pushPop { element.render(graphics, false) }
                 }
             }
+
+            Resolute.pop(graphics)
         }
     }
 

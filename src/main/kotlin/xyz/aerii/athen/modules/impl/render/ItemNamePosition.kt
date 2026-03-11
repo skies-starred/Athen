@@ -4,9 +4,8 @@ package xyz.aerii.athen.modules.impl.render
 
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.events.TickEvent
-import xyz.aerii.athen.events.core.override
 import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.athen.hud.Resolute
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 
@@ -17,26 +16,15 @@ object ItemNamePosition : Module(
     Category.RENDER
 ) {
     private const val str = "§cEpic item"
-    private var int = 0
+    private val int by lazy { client.font?.width(str) ?: 0 }
 
-    val hud = config.hud("Item name") {
+    val hud = config.hud("Item name", outsidePreview = false) {
         if (it) sizedText(str) else null
     }
 
-    init {
-        on<TickEvent.Client> {
-            int = client.font.width(str)
-
-            if (hud.x == 20f && hud.y == 20f) {
-                hud.x = client.window.guiScaledWidth / 2f
-                hud.y = client.window.guiScaledHeight - 59f
-            }
-        }.override().once()
-    }
+    @JvmStatic
+    fun x(): Int = ((hud.x + int / 2) * Resolute.scale).toInt()
 
     @JvmStatic
-    fun x(): Int = hud.x.toInt() + int / 2
-
-    @JvmStatic
-    fun y(): Int = hud.y.toInt()
+    fun y(): Int = (hud.y * Resolute.scale).toInt()
 }
