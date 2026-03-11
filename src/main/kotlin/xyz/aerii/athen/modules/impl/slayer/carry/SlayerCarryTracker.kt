@@ -20,6 +20,7 @@ import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Texter.onHover
+import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.centeredText
 import xyz.aerii.athen.handlers.Typo.command
 import xyz.aerii.athen.handlers.Typo.lie
@@ -32,6 +33,7 @@ import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryStateTracker.tracked
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.Render3D
+import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.render.renderBoundingBox
 import xyz.aerii.athen.utils.toDuration
 import java.awt.Color
@@ -100,15 +102,20 @@ object SlayerCarryTracker : Module(
             }
     }
 
-    init {
-        config.hud("Slayer Carry display") {
-            if (it) return@hud sizedText("§f§lSlayer Carries:\n§7> §bExample §8[§7Void T4§8]§f: §b3§f/§b10 §7(12.5s | 28/hr)")
-            if (tracked.isEmpty()) return@hud null
+    private val ex0 = listOf("§f§lSlayer Carries:", "§7> §bExample §8[§7Void T4§8]§f: §b3§f/§b10 §7(12.5s | 28/hr)").fcs
+    private val display = Ticking {
+        if (tracked.isEmpty()) return@Ticking null
 
-            sizedText(buildString {
-                append("§f§lSlayer Carries:")
-                for (t in tracked.values) append("\n${t.str()}")
-            })
+        buildString {
+            append("§f§lSlayer Carries:")
+            for (t in tracked.values) append("\n${t.str()}")
+        }.split("\n").fcs
+    }
+
+    init {
+        config.hud("Slayer carry display") {
+            if (it) return@hud sizedText(ex0)
+            sizedText(display() ?: return@hud null)
         }
 
         on<TickEvent.Client> {

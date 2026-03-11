@@ -13,12 +13,14 @@ import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Smoothie.alert
+import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.Render3D
+import xyz.aerii.athen.utils.render.fcs
 import java.awt.Color
 
 @Load
@@ -34,7 +36,12 @@ object BuildInfo : Module(
     private val `stun$percent` by config.slider("Notify at", 90, 1, 100, "%").dependsOn { stun }
     private val `stun$message` by config.textInput("Notification message", "<red>Stun!").dependsOn { stun }
 
+    private val ex0 = listOf("§7Builders: §c3", "§7Progress: §c47%").fcs
     private var sent: Boolean = false
+
+    private val display = Ticking {
+        listOf("§7Builders: §c${KuudraAPI.buildPlayers}", "§7Progress: §c${KuudraAPI.buildProgress.value}%").fcs
+    }
 
     private val render: Boolean
         get() = KuudraAPI.inRun && KuudraAPI.phase == KuudraPhase.Build
@@ -52,10 +59,10 @@ object BuildInfo : Module(
         }
 
         config.hud("Build info") {
-            if (it) return@hud sizedText("§7Builders: §c3\n§7Progress: §c47%")
+            if (it) return@hud sizedText(ex0)
             if (!render) return@hud null
 
-            sizedText("§7Builders: §c${KuudraAPI.buildPlayers}\n§7Progress: §c${KuudraAPI.buildProgress.value}%")
+            sizedText(display() ?: return@hud null)
         }
 
         on<KuudraEvent.Start> {

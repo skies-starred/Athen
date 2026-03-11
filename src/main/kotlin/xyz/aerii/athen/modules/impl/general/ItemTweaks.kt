@@ -32,7 +32,7 @@ import xyz.aerii.athen.utils.abbreviate
 import xyz.aerii.athen.utils.formatted
 import xyz.aerii.athen.utils.isBound
 import xyz.aerii.athen.utils.isPressed
-import xyz.aerii.athen.utils.render.Render2D.sizedText
+import xyz.aerii.athen.utils.render.Render2D.text
 import xyz.aerii.athen.utils.toDurationFromMillis
 import java.time.Instant
 import java.time.ZoneId
@@ -77,10 +77,7 @@ object ItemTweaks : Module(
 
             cakeRegex.findOrNull(slot.item.displayName.stripped(), "year") {
                 renders.add { graphics, slot ->
-                    graphics.pushPop {
-                        graphics.translate(slot.x, slot.y + 8)
-                        graphics.sizedText("§b${it.component1()}")
-                    }
+                    graphics.text("§b${it.component1()}", slot.x, slot.y + 8)
                 }
             }
         }.runWhen(cakeNumbers.state)

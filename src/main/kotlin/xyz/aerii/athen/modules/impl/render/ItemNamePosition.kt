@@ -8,6 +8,7 @@ import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.hud.Resolute
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
+import xyz.aerii.athen.utils.render.fcs
 
 @Load
 object ItemNamePosition : Module(
@@ -15,11 +16,11 @@ object ItemNamePosition : Module(
     "Changes the positions of item display names",
     Category.RENDER
 ) {
-    private const val str = "§cEpic item"
-    private val int by lazy { client.font?.width(str) ?: 0 }
+    private val ex0 = "§cEpic item".fcs
+    private val int by lazy { client.font?.width(ex0) ?: 0 }
 
     val hud = config.hud("Item name", outsidePreview = false) {
-        if (it) sizedText(str) else null
+        if (it) sizedText(ex0) else null
     }
 
     @JvmStatic

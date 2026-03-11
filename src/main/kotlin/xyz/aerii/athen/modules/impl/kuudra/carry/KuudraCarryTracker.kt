@@ -1,3 +1,5 @@
+@file:Suppress("ObjectPrivatePropertyName")
+
 package xyz.aerii.athen.modules.impl.kuudra.carry
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
@@ -15,10 +17,13 @@ import xyz.aerii.athen.api.kuudra.KuudraAPI
 import xyz.aerii.athen.api.kuudra.enums.KuudraTier
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
+import xyz.aerii.athen.config.ConfigBuilder
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.WorldRenderEvent
+import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Texter.literal
+import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.centeredText
 import xyz.aerii.athen.handlers.Typo.command
 import xyz.aerii.athen.handlers.Typo.lie
@@ -30,6 +35,7 @@ import xyz.aerii.athen.modules.impl.kuudra.carry.KuudraCarryStateTracker.tracked
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.Render3D
+import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.render.renderBoundingBox
 import xyz.aerii.athen.utils.toDuration
 import java.awt.Color
@@ -48,6 +54,14 @@ object KuudraCarryTracker : Module(
     private val highlightPlayer by config.switch("Highlight player", true)
     private val playerColor by config.colorPicker("Player color", Color(0, 255, 255, 150)).dependsOn { highlightPlayer }
     private val playerLineWidth by config.slider("Player line width", 2f, 0f, 10f).dependsOn { highlightPlayer }
+
+    private val ex0 = listOf("§f§lKuudra Carries:", "§7> §bExample §8[§7Infernal§8]§f: §b3§f/§b10 §7(5m 30s | 12/hr)").fcs
+    private val hud: ConfigBuilder.HUDElementBuilder = config.hud("Kuudra carry display") {
+        if (it) return@hud sizedText(ex0)
+        sizedText(display() ?: return@hud null)
+    }
+
+    private val `hud$kuudra` by config.switch("Only in Kuudra", true).dependsOn { hud.enabled }
 
     private val tierMap = mapOf(
         "basic" to KuudraTier.BASIC,
@@ -70,23 +84,17 @@ object KuudraCarryTracker : Module(
             }
     }
 
+    private val display = Ticking {
+        if (tracked.isEmpty()) return@Ticking null
+        if (`hud$kuudra` && !SkyBlockIsland.KUUDRA.inIsland.value) return@Ticking null
+
+        buildString {
+            append("§f§lKuudra Carries:")
+            for (i in tracked.values) append("\n${i.str()}")
+        }.split("\n").fcs
+    }
+
     init {
-        config.hudElement("Kuudra Carry display") {
-            val onlyInKuudra by switch("Only in Kuudra", true)
-            ;
-
-            {
-                if (it) return@hudElement sizedText("§f§lKuudra Carries:\n§7> §bExample §8[§7Infernal§8]§f: §b3§f/§b10 §7(5m 30s | 12/hr)")
-                if (tracked.isEmpty()) return@hudElement null
-                if (onlyInKuudra && !SkyBlockIsland.KUUDRA.inIsland.value) return@hudElement null
-
-                sizedText(buildString {
-                    append("§f§lKuudra Carries:")
-                    for (i in tracked.values) append("\n${i.str()}")
-                })
-            }
-        }
-
         on<KuudraEvent.Start> {
             val tier = KuudraAPI.tier ?: return@on
 
@@ -133,7 +141,7 @@ object KuudraCarryTracker : Module(
                 val e = teammate.entity ?: continue
                 Render3D.drawBox(e.renderBoundingBox, playerColor, playerLineWidth, false)
             }
-        }
+        }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
 
         on<CommandRegistration> {
             event.register(Athen.modId) {

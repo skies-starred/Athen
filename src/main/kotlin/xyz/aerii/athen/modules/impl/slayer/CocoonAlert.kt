@@ -10,6 +10,7 @@ import xyz.aerii.athen.handlers.Smoothie.alert
 import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
+import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.toDurationFromMillis
 
 @Load
@@ -23,8 +24,9 @@ object CocoonAlert : Module(
     private val `alert$message` by config.textInput("Alert message", "<red>Boss cocooned!").dependsOn { alert }
     private val `alert$sound` by config.sound("Alert sound").dependsOn { alert }
 
+    private val ex0 = "Cocoon: §c4.6s".fcs
     private val timer = config.hud("Cocoon timer") {
-        if (it) return@hud sizedText("Cocoon: §c4.6s")
+        if (it) return@hud sizedText(ex0)
         if (time == 0L) return@hud null
 
         val t = time - System.currentTimeMillis()

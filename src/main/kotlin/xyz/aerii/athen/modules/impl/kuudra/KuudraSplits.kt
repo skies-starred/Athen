@@ -5,6 +5,7 @@ package xyz.aerii.athen.modules.impl.kuudra
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.serialization.Codec
 import net.minecraft.network.chat.Component
+import net.minecraft.util.FormattedCharSequence
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
@@ -16,10 +17,10 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.LocationEvent
-import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.override
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
+import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
@@ -27,6 +28,7 @@ import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.render.Render2D.sizedText
+import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.toDuration
 import xyz.aerii.athen.utils.toDurationFromMillis
 import kotlin.math.abs
@@ -40,9 +42,8 @@ object KuudraSplits : Module(
 ) {
     private val chat by config.switch("Send to chat", true)
     private val _hud = config.hud("Splits display") {
-        if (it) return@hud sizedText(hudExample)
-        val display = display ?: return@hud null
-        sizedText(display)
+        if (it) return@hud sizedText(fcs)
+        sizedText(display() ?: return@hud null)
     }
 
     private val estimatePace by config.switch("Estimate run pace")
@@ -66,12 +67,35 @@ object KuudraSplits : Module(
     private val _unused0 by config.textParagraph("Variable: <red>#time<r>, <red>#tick<r>, <red>#pb").dependsOn { advanced }.childOf { styleExpandable }
 
     private val scribble = Scribble("features/kuudraSplits")
+    private val display = Ticking {
+        if (!KuudraAPI.inRun) return@Ticking null
+        val tier = KuudraAPI.tier?.int ?: return@Ticking null
+        val splits = KuudraPhase.entries.filter { tier in it.tiers }
+        val list = mutableListOf<FormattedCharSequence>()
 
-    private var display: List<Component>? = null
+        for (s in splits) {
+            val d0 = s.durTime.toDurationFromMillis(secondsDecimals = 1)
+            val d1 = (s.durTicks / 20.0).toDuration(secondsDecimals = 1)
+            val pb = PB.get(tier, s).toDurationFromMillis(secondsDecimals = 1)
+
+            list += s.style.prs(s.str(), d0, d1, pb).visualOrderText
+        }
+
+        val d0 = splits.sumOf { it.durTime }.toDurationFromMillis(secondsDecimals = 1)
+        val d1 = splits.sumOf { it.durTicks / 20.0 }.toDuration(secondsDecimals = 1)
+        val pb = PB.get(tier, null).toDurationFromMillis(secondsDecimals = 1)
+        list += (if (advanced) overallStyle else generalStyle).prs("Overall", d0, d1, pb).visualOrderText
+
+        if (!estimatePace || splits.none { it.started }) return@Ticking list
+        val ms = splits.est(tier).takeIf { it != 0L } ?: return@Ticking list
+
+        list += estimateStyle.prs("Estimate", ms.toDurationFromMillis(secondsDecimals = 1), "", "").visualOrderText
+        list
+    }
 
     init {
         on<LocationEvent.ServerConnect> {
-            display = null
+            display.reset()
         }.override()
 
         on<CommandRegistration> {
@@ -139,33 +163,6 @@ object KuudraSplits : Module(
 
                 " <dark_gray>• <red>Overall<r>: $t0 <gray>[$t1]$str".parse().lie()
             }
-        }
-
-        on<TickEvent.Client> {
-            if (!KuudraAPI.inRun) return@on
-            if (!_hud.enabled) return@on
-            val tier = KuudraAPI.tier?.int ?: return@on
-            val splits = KuudraPhase.entries.filter { tier in it.tiers }
-            val list = mutableListOf<Component>()
-
-            for (s in splits) {
-                val d0 = s.durTime.toDurationFromMillis(secondsDecimals = 1)
-                val d1 = (s.durTicks / 20.0).toDuration(secondsDecimals = 1)
-                val pb = PB.get(tier, s).toDurationFromMillis(secondsDecimals = 1)
-
-                list += s.style.prs(s.str(), d0, d1, pb)
-            }
-
-            val d0 = splits.sumOf { it.durTime }.toDurationFromMillis(secondsDecimals = 1)
-            val d1 = splits.sumOf { it.durTicks / 20.0 }.toDuration(secondsDecimals = 1)
-            val pb = PB.get(tier, null).toDurationFromMillis(secondsDecimals = 1)
-            list += (if (advanced) overallStyle else generalStyle).prs("Overall", d0, d1, pb)
-
-            if (!estimatePace || splits.none { it.started }) return@on ::display.set(list)
-            val ms = splits.est(tier).takeIf { it != 0L } ?: return@on ::display.set(list)
-
-            list += estimateStyle.prs("Estimate", ms.toDurationFromMillis(secondsDecimals = 1), "", "")
-            display = list
         }
     }
 
@@ -279,13 +276,15 @@ object KuudraSplits : Module(
             }
         }
 
-    private const val hudExample: String =
-        "§cSupply§f: 47.4s §7[46.4s]\n" +
-        "§cBuild§f: 34.3s §7[31.9s]\n" +
-        "§cEaten§f: 6.2s §7[5.7s]\n" +
-        "§cStun§f: 0.3s §7[0.3s]\n" +
-        "§cDPS§f: 8.2s §7[8.1s]\n" +
-        "§cSkip§f: 5.6s §7[5.4s]\n" +
-        "§cKill§f: 5.4s §7[5.4s]\n" +
-        "§4Overall§f: 1m 40s §7[1m 38s]"
+    private val fcs: List<FormattedCharSequence> =
+        """
+        §cSupply§f: 47.4s §7[46.4s]
+        §cBuild§f: 34.3s §7[31.9s]
+        §cEaten§f: 6.2s §7[5.7s]
+        §cStun§f: 0.3s §7[0.3s]
+        §cDPS§f: 8.2s §7[8.1s]
+        §cSkip§f: 5.6s §7[5.4s]
+        §cKill§f: 5.4s §7[5.4s]
+        §4Overall§f: 1m 40s §7[1m 38s]
+        """.trimIndent().lines().fcs
 }

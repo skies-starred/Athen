@@ -1,3 +1,5 @@
+@file:Suppress("ObjectPrivatePropertyName")
+
 package xyz.aerii.athen.modules.impl.dungeon.carry
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
@@ -15,10 +17,13 @@ import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.dungeon.DungeonAPI
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
+import xyz.aerii.athen.config.ConfigBuilder
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.DungeonEvent
 import xyz.aerii.athen.events.WorldRenderEvent
+import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Texter.literal
+import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.centeredText
 import xyz.aerii.athen.handlers.Typo.command
 import xyz.aerii.athen.handlers.Typo.lie
@@ -30,6 +35,7 @@ import xyz.aerii.athen.modules.impl.dungeon.carry.DungeonCarryStateTracker.track
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.Render3D
+import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.render.renderBoundingBox
 import xyz.aerii.athen.utils.toDuration
 import java.awt.Color
@@ -48,6 +54,14 @@ object DungeonCarryTracker : Module(
     private val highlightPlayer by config.switch("Highlight player", true)
     private val playerColor by config.colorPicker("Player color", Color(0, 255, 255, 150)).dependsOn { highlightPlayer }
     private val playerLineWidth by config.slider("Player line width", 2f, 0f, 10f).dependsOn { highlightPlayer }
+
+    private val ex0 = listOf("§f§lDungeon Carries:", "§7> §bExample §8[§7M7§8]§f: §b3§f/§b10 §7(5m 30s | 12/hr)").fcs
+    private val hud: ConfigBuilder.HUDElementBuilder = config.hud("Dungeon carry display") {
+        if (it) return@hud sizedText(ex0)
+        sizedText(display() ?: return@hud null)
+    }
+
+    private val `hud$dungeon` by config.switch("Only in dungeons", true).dependsOn { hud.enabled }
 
     private val floorMap = mapOf(
         "e" to DungeonFloor.E,
@@ -75,23 +89,17 @@ object DungeonCarryTracker : Module(
             }
     }
 
+    private val display = Ticking {
+        if (tracked.isEmpty()) return@Ticking null
+        if (`hud$dungeon` && !SkyBlockIsland.THE_CATACOMBS.inIsland.value) return@Ticking null
+
+        buildString {
+            append("§f§lDungeon Carries:")
+            for (i in tracked.values) append("\n${i.str()}")
+        }.split("\n").fcs
+    }
+
     init {
-        config.hudElement("Dungeon Carry display") {
-            val onlyInDungeon by switch("Only in dungeons", true)
-            ;
-
-            {
-                if (it) return@hudElement sizedText("§f§lDungeon Carries:\n§7> §bExample §8[§7M7§8]§f: §b3§f/§b10 §7(5m 30s | 12/hr)")
-                if (tracked.isEmpty()) return@hudElement null
-                if (onlyInDungeon && !SkyBlockIsland.THE_CATACOMBS.inIsland.value) return@hudElement null
-
-                sizedText(buildString {
-                    append("§f§lDungeon Carries:")
-                    for (i in tracked.values) append("\n${i.str()}")
-                })
-            }
-        }
-
         on<DungeonEvent.Start> {
             val floor = DungeonAPI.floor.value ?: return@on
 
@@ -137,7 +145,7 @@ object DungeonCarryTracker : Module(
                 val e = teammate.entity ?: continue
                 Render3D.drawBox(e.renderBoundingBox, playerColor, playerLineWidth, false)
             }
-        }
+        }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
 
         on<CommandRegistration> {
             event.register(Athen.modId) {

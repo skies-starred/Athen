@@ -5,14 +5,15 @@ import net.minecraft.world.entity.Entity
 import tech.thatgravyboat.skyblockapi.helpers.getAttachedLines
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
-import xyz.aerii.athen.api.skyblock.SlayerAPI.SLAYER_NAMES
+import xyz.aerii.athen.api.skyblock.SlayerAPI.slayerNames
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
-import xyz.aerii.athen.events.TickEvent
+import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
+import xyz.aerii.athen.utils.render.fcs
 
 @Load
 @OnlyIn(skyblock = true)
@@ -21,37 +22,36 @@ object SlayerDisplay : Module(
     "Displays the slayer boss's nametags on your screen.",
     Category.SLAYER
 ) {
+    private val ex0 = listOf("§c02:46", "§c☠ §bRevenant Horror I §a500§c❤").fcs
+
     private var displayComponents: List<Component>? = null
     private var slayerEntity: Entity? = null
 
-    init {
-        config.hud("Display HUD") {
-            if (it) return@hud sizedText("§c02:46\n§c☠ §bRevenant Horror I §a500§c❤", center = listOf(0))
-            val components = displayComponents ?: return@hud null
-            sizedText(components, center = listOf(0))
+    private val display = Ticking(2) {
+        val entity = slayerEntity ?: return@Ticking null
+
+        val lines = entity.getAttachedLines()
+        val c = ArrayList<Component>(lines.size)
+        val cc = ArrayList<Component>(lines.size)
+
+        for (l in lines) {
+            val name = l.stripped()
+            if ("Spawned by:" in name) continue
+
+            val co = ":" in name
+            if (!co && slayerNames.none { it in name }) continue
+
+            if (co) c.add(l) else cc.add(l)
         }
 
-        on<TickEvent.Client> {
-            if (ticks % 2 != 0) return@on
-            val entity = slayerEntity ?: return@on
+        c += cc
+        c
+    }
 
-            val lines = entity.getAttachedLines()
-            val c = ArrayList<Component>(lines.size)
-            val cc = ArrayList<Component>(lines.size)
-
-            for (i in lines.indices) {
-                val line = lines[i]
-                val name = line.stripped()
-                if ("Spawned by:" in name) continue
-
-                val co = ":" in name
-                if (!co && SLAYER_NAMES.none { it in name }) continue
-
-                if (co) c.add(line) else cc.add(line)
-            }
-
-            c += cc
-            displayComponents = c
+    init {
+        config.hud("Display HUD") {
+            if (it) return@hud sizedText(ex0, center = listOf(0))
+            sizedText(display() ?: return@hud null, center = listOf(0))
         }
 
         on<SlayerEvent.Boss.Spawn> {

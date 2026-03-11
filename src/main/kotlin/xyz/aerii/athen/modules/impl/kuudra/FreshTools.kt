@@ -19,6 +19,7 @@ import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
+import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.toDurationFromMillis
 
 @Load
@@ -33,20 +34,21 @@ object FreshTools : Module(
     private val `alert$message$t` by config.textInput("Message", "<red>Fresh tools!").dependsOn { alert && `alert$message` }
     private val `alert$title` by config.switch("Alert title", true).dependsOn { alert }
     private val `alert$title$t` by config.textInput("Title", "<red>Fresh tools!").dependsOn { alert && `alert$title` }
+
     private val notify by config.switch("Notify party", true)
     private val `notify$message` by config.textInput("Notify message", "FRESH [#buildPerc]").dependsOn { notify }
     private val `notify$unused` by config.textParagraph("Variable: <red>#buildPerc").dependsOn { notify }
     private val `notify$checkParty` by config.switch("Check party", true).dependsOn { notify }
 
+    private val ex0 = "Fresh: §c6.7s".fcs
     private val timer = config.hud("Fresh timer") {
-        if (it) return@hud sizedText("Fresh: §c6.7s")
+        if (it) return@hud sizedText(ex0)
         if (time == -1L) return@hud null
 
         val r = 10_000 - (System.currentTimeMillis() - time)
         if (r <= 0) return@hud fn()
 
         sizedText("Fresh: §c${r.toDurationFromMillis(secondsDecimals = 1)}")
-        null
     }
 
     private var time: Long = -1

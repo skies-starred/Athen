@@ -17,11 +17,13 @@ import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Smoothie.alert
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.onHover
+import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
+import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.toDuration
 import xyz.aerii.athen.utils.toDurationFromMillis
 import kotlin.math.abs
@@ -37,9 +39,30 @@ object WatcherHelper : Module(
     private val speak by config.switch("Show alert on speak", true)
     private val move by config.switch("Show alert on move", true)
 
+    private val ex0 = listOf("Speak: §c23.4s §7(23.2s)", "Move: §c25.6s §7(24.6s)", "Total: §c57.3s §7(54.2s)").fcs
+    private val ex1 = listOf("Speak: §c23.4s", "Move: §c25.6s", "Total: §c57.3s").fcs
+
+    private val display = Ticking(2) {
+        if (!DungeonAPI.bloodOpened.value) return@Ticking null
+        if (DungeonAPI.inBoss.value) return@Ticking null
+
+        buildString {
+            append("Speak: §c$`display$speak`")
+            if (showTicks) append(" §7($`display$speak$t`)")
+            append('\n')
+
+            append("Move: §c$`display$move`")
+            if (showTicks) append(" §7($`display$move$t`)")
+            append('\n')
+
+            append("Total: §c$`display$total`")
+            if (showTicks) append(" §7($`display$total$t`)")
+        }.split("\n").fcs
+    }
+
     private val hud: ConfigBuilder.HUDElementBuilder = config.hud("Blood timers") {
-        if (it) return@hud if (showTicks) sizedText("Speak: §c23.4s §7(23.2s)\nMove: §c25.6s §7(24.6s)\nTotal: §c57.3s §7(54.2s)") else sizedText("Speak: §c23.4s\nMove: §c25.6s\nTotal: §c57.3s")
-        val display = display ?: return@hud null
+        if (it) return@hud if (showTicks) sizedText(ex0) else sizedText(ex1)
+        val display = display() ?: return@hud null
         sizedText(display)
     }
 
@@ -68,7 +91,6 @@ object WatcherHelper : Module(
     private var `display$move$t`: String = "???"
     private var `display$total`: String = "???"
     private var `display$total$t`: String = "???"
-    private var display: String? = null
 
     private enum class Shrimp {
         SNAIL,
@@ -136,21 +158,6 @@ object WatcherHelper : Module(
 
             `display$total` = (System.currentTimeMillis() - `blood$start`).toDurationFromMillis(secondsDecimals = 1, secondsOnly = true)
             `display$total$t` = ((Chronos.Ticker.tickServer - `blood$start$t`) / 20.0).toDuration(secondsDecimals = 1, secondsOnly = true)
-
-            if (!hud.enabled) return@on
-
-            display = buildString {
-                append("Speak: §c$`display$speak`")
-                if (showTicks) append(" §7($`display$speak$t`)")
-                append('\n')
-
-                append("Move: §c$`display$move`")
-                if (showTicks) append(" §7($`display$move$t`)")
-                append('\n')
-
-                append("Total: §c$`display$total`")
-                if (showTicks) append(" §7($`display$total$t`)")
-            }
         }.runWhen(DungeonAPI.bloodOpened)
 
         on<MessageEvent.Chat.Receive> {
@@ -229,6 +236,6 @@ object WatcherHelper : Module(
         `display$move$t` = "???"
         `display$total` = "???"
         `display$total$t` = "???"
-        display = null
+        display.reset()
     }
 }

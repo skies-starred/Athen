@@ -1,9 +1,11 @@
 package xyz.aerii.athen.utils.render
 
+import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.athen.handlers.Texter.literal
 
 operator fun Vec3.unaryMinus(): Vec3 = Vec3(-x, -y, -z)
 
@@ -24,3 +26,9 @@ inline val Entity.renderPos: Vec3
 
 inline val Entity.renderBoundingBox: AABB
     get() = boundingBox.move(renderX - x, renderY - y, renderZ - z)
+
+inline val String.fcs: FormattedCharSequence
+    get() = literal().visualOrderText
+
+inline val List<String>.fcs: List<FormattedCharSequence>
+    get() = map { it.literal().visualOrderText }

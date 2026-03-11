@@ -8,6 +8,7 @@ import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.handlers.Smoothie
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
+import xyz.aerii.athen.utils.render.fcs
 
 @Load
 @OnlyIn(skyblock = true)
@@ -19,9 +20,11 @@ object LagDetector : Module(
     private val threshold by config.slider("Threshold", 750, 100, 5000, "ms")
     private var lastTick = 0L
 
+    private val ex0 = "§c67ms".fcs
+
     init {
         config.hud("Lag display") {
-            if (it) return@hud sizedText("§c67ms")
+            if (it) return@hud sizedText(ex0)
             if (lastTick == 0L) return@hud null
             if (Smoothie.player == null) return@hud null
 

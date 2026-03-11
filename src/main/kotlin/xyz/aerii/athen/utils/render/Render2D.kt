@@ -1,7 +1,10 @@
 package xyz.aerii.athen.utils.render
 
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.locale.Language
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.FormattedText
+import net.minecraft.util.FormattedCharSequence
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.handlers.Smoothie.client
@@ -9,61 +12,103 @@ import java.awt.Color
 
 @Load
 object Render2D {
+    // <editor-fold desc = "Text rendering">
     @JvmStatic
     @JvmOverloads
-    fun GuiGraphics.sizedText(
-        text: String,
-        color: Int = 0xFFFFFFFF.toInt(),
-        shadow: Boolean = true,
-        lineSpacing: Int = 2,
-        center: List<Int> = emptyList()
-    ): Pair<Int, Int> {
-        val lines = text.split("\n")
-        val widths = lines.map { client.font.width(it) }
-        val maxWidth = widths.maxOrNull() ?: 0
-
-        for ((i, l) in lines.withIndex()) {
-            val y = i * (client.font.lineHeight + lineSpacing)
-            val x = if (i in center) (maxWidth - widths[i]) / 2 else 0
-            drawString(client.font, l, x, y, color, shadow)
-        }
-
-        val totalHeight = lines.size * client.font.lineHeight + (lines.size - 1) * lineSpacing
-        return maxWidth to totalHeight
+    @JvmName($$"text$string")
+    fun GuiGraphics.text(text: String, x: Int, y: Int, shadow: Boolean = true, color: Int = -1, center: Boolean = false) {
+        val xx = if (center) x - client.font.width(text) / 2 else x
+        drawString(client.font, text, xx, y, color, shadow)
     }
 
     @JvmStatic
     @JvmOverloads
-    fun GuiGraphics.sizedText(
-        components: List<Component>,
-        color: Int = 0xFFFFFFFF.toInt(),
-        shadow: Boolean = true,
-        lineSpacing: Int = 2,
-        center: List<Int> = emptyList()
-    ): Pair<Int, Int> {
-        val widths = components.map { client.font.width(it) }
-        val maxWidth = widths.maxOrNull() ?: 0
-
-        for ((i, comp) in components.withIndex()) {
-            val y = i * (client.font.lineHeight + lineSpacing)
-            val x = if (i in center) (maxWidth - widths[i]) / 2 else 0
-            drawString(client.font, comp, x, y, color, shadow)
-        }
-
-        val totalHeight = components.size * client.font.lineHeight + (components.size - 1) * lineSpacing
-        return maxWidth to totalHeight
+    @JvmName($$"text$component")
+    fun GuiGraphics.text(text: Component, x: Int, y: Int, shadow: Boolean = true, color: Int = -1, center: Boolean = false) {
+        val xx = if (center) x - client.font.width(text) / 2 else x
+        drawString(client.font, text, xx, y, color, shadow)
     }
 
     @JvmStatic
     @JvmOverloads
-    fun GuiGraphics.sizedText(
-        component: Component,
-        color: Int = 0xFFFFFFFF.toInt(),
-        shadow: Boolean = true
-    ): Pair<Int, Int> {
-        drawString(client.font, component, 0, 0, color, shadow)
-        return client.font.width(component) to client.font.lineHeight
+    @JvmName($$"text$fcs")
+    fun GuiGraphics.text(text: FormattedCharSequence, x: Int, y: Int, shadow: Boolean = true, color: Int = -1, center: Boolean = false) {
+        val xx = if (center) x - client.font.width(text) / 2 else x
+        drawString(client.font, text, xx, y, color, shadow)
     }
+
+    @JvmStatic
+    @JvmOverloads
+    @JvmName($$"text$string$multi")
+    fun GuiGraphics.text(texts: List<String>, x: Int, y: Int, shadow: Boolean = true, color: Int = -1, spacing: Int = 2, center: List<Int> = emptyList()) {
+        text(texts.map { Language.getInstance().getVisualOrder(FormattedText.of(it)) }, x, y, shadow, color, spacing, center)
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    @JvmName($$"text$component$multi")
+    fun GuiGraphics.text(texts: List<Component>, x: Int, y: Int, shadow: Boolean = true, color: Int = -1, spacing: Int = 2, center: List<Int> = emptyList()) {
+        text(texts.map { it.visualOrderText }, x, y, shadow, color, spacing, center)
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    @JvmName($$"text$fcs$multi")
+    fun GuiGraphics.text(texts: List<FormattedCharSequence>, x: Int, y: Int, shadow: Boolean = true, color: Int = -1, spacing: Int = 2, center: List<Int> = emptyList()) {
+        val widths = texts.map { client.font.width(it) }
+        drawLines(texts, widths, x, y, color, shadow, spacing, center)
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    @JvmName($$"sizedText$string")
+    fun GuiGraphics.sizedText(text: String, shadow: Boolean = true, color: Int = -1, center: Boolean = false): Pair<Int, Int> {
+        text(text, 0, 0, shadow, color, center)
+        return client.font.width(text) to client.font.lineHeight
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    @JvmName($$"sizedText$component")
+    fun GuiGraphics.sizedText(text: Component, shadow: Boolean = true, color: Int = -1, center: Boolean = false): Pair<Int, Int> {
+        text(text, 0, 0, shadow, color, center)
+        return client.font.width(text) to client.font.lineHeight
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    @JvmName($$"sizedText$fcs")
+    fun GuiGraphics.sizedText(text: FormattedCharSequence, shadow: Boolean = true, color: Int = -1, centered: Boolean = false): Pair<Int, Int> {
+        text(text, 0, 0, shadow, color, centered)
+        return client.font.width(text) to client.font.lineHeight
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    @JvmName($$"sizedText$string$multi")
+    fun GuiGraphics.sizedText(texts: List<String>, shadow: Boolean = true, color: Int = -1, spacing: Int = 2, center: List<Int> = emptyList()): Pair<Int, Int> {
+        return sizedText(texts.map { Language.getInstance().getVisualOrder(FormattedText.of(it)) }, shadow, color, spacing, center)
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    @JvmName($$"sizedText$component$multi")
+    fun GuiGraphics.sizedText(texts: List<Component>, shadow: Boolean = true, color: Int = -1, spacing: Int = 2, center: List<Int> = emptyList()): Pair<Int, Int> {
+        return sizedText(texts.map { it.visualOrderText }, shadow, color, spacing, center)
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    @JvmName($$"sizedText$fcs$multi")
+    fun GuiGraphics.sizedText(texts: List<FormattedCharSequence>, shadow: Boolean = true, color: Int = -1, spacing: Int = 2, center: List<Int> = emptyList()): Pair<Int, Int> {
+        val widths = texts.map { client.font.width(it) }
+
+        drawLines(texts, widths, 0, 0, color, shadow, spacing, center)
+
+        val h = texts.size * client.font.lineHeight + (texts.size - 1) * spacing
+        return (widths.maxOrNull() ?: 0) to h
+    }
+    // </editor-fold>
 
     @JvmStatic
     @JvmOverloads
@@ -86,5 +131,14 @@ object Render2D {
         fill(x - border, y + height, x + width + border, y + height + border, color)
         fill(x - border, y, x, y + height, color)
         fill(x + width, y, x + width + border, y + height, color)
+    }
+
+    private fun GuiGraphics.drawLines(lines: List<FormattedCharSequence>, widths: List<Int>, x: Int, y: Int, color: Int, shadow: Boolean, spacing: Int, center: List<Int>) {
+        val max = widths.maxOrNull() ?: 0
+        for (i in lines.indices) {
+            val xx = if (i in center) x + (max - widths[i]) / 2 else x
+            val yy = y + i * (client.font.lineHeight + spacing)
+            drawString(client.font, lines[i], xx, yy, color, shadow)
+        }
     }
 }
