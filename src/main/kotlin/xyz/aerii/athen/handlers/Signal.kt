@@ -151,7 +151,10 @@ object Signal {
     }
 
     @Subscription(tech.thatgravyboat.skyblockapi.api.events.time.TickEvent::class)
-    fun onTick() = TickEvent.Client.post()
+    fun onTick() {
+        TickEvent.Client.post()
+        if (Smoothie.client.isSingleplayer) TickEvent.Server.post()
+    }
 
     @Subscription
     fun onTabListChange(event: TabListChangeEvent) = TabListEvent.Change(event.old, event.new).post()

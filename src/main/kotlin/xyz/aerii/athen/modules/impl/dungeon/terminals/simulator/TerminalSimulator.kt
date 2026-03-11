@@ -9,6 +9,7 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.config.ConfigManager
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.override
 import xyz.aerii.athen.handlers.React
 import xyz.aerii.athen.handlers.Smoothie.client
@@ -47,6 +48,10 @@ object TerminalSimulator : Module(
                 ConfigManager.updateConfig(configKey ?: return@onChange, false)
             }
         }
+
+        on<TickEvent.Client> {
+            TickEvent.Server.post()
+        }.override(s0)
 
         on<LocationEvent.ServerConnect> {
             s0.value = client.currentServer?.ip == ipInput
