@@ -1,4 +1,4 @@
-@file:Suppress("Unused")
+@file:Suppress("Unused", "ObjectPrivatePropertyName")
 
 package xyz.aerii.athen.modules.impl.render
 
@@ -16,6 +16,7 @@ import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.GameEvent
 import xyz.aerii.athen.handlers.Beacon
 import xyz.aerii.athen.handlers.Scribble
+import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.centeredText
@@ -36,6 +37,8 @@ object VisualWords : Module(
     private class Entry(val cps: IntArray, val len: Int, val seq: FormattedCharSequence)
 
     private val unused by config.textParagraph("Use the command \"/athen visuals help\" to learn more about the available commands!")
+    private val nickHider by config.switch("Nick hider")
+    private val nickname = config.textInput("Nickname", "cooluser4").dependsOn { nickHider }.custom("nickname")
 
     private const val SKIP = "\u0000vw_bypass"
 
@@ -46,8 +49,18 @@ object VisualWords : Module(
     private var words by scribble.map("words", Codec.STRING, ComponentSerialization.CODEC.xmap({ it.visualOrderText }, { seq -> seq.toComponent() }))
 
     private val remote = mutableSetOf<String>()
+    private val user = client.user.name
+    private val `user$cps` = user.codePoints().toArray()
+    private val `user$len` = `user$cps`.size
+
+    private var nick: FormattedCharSequence? = null
 
     init {
+        nick = nickname.value.parse(true).visualOrderText
+        nickname.state.onChange {
+            nick = it.parse(true).visualOrderText
+        }
+
         Beacon.get("https://raw.githubusercontent.com/skies-starred/athen-assets/refs/heads/main/cool.json") {
             onJsonSuccess { json ->
                 val map = json.entrySet().associate { it.key to it.value.asString.parse().visualOrderText }
@@ -124,8 +137,9 @@ object VisualWords : Module(
 
     @JvmStatic
     fun fn(seq: FormattedCharSequence): FormattedCharSequence {
-        if (replace.isEmpty()) return seq
+        if (replace.isEmpty() && !nickHider) return seq
 
+        val a = nickHider
         val chars = IntArray(256)
         val styles = ArrayList<Style>(256)
         var size = 0
@@ -144,6 +158,30 @@ object VisualWords : Module(
             while (i < size) {
                 val cp = chars[i]
                 val style = styles[i]
+
+                if (a && i + `user$len` <= size) {
+                    var j = 0
+                    while (j < `user$len`) {
+                        if (chars[i + j] != `user$cps`[j]) break
+                        j++
+                    }
+
+                    if (j == `user$len`) {
+                        val seq2 = nick ?: run {
+                            sink.accept(0, style, cp)
+                            i++
+                            continue
+                        }
+
+                        seq2.accept { _, repStyle, repCp ->
+                            sink.accept(0, repStyle.applyTo(style), repCp)
+                            true
+                        }
+
+                        i += `user$len`
+                        continue
+                    }
+                }
 
                 if (style.insertion == SKIP) {
                     sink.accept(0, style, cp)
@@ -165,18 +203,8 @@ object VisualWords : Module(
 
                     val cps = entry.cps
                     var j = 0
-                    var ok = true
-
-                    while (j < len) {
-                        if (chars[i + j] != cps[j]) {
-                            ok = false
-                            break
-                        }
-
-                        j++
-                    }
-
-                    if (ok) {
+                    while (j < len && chars[i + j] == cps[j]) j++
+                    if (j == len) {
                         matched = entry
                         break
                     }
