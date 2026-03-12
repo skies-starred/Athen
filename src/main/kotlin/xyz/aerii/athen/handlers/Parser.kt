@@ -15,8 +15,8 @@ private data class Frame(val component: MutableComponent, val action: (MutableCo
 
 private class ParseState(val whiteBase: Boolean) {
     var current: MutableComponent = EMPTY_COMPONENT.copy()
-    var currentColor = 0xFFFFFF
-    var baseColor = 0xFFFFFF
+    var currentColor: Int? = null
+    var baseColor: Int? = null
     var bold = false
     var italic = false
     var underline = false
@@ -44,7 +44,7 @@ private fun String.findPop(start: Int): Int {
 private fun ParseState.flush(text: String) {
     if (text.isEmpty()) return
     current.append(Component.literal(text).apply {
-        color = currentColor
+        currentColor?.let { color = it }
         style = style
             .withBold(if (bold) true else null)
             .withItalic(if (italic) true else null)
@@ -109,7 +109,7 @@ fun String.parse(whiteBase: Boolean = false): MutableComponent {
         if (lower == "r" || namedColor != null || numericColor != null) {
             state.flush(substring(textStart, i))
 
-            val colorVal = if (lower == "r") state.baseColor else namedColor ?: numericColor!!
+            val colorVal = if (lower == "r") state.baseColor else namedColor ?: numericColor
             state.currentColor = colorVal
 
             if (lower != "r" && !state.whiteBase && i == 0) state.baseColor = colorVal
