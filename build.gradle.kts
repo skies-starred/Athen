@@ -82,6 +82,12 @@ loom {
     }
 }
 
+afterEvaluate {
+    loom.runs.named("client") {
+        vmArg("-javaagent:${configurations.compileClasspath.get().find { it.name.contains("sponge-mixin") }}")
+    }
+}
+
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
