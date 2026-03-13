@@ -10,6 +10,7 @@ import xyz.aerii.athen.handlers.Scram
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.Dev
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
+import xyz.aerii.athen.utils.render.Render2D.text
 import kotlin.math.roundToInt
 
 @Priority(-1)
@@ -91,7 +92,7 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
 
             guiGraphics.fill(-6, -6, textWidth + 6, textHeight + 6, Mocha.Base.withAlpha(0.8f))
             guiGraphics.drawOutline(-6, -6, textWidth + 12, textHeight + 12, Mocha.Text.argb)
-            guiGraphics.drawString(client.font, text, 0, 0, Mocha.Text.argb, false)
+            guiGraphics.text(text, 0, 0, false, Mocha.Text.argb)
             guiGraphics.pose().popMatrix()
         }
 
@@ -254,8 +255,8 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
             for (entry in lines) {
                 val (enabled, text) = entry()
 
-                drawString(client.font, "•", 0, yOff, if (enabled) Mocha.Green.argb else Mocha.Red.argb, false)
-                drawString(client.font, text, t0, yOff, Mocha.Text.argb, false)
+                text("•", 0, yOff, false, if (enabled) Mocha.Green.argb else Mocha.Red.argb)
+                text(text, t0, yOff, false, Mocha.Text.argb)
 
                 yOff += font.lineHeight
             }
