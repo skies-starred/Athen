@@ -94,9 +94,11 @@ fun Number.toDurationFromMillis(short: Boolean = false, secondsDecimals: Int = 0
  *
  * @return Formatted string with commas (e.g., "1,200,000", "1,234.56")
  */
-fun Number.formatted(): String {
-    val value = this.toDouble()
-    return if (value % 1.0 == 0.0) "%,d".format(value.toLong()) else "%,.2f".format(value)
+fun Number.formatted(decimal: Boolean = true): String {
+    val value = toDouble()
+
+    if (value % 1.0 != 0.0 && decimal) return "%,.2f".format(value)
+    return "%,d".format(value.toLong())
 }
 
 fun Number.toHMS(): String {

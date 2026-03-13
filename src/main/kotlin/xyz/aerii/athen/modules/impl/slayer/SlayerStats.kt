@@ -20,6 +20,7 @@ import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
+import xyz.aerii.athen.utils.formatted
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.toDuration
@@ -71,11 +72,11 @@ object SlayerStats : Module(
 
             if (1 in displayOptions)
                 add((if (`style$advanced`) `style$bosses` else `style$general`.replace("#name", "Bosses/hr"))
-                    .replace("#number", "${kills / d}").prs())
+                    .replace("#number", (kills / d).formatted(false)).prs())
 
             if (2 in displayOptions)
                 add((if (`style$advanced`) `style$xp` else `style$general`.replace("#name", "XP/hr"))
-                    .replace("#number", "${xp / d}").prs())
+                    .replace("#number", (xp / d).formatted(false)).prs())
 
             if (3 in displayOptions)
                 add((if (`style$advanced`) `style$kill` else `style$general`.replace("#name", "Kill"))
