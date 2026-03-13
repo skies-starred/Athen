@@ -6,10 +6,10 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import tech.thatgravyboat.skyblockapi.api.area.slayer.SlayerType
-import tech.thatgravyboat.skyblockapi.helpers.getAttachedTo
-import tech.thatgravyboat.skyblockapi.helpers.getStrippedAttachedLines
 import tech.thatgravyboat.skyblockapi.utils.extentions.serverHealth
 import tech.thatgravyboat.skyblockapi.utils.extentions.toRomanNumeral
+import xyz.aerii.athen.accessors.attachedStripped
+import xyz.aerii.athen.accessors.parent
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
@@ -80,7 +80,7 @@ object SlayerInfo : Module(
                 var hits: Int? = null
                 var attached: String? = null
 
-                for (l in e.getStrippedAttachedLines()) {
+                for (l in e.attachedStripped) {
                     if (hits == null && i.slayer.type == SlayerType.VOIDGLOOM_SERAPH && " Hits" in l) {
                         hits = l.substringBefore(" Hits").substringAfterLast(' ').toIntOrNull()
                         continue
@@ -93,7 +93,7 @@ object SlayerInfo : Module(
                 }
 
                 if (attached != null) i.attached = attached
-                i.renderText = i.str(hits).split('\n')
+                i.renderText = i.str(hits)
             }
         }
 
@@ -117,7 +117,7 @@ object SlayerInfo : Module(
 
             val entity = entity as? ArmorStand ?: return@on
             if (entity in hideCache) return@on cancel()
-            if (entity.getAttachedTo() !in entities) return@on
+            if (entity.parent !in entities) return@on
 
             cancel()
             hideCache.add(entity)
@@ -135,12 +135,12 @@ object SlayerInfo : Module(
         }
     }
 
-    private fun Info.str(hits: Int? = null): String = buildString {
-        append(attached.str(slayer.entity.time()) + '\n')
-        append(nameStyle.str0((slayer.type as? SlayerType)?.shortName ?: name, name, slayer.tier?.toRomanNumeral(true) ?: "???") + '\n')
+    private fun Info.str(hits: Int? = null): List<String> = buildList {
+        add(attached.str(slayer.entity.time()))
+        add(nameStyle.str0((slayer.type as? SlayerType)?.shortName ?: name, name, slayer.tier?.toRomanNumeral(true) ?: "???"))
 
         val cH = (slayer.entity as? LivingEntity)?.serverHealth?.abbreviate() ?: "???"
-        append(if (hits != null) hitStyle.str2(cH, hits) else healthStyle.str2(cH))
+        add(if (hits != null) hitStyle.str2(cH, hits) else healthStyle.str2(cH))
     }
 
     private fun String.str(t: Double?): String {
