@@ -2,7 +2,7 @@ package xyz.aerii.athen.modules.impl.slayer
 
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
-import tech.thatgravyboat.skyblockapi.helpers.getAttachedTo
+import xyz.aerii.athen.accessors.parent
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.location.SkyBlockIsland
@@ -52,7 +52,7 @@ object VengeanceTimer : Module(
 
         on<EntityEvent.Update.Named> {
             if (count.value) return@on
-            val entity = infoLineEntity.getAttachedTo() ?: return@on
+            val entity = entity.parent ?: return@on
             val slayerInfo = SlayerAPI.slayerBosses[entity] ?: return@on
 
             if (!slayerInfo.isOwnedByPlayer) return@on

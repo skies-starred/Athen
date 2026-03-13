@@ -41,7 +41,7 @@ object Athen : ClientModInitializer {
         AnnotationLoader.load()
         ping()
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             if (!Dev.debug) return@on
 
             "<- Normal PrefixType".modMessage(Typo.PrefixType.DEFAULT)
@@ -50,7 +50,7 @@ object Athen : ClientModInitializer {
             "<- Dev PrefixType".modMessage(Typo.PrefixType.DEV)
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             Chronos.Tick after 20 then {
                 if (Dev.lastVersion != modVersion) li()
                 "Debug mode is enabled -> Run \"/$modId toggle dev\" to toggle.".devMessage()

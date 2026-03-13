@@ -2,7 +2,7 @@ package xyz.aerii.athen.modules.impl.slayer
 
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
-import tech.thatgravyboat.skyblockapi.helpers.getAttachedLines
+import xyz.aerii.athen.accessors.attachedNames
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.skyblock.SlayerAPI.slayerNames
@@ -30,7 +30,7 @@ object SlayerDisplay : Module(
     private val display = Ticking(2) {
         val entity = slayerEntity ?: return@Ticking null
 
-        val lines = entity.getAttachedLines()
+        val lines = entity.attachedNames
         val c = ArrayList<Component>(lines.size)
         val cc = ArrayList<Component>(lines.size)
 

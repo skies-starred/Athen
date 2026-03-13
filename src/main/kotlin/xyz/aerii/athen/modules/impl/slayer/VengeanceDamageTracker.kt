@@ -44,7 +44,7 @@ object VengeanceDamageTracker : Module(
 
         on<EntityEvent.Update.Named> {
             val slayer = slayerEntity ?: return@on
-            val entity = infoLineEntity as? ArmorStand ?: return@on
+            val entity = entity as? ArmorStand ?: return@on
             val match = vengeanceRegex.findGroup(component.stripped(), "damage") ?: return@on
 
             if (entity.distanceTo(slayer) > 5) return@on

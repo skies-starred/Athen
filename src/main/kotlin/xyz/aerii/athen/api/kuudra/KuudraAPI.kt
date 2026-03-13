@@ -147,7 +147,7 @@ object KuudraAPI {
             val phase = phase ?: return@on
 
             if (phase.ordinal > KuudraPhase.Build.ordinal) return@on
-            val pos = infoLineEntity.blockPosition()
+            val pos = entity.blockPosition()
             val n = component.stripped()
 
             when (phase) {

@@ -24,13 +24,21 @@ sealed class EntityEvent {
     sealed class Update {
         data class Attach(
             val component: Component,
+            val entity: Entity
+        ) : Event() {
+            @Deprecated("Use entity.")
             val infoLineEntity: Entity
-        ) : Event()
+                get() = entity
+        }
 
         data class Named(
             val component: Component,
+            val entity: Entity
+        ) : Event() {
+            @Deprecated("Use entity.")
             val infoLineEntity: Entity
-        ) : Event()
+                get() = entity
+        }
 
         data class Health(
             val entity: LivingEntity,
