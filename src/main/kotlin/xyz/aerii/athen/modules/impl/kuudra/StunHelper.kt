@@ -54,7 +54,7 @@ object StunHelper : Module(
     private var last = 0L
 
     init {
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             reset()
         }
 

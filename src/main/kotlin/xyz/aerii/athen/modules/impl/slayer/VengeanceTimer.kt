@@ -62,7 +62,7 @@ object VengeanceTimer : Module(
             count.value = true
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             reset()
         }
     }

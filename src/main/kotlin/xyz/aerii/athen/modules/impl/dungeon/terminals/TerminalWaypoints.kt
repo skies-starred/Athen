@@ -140,7 +140,7 @@ object TerminalWaypoints : Module(
             }
         }.runWhen(r)
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             c = emptyList()
             r.value = false
         }

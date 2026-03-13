@@ -53,13 +53,13 @@ object TerminalSimulator : Module(
             TickEvent.Server.post()
         }.override(s0)
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             s0.value = client.currentServer?.ip == ipInput
-        }.override()
+        }
 
-        on<LocationEvent.ServerDisconnect> {
+        on<LocationEvent.Server.Disconnect> {
             s0.value = false
-        }.override()
+        }
 
         on<CommandRegistration> {
             event.register(Athen.modId) {

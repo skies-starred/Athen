@@ -17,7 +17,6 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.LocationEvent
-import xyz.aerii.athen.events.core.override
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Ticking
@@ -94,9 +93,9 @@ object KuudraSplits : Module(
     }
 
     init {
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             display.reset()
-        }.override()
+        }
 
         on<CommandRegistration> {
             event.register(Athen.modId) {

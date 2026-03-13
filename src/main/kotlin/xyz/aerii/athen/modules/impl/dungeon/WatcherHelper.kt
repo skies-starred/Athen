@@ -148,7 +148,7 @@ object WatcherHelper : Module(
             " <gray>• <r>Total time: <red>$`display$total` <gray>| <red>$`display$total$t`".parse().modMessage()
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             reset()
             resetStr()
         }

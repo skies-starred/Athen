@@ -28,7 +28,15 @@ sealed class LocationEvent {
 
     data object SkyBlockLeave : Event()
 
+    @Deprecated("Use Server.Connect")
     data object ServerConnect : Event()
 
+    @Deprecated("Use Server.Disconnect")
     data object ServerDisconnect : Event()
+
+    sealed class Server : Event() {
+        data object Connect : Server()
+
+        data object Disconnect : Server()
+    }
 }

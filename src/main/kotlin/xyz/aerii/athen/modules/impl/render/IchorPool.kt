@@ -40,7 +40,7 @@ object IchorPool : Module(
     private var time: Long = 0
 
     init {
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             reset()
         }
 

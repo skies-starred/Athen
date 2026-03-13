@@ -107,7 +107,7 @@ object SlayerInfo : Module(
             e.renderText = listOf("§c${(entity.tickCount / 20.0).toDuration(secondsDecimals = 1)}")
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             entities.clear()
             hideCache.clear()
         }

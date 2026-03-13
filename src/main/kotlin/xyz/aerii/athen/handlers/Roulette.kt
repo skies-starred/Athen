@@ -48,7 +48,7 @@ object Roulette {
             download()
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             if (!loadSuccess) {
                 Chronos.Tick after 20 then {
                     "Failed to download assets. Some features may not work correctly.".modMessage(Typo.PrefixType.ERROR)

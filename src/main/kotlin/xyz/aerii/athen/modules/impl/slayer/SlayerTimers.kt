@@ -45,7 +45,7 @@ object SlayerTimers : Module(
             reset()
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             reset()
         }
 

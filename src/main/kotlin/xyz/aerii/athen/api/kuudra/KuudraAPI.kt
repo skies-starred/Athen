@@ -80,7 +80,7 @@ object KuudraAPI {
     val teammates: MutableSet<KuudraPlayer> = mutableSetOf()
 
     init {
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             reset()
         }
 

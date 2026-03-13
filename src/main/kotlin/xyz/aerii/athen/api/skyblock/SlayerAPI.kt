@@ -100,7 +100,7 @@ object SlayerAPI {
             }
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             "SlayerAPI: Cleaning up.".devMessage()
             SlayerEvent.Cleanup(SlayerEvent.CleanupType.ServerChange).post()
             reset()

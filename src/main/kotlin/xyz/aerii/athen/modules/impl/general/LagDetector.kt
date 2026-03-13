@@ -34,7 +34,7 @@ object LagDetector : Module(
             sizedText("§c${t}ms")
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             lastTick = 0
         }
 

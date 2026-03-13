@@ -235,7 +235,7 @@ object SlayerCarryTracker : Module(
             }
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             for (t in tracked.values) t.reset()
             bossToPlayer.clear()
         }

@@ -126,7 +126,7 @@ object SlayerStats : Module(
             `start$quest` = 0
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             reset()
         }
 

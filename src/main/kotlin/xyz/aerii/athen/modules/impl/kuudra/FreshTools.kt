@@ -54,7 +54,7 @@ object FreshTools : Module(
     private var time: Long = -1
 
     init {
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             fn()
         }
 

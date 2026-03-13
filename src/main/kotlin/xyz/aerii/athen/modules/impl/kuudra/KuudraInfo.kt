@@ -11,7 +11,6 @@ import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.WorldRenderEvent
-import xyz.aerii.athen.events.core.override
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
@@ -46,10 +45,10 @@ object KuudraInfo : Module(
     private var health: Float = 0f
 
     init {
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             display = null
             health = 0f
-        }.override()
+        }
 
         on<EntityEvent.Update.Health> {
             if (!hud.enabled && !hpOnKuudra) return@on

@@ -68,7 +68,7 @@ object SlayerHighlight : Module(
             trackedDemons.remove(slayerInfo.entity)
         }
 
-        on<LocationEvent.ServerConnect> {
+        on<LocationEvent.Server.Connect> {
             trackedSlayers.clear()
             trackedMinibosses.clear()
             trackedDemons.clear()

@@ -21,7 +21,10 @@ inline fun <reified E : PacketEvent, reified P : Packet<*>> on(
 }
 
 fun Node<*>.runWhen(state: React<Boolean>) = apply {
-    if (!overridden && eventClass != CommandRegistration::class.java) add(state)
+    if (overridden) return@apply
+    if (eventClass == CommandRegistration::class.java) return@apply
+    if (LocationEvent.Server::class.java.isAssignableFrom(eventClass)) return@apply
+    add(state)
 }
 
 fun Node<*>.override(state: React<Boolean>) = apply {

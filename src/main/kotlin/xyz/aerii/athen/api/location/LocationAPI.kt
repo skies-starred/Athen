@@ -130,7 +130,7 @@ object LocationAPI {
             }
         }.runWhen(isOnSkyBlock)
 
-        on<LocationEvent.ServerDisconnect> {
+        on<LocationEvent.Server.Disconnect> {
             reset()
         }
     }

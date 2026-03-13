@@ -21,10 +21,8 @@ import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket
 import tech.thatgravyboat.skyblockapi.api.SkyBlockAPI
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
-import tech.thatgravyboat.skyblockapi.api.events.entity.ComponentAttachEvent
 import tech.thatgravyboat.skyblockapi.api.events.entity.EntityAttributesUpdateEvent
 import tech.thatgravyboat.skyblockapi.api.events.entity.EntityEquipmentUpdateEvent
-import tech.thatgravyboat.skyblockapi.api.events.entity.NameChangedEvent
 import tech.thatgravyboat.skyblockapi.api.events.info.ScoreboardTitleUpdateEvent
 import tech.thatgravyboat.skyblockapi.api.events.info.ScoreboardUpdateEvent
 import tech.thatgravyboat.skyblockapi.api.events.info.TabListChangeEvent
@@ -100,11 +98,11 @@ object Signal {
         }
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
-            LocationEvent.ServerConnect.post()
+            LocationEvent.Server.Connect.post()
         }
 
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
-            LocationEvent.ServerDisconnect.post()
+            LocationEvent.Server.Disconnect.post()
         }
 
         ClientEntityEvents.ENTITY_LOAD.register { entity, _ ->
@@ -167,12 +165,6 @@ object Signal {
 
     @Subscription
     fun onCommand(event: RegisterCommandsEvent) = CommandRegistration(event).post()
-
-    @Subscription(receiveCancelled = true)
-    fun onComponentAttach(event: ComponentAttachEvent) = EntityEvent.Update.Attach(event.component, event.infoLineEntity).post()
-
-    @Subscription(receiveCancelled = true)
-    fun onNameChanged(event: NameChangedEvent) = EntityEvent.Update.Named(event.component, event.infoLineEntity).post()
 
     @Subscription(receiveCancelled = true)
     fun onEntityEquipment(event: EntityEquipmentUpdateEvent) = EntityEvent.Update.Equipment(event.entity).post()
