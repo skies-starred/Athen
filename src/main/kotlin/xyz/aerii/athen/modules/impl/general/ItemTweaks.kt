@@ -11,8 +11,6 @@ import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import tech.thatgravyboat.skyblockapi.api.item.calculator.getItemValue
-import tech.thatgravyboat.skyblockapi.platform.pushPop
-import tech.thatgravyboat.skyblockapi.platform.translate
 import tech.thatgravyboat.skyblockapi.utils.extentions.format
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
@@ -23,7 +21,6 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Itemizer.`watch$tooltip`
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.colorCoded
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
@@ -81,23 +78,6 @@ object ItemTweaks : Module(
                 }
             }
         }.runWhen(cakeNumbers.state)
-
-        on<GuiEvent.Slots.Render.Update> {
-            if (!showItemStars || slot.item.isEmpty) return@on
-
-            val starCount = slot.item.getData(DataTypes.STAR_COUNT) ?: return@on
-            if (starCount <= 0) return@on
-
-            renders.add { graphics, slotData ->
-                graphics.pushPop {
-                    graphics.translate(slotData.x, slotData.y)
-                    val starText = starCount.toString()
-                    val textX = 17 - client.font.width(starText)
-                    val textY = 18 - client.font.lineHeight
-                    graphics.drawString(client.font, starText, textX, textY, starColor.rgb, true)
-                }
-            }
-        }
 
         on<GuiEvent.Tooltip.Update> {
             if (removeGearScore || removeEnchants) {
@@ -168,14 +148,14 @@ object ItemTweaks : Module(
 
     @JvmStatic
     fun renderStarCount(guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int) {
-        if (!showItemStars || stack.isEmpty) return
+        if (!enabled) return
+        if (!showItemStars) return
+        if (stack.isEmpty) return
 
-        val starCount = stack.getData(DataTypes.STAR_COUNT) ?: return
-        if (starCount <= 0) return
+        val stars = stack.getData(DataTypes.STAR_COUNT) ?: return
+        if (stars <= 0) return
 
-        val starText = starCount.toString()
-        val textX = x + 17 - font.width(starText)
-        val textY = y + 18 - font.lineHeight
-        guiGraphics.drawString(font, starText, textX, textY, starColor.rgb, true)
+        val str = stars.toString()
+        guiGraphics.text(str, x + 17 - font.width(str), y + 18 - font.lineHeight, color = starColor.rgb)
     }
 }
