@@ -41,8 +41,8 @@ import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.Blaze
 import net.minecraft.world.entity.monster.EnderMan
-import net.minecraft.world.entity.monster.Spider
-import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.monster./*? >= 1.21.11 {*//*spider.*//*? }*/Spider
+import net.minecraft.world.entity.monster./*? >= 1.21.11 {*//*zombie.*//*? }*/Zombie
 import net.minecraft.world.entity.player.Player
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
