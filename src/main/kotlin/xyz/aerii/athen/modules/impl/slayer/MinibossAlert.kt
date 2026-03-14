@@ -10,7 +10,6 @@ import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Smoothie.alert
 import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Toaster.toast
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
@@ -25,7 +24,6 @@ object MinibossAlert : Module(
     private val sendMessage by config.switch("Send message", true)
     private val vanillaMessage by config.switch("Use mc message").dependsOn { sendMessage }
     private val showTitle by config.switch("Show title", true)
-    private val vanillaTitle by config.switch("Use mc title").dependsOn { showTitle }
     private val maxDistance by config.slider("Maximum distance", 10, 1, 15, "blocks")
     private val alertText by config.textInput("Alert text", "<aqua>Miniboss spawned!")
     private val bigBoiText by config.textInput("Big boi text", "<red>Big boi spawned!")
@@ -38,7 +36,7 @@ object MinibossAlert : Module(
             val slayerMiniBoss = (slayerInfo.type as? SlayerMiniBoss).takeIf { entity.distanceTo(player) < maxDistance } ?: return@on
             val text = (if (slayerMiniBoss.isBigBoy) bigBoiText else alertText)
 
-            if (showTitle) if (vanillaTitle) text.parse().alert() else text.toast()
+            if (showTitle) text.parse().alert()
             if (sendMessage) if (vanillaMessage) text.parse().modMessage() else text.notify()
         }
     }
