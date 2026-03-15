@@ -22,4 +22,7 @@ object ModSettings : Module(
 
     @JvmStatic
     val upsideDown by config.switch("Upside down", true)
+
+    @JvmStatic
+    val priceFetch = config.slider("Price re-fetch", 10, 5, 60, "minutes").custom("priceFetch")
 }

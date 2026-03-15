@@ -10,6 +10,7 @@ import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.handlers.Beacon
 import xyz.aerii.athen.handlers.Chronos
+import xyz.aerii.athen.modules.impl.ModSettings
 import kotlin.time.Duration.Companion.minutes
 
 @Priority
@@ -17,9 +18,16 @@ object PriceAPI {
     private val lbin = Long2LongOpenHashMap(8192).apply { defaultReturnValue(-1) }
     private val bazaar = Int2ObjectOpenHashMap<Bazaar>(2048)
 
+    private var task: Chronos.Task? = null
+
     init {
         fn()
-        Chronos.Time every 5.minutes repeat ::fn
+
+        task = Chronos.Time every ModSettings.priceFetch.value.minutes repeat ::fn
+        ModSettings.priceFetch.state.onChange {
+            task?.cancel()
+            task = Chronos.Time every it.minutes repeat ::fn
+        }
     }
 
     fun ItemStack.price(): Price? =
