@@ -1,7 +1,8 @@
-@file:Suppress("ObjectPrivatePropertyName")
+@file:Suppress("ObjectPrivatePropertyName", "Unused")
 
 package xyz.aerii.athen.modules.impl.general
 
+import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import tech.thatgravyboat.skyblockapi.api.item.calculator.getItemValue
@@ -30,22 +31,27 @@ object ItemValue : Module(
 
     private val bazaar by config.switch("Bazaar")
     private val `bazaar$oneLine` by config.switch("One line").dependsOn { bazaar }
-    private val `bazaar$style` by config.textInput("Bazaar style", "Bazaar: <aqua>#buy <gray>| <aqua>#sell").dependsOn { `bazaar$oneLine` && bazaar }
-    private val `bazaar$style$buy` by config.textInput("Bazaar buy style", "Bazaar Buy: <aqua>#price").dependsOn { !`bazaar$oneLine` && bazaar }
-    private val `bazaar$style$sell` by config.textInput("Bazaar sell style", "Bazaar Sell: <aqua>#price").dependsOn { !`bazaar$oneLine` && bazaar }
+    private val `bazaar$style` by config.textInput("Bazaar style", "Bazaar: <aqua>#buy <gray>| <aqua>#sell #individual").dependsOn { `bazaar$oneLine` && bazaar }
+    private val `bazaar$style$buy` by config.textInput("Bazaar buy style", "Bazaar Buy: <aqua>#price #individual").dependsOn { !`bazaar$oneLine` && bazaar }
+    private val `bazaar$style$sell` by config.textInput("Bazaar sell style", "Bazaar Sell: <aqua>#price #individual").dependsOn { !`bazaar$oneLine` && bazaar }
+    private val `bazaar$style$individual` by config.textInput("Individual count style", "<gray>[#count@#price]")
+    private val unused by config.textParagraph("Variable: <red>#price\nBazaar only: <red>#buy<r>, <red>#sell<r>, <red>#individual\nIndividual only: <red>#count<r>, <red>#price")
 
     private val number by config.dropdown("Number style", listOf("Abbreviate", "Comma"))
 
     init {
         on<GuiEvent.Tooltip.Update> {
-            if (craft) run {
+            val price = item.price()
+            val bool = price?.bazaar == null
+
+            if (craft && bool) run {
                 if (item.getData(DataTypes.SKYBLOCK_ID)?.skyblockId == null) return@run
                 val long = item.getItemValue().price.takeIf { it != 0L } ?: return@run
                 tooltip.add(`craft$style`.prs(long))
             }
 
-            val price = item.price() ?: return@on
-            if (lbin && price.bazaar == null) run {
+            if (price == null) return@on
+            if (lbin && bool) run {
                 val long = price.lbin?.takeIf { it != 0L } ?: return@run
                 tooltip.add(`lbin$style`.prs(long))
             }
@@ -56,21 +62,28 @@ object ItemValue : Module(
                 val a = bz.buy * item.count
                 val b = bz.sell * item.count
 
-                if (`bazaar$oneLine`) {
-                    val buy = if (number == 0) a.abbreviate() else a.formatted()
-                    val sell = if (number == 0) b.abbreviate() else b.formatted()
+                val c = if (number == 0) a.abbreviate() else a.formatted()
+                val d = if (number == 0) b.abbreviate() else b.formatted()
 
-                    tooltip.add(`bazaar$style`.replace("#buy", buy).replace("#sell", sell).parse(true))
+                val e = fn(bz.buy, item.count)
+                val f = fn(bz.sell, item.count)
+
+                if (`bazaar$oneLine`) {
+                    tooltip.add(`bazaar$style`.replace("#buy", c).replace("#sell", d).replace("#individual", "$e | $f").parse(true))
                     return@run
                 }
 
-                tooltip.add(`bazaar$style$buy`.prs(a))
-                tooltip.add(`bazaar$style$sell`.prs(b))
+                tooltip.add(`bazaar$style$buy`.replace("#price", c).replace("#individual", e).parse(true))
+                tooltip.add(`bazaar$style$sell`.replace("#price", d).replace("#individual", f).parse(true))
             }
         }
     }
 
-    private fun String.prs(a: Number) = this
+    private fun String.prs(a: Number): Component = this
         .replace("#price", if (number == 0) a.abbreviate() else a.formatted())
         .parse(true)
+
+    private fun fn(price: Number, count: Int): String = `bazaar$style$individual`
+        .replace("#count", count.toString())
+        .replace("#price", if (number == 0) price.abbreviate() else price.formatted())
 }
