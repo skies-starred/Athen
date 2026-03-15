@@ -20,6 +20,7 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Itemizer.`watch$tooltip`
+import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.colorCoded
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
@@ -28,6 +29,7 @@ import xyz.aerii.athen.utils.isBound
 import xyz.aerii.athen.utils.isPressed
 import xyz.aerii.athen.utils.render.Render2D.text
 import xyz.aerii.athen.utils.toDurationFromMillis
+import java.awt.Color
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -43,8 +45,8 @@ object ItemTweaks : Module(
     private val enchants = hashSetOf("Aqua Affinity", "Depth Strider")
     private val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm").withZone(ZoneId.systemDefault())
 
-    private val showItemStars by config.switch("Item stars as stack size")
-    private val starColor by config.colorPicker("Star Color", java.awt.Color(0xFFFF0000.toInt(), true)).dependsOn { showItemStars }
+    private val showItemStars = config.switch("Item stars as stack size").custom("showItemStars")
+    private val starColor by config.colorPicker("Star Color", Color.RED).dependsOn { showItemStars.value }
 
     private val cakeNumbers = config.switch("Cake numbers").custom("cakeNumbers")
 
@@ -106,6 +108,15 @@ object ItemTweaks : Module(
             val rgb = item.get(DataComponents.DYED_COLOR)?.rgb ?: return@on
             tooltip.add(1, rgb.hex())
         }.runWhen(showItemHex.state)
+
+        on<GuiEvent.Items.Render.Post> {
+            if (item.isEmpty) return@on
+            val stars = item.getData(DataTypes.STAR_COUNT) ?: return@on
+            if (stars <= 0) return@on
+
+            val str = stars.toString()
+            graphics.text(str, x + 17 - client.font.width(str), y + 18 - client.font.lineHeight, color = starColor.rgb)
+        }.runWhen(showItemStars.state)
     }
 
     private fun String.stamp(time: String): String =
@@ -121,17 +132,4 @@ object ItemTweaks : Module(
             .literal()
             .append(String.format("#%06X", this).literal { color = if (`showItemHex$color`) this@hex else TextColor.DARK_GRAY })
             .apply { if (`showItemHex$box`) append("⬛".literal { color = this@hex }) }
-
-    @JvmStatic
-    fun renderStarCount(guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int) {
-        if (!enabled) return
-        if (!showItemStars) return
-        if (stack.isEmpty) return
-
-        val stars = stack.getData(DataTypes.STAR_COUNT) ?: return
-        if (stars <= 0) return
-
-        val str = stars.toString()
-        guiGraphics.text(str, x + 17 - font.width(str), y + 18 - font.lineHeight, color = starColor.rgb)
-    }
 }
