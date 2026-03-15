@@ -60,7 +60,7 @@ sealed class GuiEvent {
             ) : CancellableEvent()
         }
 
-        data class Click (
+        data class Click(
             val slot: Slot?,
             val slotId: Int,
             val mouseButton: Int,
@@ -70,6 +70,24 @@ sealed class GuiEvent {
         data class Hover(
             val slot: Slot
         ) : Event()
+    }
+
+    sealed class Items {
+        sealed class Render {
+            data class Pre(
+                val graphics: GuiGraphics,
+                val item: ItemStack,
+                val x: Int,
+                val y: Int
+            ) : Event()
+
+            data class Post(
+                val graphics: GuiGraphics,
+                val item: ItemStack,
+                val x: Int,
+                val y: Int
+            ) : Event()
+        }
     }
 
     sealed class Tooltip {
