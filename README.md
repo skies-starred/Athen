@@ -19,13 +19,13 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
 * Commission display
 * Item tweaks:
     * Show item age
-    * Show item price
     * Show item hex color
     * Show stars as stack size
     * Show cake numbers
     * Remove gear score
     * Remove vanilla enchants
 * Item quality indicator
+* Item value: lowest bin, craft cost
 * Kat reminder
 * Keybinds
 * Lag detector
