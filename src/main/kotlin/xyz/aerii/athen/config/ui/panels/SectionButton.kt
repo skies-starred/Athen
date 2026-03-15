@@ -167,7 +167,7 @@ class SectionButton(
         return if (extended || expandAnim > 0f) HEIGHT + expandAnim * height() else HEIGHT
     }
 
-    private fun height() = elements.sumOf { it.getHeight().toDouble() }.toFloat()
+    private fun height() = elements.sumOf { it.getHeight().toDouble() }.toFloat() + 4f
 
     private fun sections(): Boolean = panel.sections.drop(panel.sections.indexOf(this) + 1).any { it.visible }
 }

@@ -11,5 +11,5 @@ class TextParagraphElement(text: String) : IBaseUI(text, "", { _, _ -> }) {
         return getHeight()
     }
 
-    override fun getHeight() = textHeight + 16f
+    override fun getHeight() = textHeight + 8f
 }

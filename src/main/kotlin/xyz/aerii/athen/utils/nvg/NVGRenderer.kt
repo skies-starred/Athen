@@ -355,28 +355,38 @@ object NVGRenderer {
         fun emitChunk(chunk: String) {
             if (chunk.isEmpty()) return
 
-            val words = chunk.split(' ')
-            for (idx in words.indices) {
-                if (idx > 0) {
-                    if (lineWidth + spaceWidth > maxWidth && lineWidth > 0f) {
+            val lines = chunk.split('\n')
+            for (li in lines.indices) {
+                if (li > 0) {
+                    consumer("", 0, 0f, true)
+                    lineWidth = 0f
+                    color = 0xFFFFFF
+                }
+
+                val words = lines[li].split(' ')
+                for (idx in words.indices) {
+                    if (idx > 0) {
+                        if (lineWidth + spaceWidth > maxWidth && lineWidth > 0f) {
+                            consumer("", 0, 0f, true)
+                            lineWidth = 0f
+                        }
+
+                        consumer(space, color, spaceWidth, false)
+                        lineWidth += spaceWidth
+                    }
+
+                    val word = words[idx]
+                    if (word.isEmpty()) continue
+
+                    val w = getTextWidth(word, fontSize, font)
+                    if (lineWidth + w > maxWidth && lineWidth > 0f) {
                         consumer("", 0, 0f, true)
                         lineWidth = 0f
                     }
-                    consumer(space, color, spaceWidth, false)
-                    lineWidth += spaceWidth
+
+                    consumer(word, color, w, false)
+                    lineWidth += w
                 }
-
-                val word = words[idx]
-                if (word.isEmpty()) continue
-
-                val w = getTextWidth(word, fontSize, font)
-                if (lineWidth + w > maxWidth && lineWidth > 0f) {
-                    consumer("", 0, 0f, true)
-                    lineWidth = 0f
-                }
-
-                consumer(word, color, w, false)
-                lineWidth += w
             }
         }
 
