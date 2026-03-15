@@ -1,4 +1,4 @@
-@file:Suppress("ObjectPrivatePropertyName")
+@file:Suppress("ObjectPrivatePropertyName", "Unchecked_cast")
 
 package xyz.aerii.athen.modules.impl.general
 
@@ -37,7 +37,7 @@ object ColoredEnchants : Module(
 ) {
     private val l = listOf("Bold", "Italic", "Underline", "Strike-through")
 
-    private val replaceRoman by config.switch("Number instead of romans", true)
+    private val replaceRoman by config.switch("Replace roman", true)
 
     private val `ultimate$expandable` by config.expandable("Ultimate enchants")
     private val `ultimate$color` by config.colorPicker("Ultimate color", Color(Catppuccin.Mocha.Mauve.argb, true)).childOf { `ultimate$expandable` }
