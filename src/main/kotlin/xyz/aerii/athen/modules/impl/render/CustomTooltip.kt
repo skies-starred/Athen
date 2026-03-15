@@ -160,7 +160,7 @@ object CustomTooltip : Module(
 
             drawBox(gg, bx, by, w, bh, bw)
             drawComponents(gg, font, body, tx, bx, by, w, bh, by + 4 + minOf(0, scrollY), width, bodyHeight)
-            drawFades(gg, bx, by, w, bh, scrollY, by + 4 + minOf(0, scrollY) + bodyHeight)
+            drawFades(gg, bx, by, w, bh, scrollY, bodyHeight)
         } else {
             val x0 = tx - 4
             val y0 = if (height + 8 < screenH - 40) (ty - 4).coerceIn(20, screenH - 20 - (height + 8)) else 20
@@ -175,7 +175,7 @@ object CustomTooltip : Module(
 
             drawBox(gg, x0, y0, w, h, bw)
             drawComponents(gg, font, components, tx, x0, y0, w, h, drawTy + minOf(0, scrollY), width, height, firstGap = 2)
-            drawFades(gg, x0, y0, w, h, scrollY, drawTy + minOf(0, scrollY) + height)
+            drawFades(gg, x0, y0, w, h, scrollY, height)
         }
 
         pose.popMatrix()
@@ -204,12 +204,12 @@ object CustomTooltip : Module(
         gg.disableScissor()
     }
 
-    private fun drawFades(gg: GuiGraphics, x: Int, y: Int, w: Int, h: Int, scrollY: Int, contentBottom: Int) {
+    private fun drawFades(gg: GuiGraphics, x: Int, y: Int, w: Int, h: Int, scrollY: Int, contentHeight: Int) {
         val bg = `background$color`.rgb or 0xFF000000.toInt()
         val bgT = bg and 0x00FFFFFF
         gg.enableScissor(x, y, x + w, y + h)
         if (scrollY < 0) gg.fillGradient(x, y, x + w, y + 18, bg, bgT)
-        if (scrollY > 0 || (!`scroll$infinite` && contentBottom > y + h)) gg.fillGradient(x, y + h - 18, x + w, y + h, bgT, bg)
+        if (scrollY > 0 || contentHeight + scrollY > h) gg.fillGradient(x, y + h - 18, x + w, y + h, bgT, bg)
         gg.disableScissor()
     }
 
