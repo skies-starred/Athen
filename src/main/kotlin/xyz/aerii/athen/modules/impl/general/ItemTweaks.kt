@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
-import tech.thatgravyboat.skyblockapi.api.item.calculator.getItemValue
 import tech.thatgravyboat.skyblockapi.utils.extentions.format
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
@@ -25,8 +24,6 @@ import xyz.aerii.athen.handlers.Texter.colorCoded
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
-import xyz.aerii.athen.utils.abbreviate
-import xyz.aerii.athen.utils.formatted
 import xyz.aerii.athen.utils.isBound
 import xyz.aerii.athen.utils.isPressed
 import xyz.aerii.athen.utils.render.Render2D.text
@@ -57,10 +54,6 @@ object ItemTweaks : Module(
 
     private val showItemAge by config.switch("Show age").childOf { tooltipExpandable }
     private val `showItemAge$style` by config.textInput("Style", "&7Age: &c#age &8(#time)").dependsOn { showItemAge }.childOf { tooltipExpandable }
-
-    private val showItemPrice by config.switch("Show price").childOf { tooltipExpandable }
-    private val `showItemPrice$style` by config.textInput("Style", "&fCraft cost: &b#price").dependsOn { showItemPrice }.childOf { tooltipExpandable }
-    private val `showItemPrice$abb` by config.dropdown("Numbers", listOf("Abbreviate", "Normal with comma")).dependsOn { showItemPrice }.childOf { tooltipExpandable }
 
     private val showItemHex = config.switch("Show hex color").childOf { tooltipExpandable }.custom("showItemHex")
     private val `showItemHex$style` by config.textInput("Style", "&7Color: #hex").dependsOn { showItemHex.value }.childOf { tooltipExpandable }
@@ -108,29 +101,12 @@ object ItemTweaks : Module(
         }
 
         on<GuiEvent.Tooltip.Update> {
-            if (!showItemPrice) return@on
-            if (item.getData(DataTypes.SKYBLOCK_ID)?.skyblockId == null) return@on
-            val long = item.getItemValue().price
-
-            val str =
-                if (`showItemPrice$abb` == 0) long.abbreviate()
-                else long.formatted()
-
-            tooltip.add(str.price().literal())
-        }
-
-        on<GuiEvent.Tooltip.Update> {
             if (`showItemHex$keybind`.isBound() && !`showItemHex$keybind`.isPressed()) return@on
 
             val rgb = item.get(DataComponents.DYED_COLOR)?.rgb ?: return@on
             tooltip.add(1, rgb.hex())
         }.runWhen(showItemHex.state)
     }
-
-    private fun String.price(): String =
-        `showItemPrice$style`
-            .replace("&", "§")
-            .replace("#price", this)
 
     private fun String.stamp(time: String): String =
         `showItemAge$style`
