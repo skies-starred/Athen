@@ -42,7 +42,7 @@ object CocoonAlert : Module(
 
     init {
         on<MessageEvent.Chat.Receive> {
-            if (stripped != "YOU COCOONED YOUR SLAYER BOSS") return@on
+            if (stripped.trim() != "YOU COCOONED YOUR SLAYER BOSS") return@on
 
             if (alert) `alert$message`.parse().alert(soundType = `alert$sound`.sound)
             if (timer.enabled) time = System.currentTimeMillis() + 6000
