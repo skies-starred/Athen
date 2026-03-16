@@ -10,6 +10,7 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Ticking
+import xyz.aerii.athen.handlers.Typo.devMessage
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
@@ -31,21 +32,20 @@ object SlayerDisplay : Module(
         val entity = slayerEntity ?: return@Ticking null
 
         val lines = entity.attachedNames
-        val c = ArrayList<Component>(lines.size)
-        val cc = ArrayList<Component>(lines.size)
+        var colon: Component? = null
+        var name: Component? = null
 
         for (l in lines) {
-            val name = l.stripped()
-            if ("Spawned by:" in name) continue
+            val s = l.stripped()
+            if ("Spawned by:" in s) continue
 
-            val co = ":" in name
-            if (!co && slayerNames.none { it in name }) continue
+            colon = colon ?: l.takeIf { ":" in s }
+            name = name ?: l.takeIf { slayerNames.any { it in s } }
 
-            if (co) c.add(l) else cc.add(l)
+            if (colon != null && name != null) break
         }
 
-        c += cc
-        c
+        listOfNotNull(colon, name)
     }
 
     init {
@@ -55,11 +55,16 @@ object SlayerDisplay : Module(
         }
 
         on<SlayerEvent.Boss.Spawn> {
-            if (slayerInfo.isOwnedByPlayer) slayerEntity = entity
+            if (slayerEntity != null) return@on
+            slayerEntity = entity
+            "Slayer entity set".devMessage()
         }
 
         on<SlayerEvent.Boss.Death> {
-            if (slayerInfo.isOwnedByPlayer) reset()
+            if (slayerEntity == entity) {
+                reset()
+                "Slayer entity reset".devMessage()
+            }
         }
 
         on<SlayerEvent.Cleanup> {

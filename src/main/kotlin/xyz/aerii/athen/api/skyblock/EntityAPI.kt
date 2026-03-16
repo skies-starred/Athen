@@ -35,33 +35,25 @@
 
 package xyz.aerii.athen.api.skyblock
 
-import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.animal.wolf.Wolf
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster.Blaze
-import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster./*? >= 1.21.11 { *//*spider.*//*? }*/CaveSpider
+import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster./*? >= 1.21.11 {*//*spider.*//*? }*/Spider
-import net.minecraft.world.entity.monster./*? >= 1.21.11 {*//*zombie.*//*? }*/Zombie
-import net.minecraft.world.entity.player.Player
-import tech.thatgravyboat.skyblockapi.utils.text.TextColor
-import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
 import xyz.aerii.athen.accessors.EntityAccessor
 import xyz.aerii.athen.annotations.Priority
-import xyz.aerii.athen.api.location.SkyBlockIsland
-import xyz.aerii.athen.api.skyblock.SlayerAPI.slayerNames
 import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Typo.stripped
 import java.lang.ref.WeakReference
+import kotlin.math.abs
 
 @Priority
 object EntityAPI {
-    private val bool: Boolean
-        get() = SkyBlockIsland.THE_CATACOMBS.inIsland.value
-
     init {
         on<EntityEvent.Load> {
             load(entity as? ArmorStand ?: return@on)
@@ -75,10 +67,53 @@ object EntityAPI {
     @JvmStatic
     fun attach(ent: Entity) {
         val lit = ent.customName ?: return
-        val str = lit.stripped().takeIf { !it.damage() } ?: return
-        val b = ent.find(lit, str) ?: return
+        val level = client.level ?: return
+        if (lit.stripped().damage()) return
 
-        val acc = (ent as? EntityAccessor)?.takeIf { it.`athen$attach`() != b } ?: return
+        var a: Entity? = null
+        var a2: Entity? = null
+        var d = Double.MAX_VALUE
+        var d2 = Double.MAX_VALUE
+        var t = Int.MAX_VALUE
+
+        val es = level.getEntities(ent, ent.boundingBox.inflate(0.0, 1.0, 0.0)) ?: return
+        for (e0 in es) {
+            var e = e0
+
+            if (e is ArmorStand) continue
+            if (!e.isAlive) continue
+            if (e.isInvisible && e !is Creeper && !e.armor()) continue
+
+            if (e is CaveSpider) level.getEntities(e, e.boundingBox.inflate(0.0, 0.5, 0.0)).firstOrNull { it is Spider && !it.isInvisible && it.isAlive }?.let { e = it }
+
+            val d0 = e.distanceToSqr(ent)
+            if (a != null && d0 > d) continue
+
+            val t0 = abs(e.tickCount - ent.tickCount)
+            if (d0 == 0.0 && t0 == 0) {
+                a = e
+                break
+            }
+
+            if (a == null || d0 < d || (d0 == d && t0 < t)) {
+                a2 = a
+                d2 = d
+
+                a = e
+                d = d0
+                t = t0
+            } else if (a2 == null || d0 < d2) {
+                a2 = e
+                d2 = d0
+            }
+        }
+
+        val b = a ?: return
+
+        val acc = (ent as? EntityAccessor) ?: return
+        val c = acc.`athen$attach`()
+        if (c != null && (c == a || c == a2)) return
+
         val list = (b as? EntityAccessor)?.`athen$attachments`() ?: return
 
         list.removeIf { it.get() == null }
@@ -88,35 +123,13 @@ object EntityAPI {
         EntityEvent.Update.Attach(lit, ent).post()
     }
 
-    private fun Entity.find(lit: Component, str: String): Entity? {
-        val level = client.level ?: return null
-        if ("Withermancer" in str) return level.getEntity(id - 3)
-        if (str.endsWith("❤") && ("[Lv" in str || "☠" in str || bool)) return level.getEntity(id - 1)
-
-        val s = slayer(lit, str) ?: return null
-        return level.getEntity(id - s)?.takeIf { it.v(this) }
-    }
-
-    private fun slayer(lit: Component, str: String): Int? {
-        return when {
-            str.startsWith("Spawned by: ") -> 3
-            str.time() && lit.color == TextColor.RED -> 2
-            slayerNames.any { str.contains(it) } -> 1
-            else -> null
-        }
-    }
-
-    private fun Entity.v(a: Entity): Boolean {
-        if (this !is Blaze && this !is EnderMan && this !is Spider && this !is Wolf && this !is Zombie && this !is Player) return false
-        if (distanceToSqr(a) > 4) return false
-        return true
-    }
-
-    private fun String.time(): Boolean =
-        indexOf(':').let { it > 0 && it < length - 1 && all { c -> c.isDigit() || c == ':' } }
-
     private fun String.damage(): Boolean =
         all { it.isDigit() || it == ',' || it in "✧✯❤⚔✷ﬗ♞☄" }
+
+    private fun Entity.armor(): Boolean {
+        val l = this as? LivingEntity ?: return false
+        return !l.getItemBySlot(EquipmentSlot.HEAD).isEmpty || !l.getItemBySlot(EquipmentSlot.CHEST).isEmpty || !l.getItemBySlot(EquipmentSlot.LEGS).isEmpty || !l.getItemBySlot(EquipmentSlot.FEET).isEmpty
+    }
 
     private fun load(ent: ArmorStand) {
         var tries = 0
