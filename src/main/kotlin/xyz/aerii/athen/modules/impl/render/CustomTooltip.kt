@@ -22,7 +22,6 @@ import xyz.aerii.athen.utils.isPressed
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
 import java.awt.Color
-import kotlin.math.round
 
 @Load
 object CustomTooltip : Module(
@@ -65,6 +64,8 @@ object CustomTooltip : Module(
     private var yo: Double = 0.0
     private var scale: Double = 1.0
     private var name: Boolean = false
+    private var mss = 0.0
+    private var msx = 0.0
 
     init {
         on<GuiEvent.Slots.Hover> {
@@ -101,7 +102,7 @@ object CustomTooltip : Module(
             }
 
             if (`scroll$horizontal` && `scroll$horizontal$key`.isBound() && `scroll$horizontal$key`.isPressed()) xo += amount * `scroll$horizontal$speed`
-            else yo += amount * `scroll$vertical$speed`
+            else yo = (yo + amount * `scroll$vertical$speed`).coerceIn(mss, msx)
         }
     }
 
@@ -152,14 +153,15 @@ object CustomTooltip : Module(
             val by = hy + headerH + 4
             val maxBh = minOf(bodyHeight + 6, screenH - 20 - by).coerceAtLeast(0)
 
-            val s = `scroll$vertical$speed`.toDouble()
-            yo = round((if (`scroll$infinite`) yo.coerceIn(-bodyHeight.toDouble(), bodyHeight.toDouble()) else yo.coerceIn(-maxOf(0, bodyHeight - (maxBh - 6)).toDouble(), 0.0)) / s) * s
+            mss = if (`scroll$infinite`) -bodyHeight.toDouble() else -maxOf(0, bodyHeight - (maxBh - 6)).toDouble()
+            msx = if (`scroll$infinite`) bodyHeight.toDouble() else 0.0
+            yo = yo.coerceIn(mss, msx)
 
             val scrollY = yo.toInt()
             val bh = if (`scroll$infinite`) (if (scrollY > 0) maxBh - scrollY else bodyHeight + scrollY + 6).coerceIn(0, screenH - 20 - by) else maxBh
 
             drawBox(gg, bx, by, w, bh, bw)
-            drawComponents(gg, font, body, tx, bx, by, w, bh, by + 4 + minOf(0, scrollY), width, bodyHeight)
+            drawComponents(gg, font, body, tx, bx, by, w, bh, by + 4 + scrollY.coerceAtMost(0), width, bodyHeight)
             drawFades(gg, bx, by, w, bh, scrollY, bodyHeight)
         } else {
             val x0 = tx - 4
@@ -167,8 +169,9 @@ object CustomTooltip : Module(
             val drawTy = y0 + 4
             val maxH = minOf(height + 8, screenH - 20 - y0).coerceAtLeast(0)
 
-            val s = `scroll$vertical$speed`.toDouble()
-            yo = round((if (`scroll$infinite`) yo.coerceIn(-height.toDouble(), height.toDouble()) else yo.coerceIn(-maxOf(0, height - (maxH - 8)).toDouble(), 0.0)) / s) * s
+            mss = if (`scroll$infinite`) -height.toDouble() else -maxOf(0, height - (maxH - 8)).toDouble()
+            msx = if (`scroll$infinite`) height.toDouble() else 0.0
+            yo = yo.coerceIn(mss, msx)
 
             val scrollY = yo.toInt()
             val h = if (`scroll$infinite`) (if (scrollY > 0) maxH - scrollY else height + scrollY + 8).coerceIn(0, screenH - 20 - y0) else maxH
@@ -217,5 +220,8 @@ object CustomTooltip : Module(
         xo = 0.0
         yo = 0.0
         scale = 1.0
+
+        mss = 0.0
+        msx = 0.0
     }
 }
