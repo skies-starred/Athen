@@ -14,6 +14,7 @@ import xyz.aerii.athen.Athen
 import xyz.aerii.athen.events.GameEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.utils.asJsonObjectOrNull
+import xyz.aerii.athen.utils.safely
 import java.io.File
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -57,7 +58,7 @@ class Scribble(private val path: String, private val tts: Int = 15) {
     fun save() {
         if (!dirty) return
 
-        try {
+        safely(true) {
             val data = root ?: return
 
             val wrapped = JsonObject().apply {
@@ -74,8 +75,6 @@ class Scribble(private val path: String, private val tts: Int = 15) {
             }
 
             dirty = false
-        } catch (e: Exception) {
-            Athen.LOGGER.error("Failed to save scribbled file ($path): $e")
         }
     }
 

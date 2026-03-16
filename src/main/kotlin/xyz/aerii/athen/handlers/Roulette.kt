@@ -17,6 +17,7 @@ import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.impl.Dev
 import xyz.aerii.athen.utils.mainThread
+import xyz.aerii.athen.utils.safely
 import java.io.File
 import java.util.zip.ZipInputStream
 
@@ -272,19 +273,14 @@ object Roulette {
         return extractedFiles
     }
 
-    private fun List<String>.save() {
-        try {
-            val existingFiles = if (manifestFile.exists()) {
-                val manifest = JsonParser.parseString(manifestFile.readText()).asJsonObject
-                manifest.getAsJsonArray("files")?.map { it.asString }?.toMutableSet() ?: mutableSetOf()
-            } else mutableSetOf()
+    private fun List<String>.save() = safely {
+        val existing =
+            if (manifestFile.exists()) JsonParser.parseString(manifestFile.readText()).asJsonObject.getAsJsonArray("files")?.map { it.asString }?.toMutableSet() ?: mutableSetOf()
+            else mutableSetOf()
 
-            existingFiles.addAll(this)
-            val manifest = JsonArray().apply { for (e in existingFiles) add(e) }
+        existing.addAll(this)
+        val manifest = JsonArray().apply { for (e in existing) add(e) }
 
-            manifestFile.writeText(Json.gson.toJson(mapOf("files" to manifest)))
-        } catch (e: Exception) {
-            Athen.LOGGER.error("Failed to save manifest", e)
-        }
+        manifestFile.writeText(Json.gson.toJson(mapOf("files" to manifest)))
     }
 }
