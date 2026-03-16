@@ -12,6 +12,7 @@ object RenderOptimiser :  Module(
     "Cleans up rendering stuff, and maybe optimizes a bit.",
     Category.RENDER
 ) {
+    private val _arm by config.switch("Hide player arm")
     private val _fog by config.switch("Hide fog", true)
     private val lavaOverlay by config.switch("Hide lava overlay", true)
     private val fireOverlay by config.switch("Hide fire overlay", true)
@@ -28,6 +29,10 @@ object RenderOptimiser :  Module(
     @JvmStatic
     val fog: Boolean
         get() = enabled && _fog
+
+    @JvmStatic
+    val arm: Boolean
+        get() = enabled && _arm
 
     init {
         on<WorldRenderEvent.Entity.Pre> {
