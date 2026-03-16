@@ -10,7 +10,6 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Ticking
-import xyz.aerii.athen.handlers.Typo.devMessage
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
@@ -55,16 +54,11 @@ object SlayerDisplay : Module(
         }
 
         on<SlayerEvent.Boss.Spawn> {
-            if (slayerEntity != null) return@on
-            slayerEntity = entity
-            "Slayer entity set".devMessage()
+            if (slayerInfo.isOwnedByPlayer) slayerEntity = entity
         }
 
         on<SlayerEvent.Boss.Death> {
-            if (slayerEntity == entity) {
-                reset()
-                "Slayer entity reset".devMessage()
-            }
+            if (slayerInfo.isOwnedByPlayer) reset()
         }
 
         on<SlayerEvent.Cleanup> {
