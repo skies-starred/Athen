@@ -76,14 +76,15 @@ object ColoredEnchants : Module(
 
     init {
         Beacon.get("https://raw.githubusercontent.com/Fix3dll/SkyblockAddons-Data/main/skyblock/enchants.json") {
-            onSuccess<Map<String, Map<String, Map<String, Any?>>>> { str ->
+            onSuccess<Map<String, Any>> { str ->
                 for ((a, b) in str) {
-                    for ((c, d) in b) {
-                        enchants[c] = Enchant(
-                            d["loreName"] as String,
+                    val c = b as? Map<String, Map<String, Any?>> ?: continue
+                    for ((d, e) in c) {
+                        enchants[d] = Enchant(
+                            e["loreName"] as String,
                             Enchant.category(a),
-                            (d["maxLevel"] as Double).toInt(),
-                            (d["goodLevel"] as Double).toInt()
+                            (e["maxLevel"] as Double).toInt(),
+                            (e["goodLevel"] as Double).toInt()
                         )
                     }
                 }
