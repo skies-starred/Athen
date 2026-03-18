@@ -148,11 +148,10 @@ object KuudraAPI {
 
             if (phase.ordinal > KuudraPhase.Build.ordinal) return@on
             val pos = entity.blockPosition()
-            val n = component.stripped()
 
             when (phase) {
                 KuudraPhase.Supply -> {
-                    when (n) {
+                    when (stripped) {
                         "BRING SUPPLY CHEST HERE" -> {
                             KuudraSupply.at(pos)?.active = false
                         }
@@ -164,16 +163,16 @@ object KuudraAPI {
                 }
 
                 KuudraPhase.Build -> {
-                    if (n == "PROGRESS: COMPLETE") {
+                    if (stripped == "PROGRESS: COMPLETE") {
                         KuudraSupply.at(pos, 100)?.built = true
                         return@on
                     }
 
-                    progressRegex.findThenNull(n, "progress") { (progress) ->
+                    progressRegex.findThenNull(stripped, "progress") { (progress) ->
                         KuudraSupply.at(pos, progress.toInt())?.built = false
                     } ?: return@on
 
-                    buildRegex.findOrNull(n, "progress", "players") { (p0, p1) ->
+                    buildRegex.findOrNull(stripped, "progress", "players") { (p0, p1) ->
                         buildProgress.value = p0.toInt()
                         buildPlayers = p1.toInt()
                     }

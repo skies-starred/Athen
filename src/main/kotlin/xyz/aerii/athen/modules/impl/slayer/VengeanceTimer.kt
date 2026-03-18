@@ -14,7 +14,6 @@ import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.React
 import xyz.aerii.athen.handlers.Smoothie
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.toDuration
@@ -56,7 +55,7 @@ object VengeanceTimer : Module(
             val slayerInfo = SlayerAPI.slayerBosses[entity] ?: return@on
 
             if (!slayerInfo.isOwnedByPlayer) return@on
-            if (!component.stripped().contains("ASHEN ♨7")) return@on
+            if (!stripped.contains("ASHEN ♨7")) return@on
             if (Smoothie.heldItem?.getData(DataTypes.SKYBLOCK_ID)?.skyblockId !in abilityIds) return@on
 
             count.value = true

@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attribute
 import tech.thatgravyboat.skyblockapi.api.events.entity.EntityAttributesUpdateEvent
 import xyz.aerii.athen.events.core.Event
+import xyz.aerii.athen.handlers.Typo.stripped
 
 sealed class EntityEvent {
     data class Load(
@@ -29,6 +30,9 @@ sealed class EntityEvent {
             @Deprecated("Use entity.")
             val infoLineEntity: Entity
                 get() = entity
+
+            val stripped: String =
+                component.stripped()
         }
 
         data class Named(
@@ -38,6 +42,9 @@ sealed class EntityEvent {
             @Deprecated("Use entity.")
             val infoLineEntity: Entity
                 get() = entity
+
+            val stripped: String =
+                component.stripped()
         }
 
         data class Health(

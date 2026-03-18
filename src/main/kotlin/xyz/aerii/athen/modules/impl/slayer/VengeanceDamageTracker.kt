@@ -10,7 +10,6 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
@@ -45,7 +44,7 @@ object VengeanceDamageTracker : Module(
         on<EntityEvent.Update.Named> {
             val slayer = slayerEntity ?: return@on
             val entity = entity as? ArmorStand ?: return@on
-            val match = vengeanceRegex.findGroup(component.stripped(), "damage") ?: return@on
+            val match = vengeanceRegex.findGroup(stripped, "damage") ?: return@on
 
             if (entity.distanceTo(slayer) > 5) return@on
 

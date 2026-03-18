@@ -10,7 +10,6 @@ import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Typo.devMessage
-import xyz.aerii.athen.handlers.Typo.stripped
 import java.util.*
 
 // FIXME: Doesn't work for tarantula T5.
@@ -53,7 +52,7 @@ object SlayerAPI {
             var entity = entity.parent ?: return@on
 
             val slayerInfo = when {
-                component.stripped().check() -> slayerBosses.computeIfAbsent(entity, ::SlayerInfo)
+                stripped.check() -> slayerBosses.computeIfAbsent(entity, ::SlayerInfo)
                 else -> slayerBosses[entity] ?: return@on
             }
 
