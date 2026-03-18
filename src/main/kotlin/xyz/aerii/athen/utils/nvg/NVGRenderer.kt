@@ -42,6 +42,7 @@ import org.lwjgl.stb.STBImage.stbi_load_from_memory
 import org.lwjgl.system.MemoryUtil.memAlloc
 import org.lwjgl.system.MemoryUtil.memFree
 import xyz.aerii.athen.handlers.Resourceful
+import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter
 import xyz.aerii.athen.utils.alpha
 import xyz.aerii.athen.utils.blue
@@ -77,7 +78,8 @@ object NVGRenderer {
     fun beginFrame(width: Float, height: Float) {
         if (drawing) error("[NVGRenderer] Already drawing, but called beginFrame")
 
-        nvgBeginFrame(vg, width, height, 1f)
+        val dpr = dpr()
+        nvgBeginFrame(vg, width / dpr, height / dpr, dpr)
         nvgTextAlign(vg, NVG_ALIGN_LEFT or NVG_ALIGN_TOP)
         drawing = true
     }
@@ -462,6 +464,17 @@ object NVGRenderer {
         when (direction) {
             Gradient.`L->R` -> nvgLinearGradient(vg, x, y, x + w, y, nvgColor, nvgColor2, nvgPaint)
             Gradient.`T->B` -> nvgLinearGradient(vg, x, y, x, y + h, nvgColor, nvgColor2, nvgPaint)
+        }
+    }
+
+    private fun dpr(): Float {
+        return try {
+            val window = client.window
+            val fbw = window.width
+            val ww = window.screenWidth
+            if (ww == 0) 1f else fbw.toFloat() / ww.toFloat()
+        } catch (_: Exception) {
+            1f
         }
     }
 
