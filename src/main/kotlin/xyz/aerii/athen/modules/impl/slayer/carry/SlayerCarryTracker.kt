@@ -292,11 +292,11 @@ object SlayerCarryTracker : Module(
                     }
 
                     thenCallback("gui") {
-                        McClient.setScreen(SlayerCarryGUI)
+                        SlayerCarryGUI.open()
                     }
 
                     callback {
-                        McClient.setScreen(SlayerCarryGUI)
+                        SlayerCarryGUI.open()
                     }
                 }
             }

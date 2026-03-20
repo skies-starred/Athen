@@ -4,7 +4,6 @@ package xyz.aerii.athen.handlers
 
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
-import tech.thatgravyboat.skyblockapi.helpers.McClient
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.ui.ClickGUI
@@ -18,6 +17,7 @@ import xyz.aerii.athen.handlers.Typo.centeredText
 import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.Typo.repeatBreak
+import xyz.aerii.athen.hud.HUDEditor
 import xyz.aerii.athen.modules.impl.Dev
 import xyz.aerii.athen.modules.impl.Dev.clickUiHelperCollapsed
 import xyz.aerii.athen.modules.impl.Dev.clickUiHelperHidden
@@ -40,6 +40,7 @@ object Commander {
         "/${Athen.modId} config" to "Open the configuration menu",
         "/${Athen.modId} hud" to "Open the HUD editor",
         "/${Athen.modId} simulate terminals" to "Terminal simulator",
+        "/${Athen.modId} radial help" to "Info about radial menu",
         "/${Athen.modId} visuals help" to "Info about visual words replacement",
         "/${Athen.modId} carry help" to "Info about slayer carry commands",
         "/${Athen.modId} dcarry help" to "Info about dungeon carry commands",
@@ -59,26 +60,26 @@ object Commander {
                 callback {
                     if (!ModSettings.commandConfig) return@callback showHelp()
 
-                    McClient.setScreen(ClickGUI)
+                    ClickGUI.open()
                     "Opened the config! <gray>(use /athen help to view commands)".parse().modMessage()
                 }
 
                 then("config") {
                     callback {
-                        McClient.setScreen(ClickGUI)
+                        ClickGUI.open()
                     }
 
                     thenCallback("keybinds") {
-                        McClient.setScreen(KeybindsGUI)
+                        KeybindsGUI.open()
                     }
                 }
 
                 thenCallback("hud") {
-                    McClient.setScreen(xyz.aerii.athen.hud.HUDEditor)
+                    HUDEditor.open()
                 }
 
                 thenCallback("keybinds") {
-                    McClient.setScreen(KeybindsGUI)
+                    KeybindsGUI.open()
                 }
 
                 then("calc") {

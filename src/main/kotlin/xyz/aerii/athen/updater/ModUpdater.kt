@@ -6,7 +6,6 @@ import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
 import moe.nea.libautoupdate.UpdateTarget
 import net.minecraft.SharedConstants
-import tech.thatgravyboat.skyblockapi.helpers.McClient
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.handlers.Typo.PrefixType
@@ -72,13 +71,7 @@ object ModUpdater {
 
             if (newVersion == skippedVersion) return@thenAccept
             mainThread {
-                McClient.setScreen(UpdateGUI(
-                    Athen.modVersion,
-                    newVersion,
-                    onUpdate = { installUpdate(stream) },
-                    onSkip = { skippedVersion = newVersion },
-                    onRemind = {}
-                ))
+                UpdateGUI(Athen.modVersion, newVersion, onUpdate = { installUpdate(stream) }, onSkip = { skippedVersion = newVersion }, onRemind = {}).open()
             }
         }.exceptionally {
             Athen.LOGGER.error("Failed to check for updates: ${it.message}")

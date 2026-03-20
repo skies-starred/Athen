@@ -195,11 +195,11 @@ object KuudraCarryTracker : Module(
                     }
 
                     thenCallback("gui") {
-                        McClient.setScreen(KuudraCarryGUI)
+                        KuudraCarryGUI.open()
                     }
 
                     callback {
-                        McClient.setScreen(KuudraCarryGUI)
+                        KuudraCarryGUI.open()
                     }
                 }
             }

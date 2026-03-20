@@ -199,11 +199,11 @@ object DungeonCarryTracker : Module(
                     }
 
                     thenCallback("gui") {
-                        McClient.setScreen(DungeonCarryGUI)
+                        DungeonCarryGUI.open()
                     }
 
                     callback {
-                        McClient.setScreen(DungeonCarryGUI)
+                        DungeonCarryGUI.open()
                     }
                 }
             }
