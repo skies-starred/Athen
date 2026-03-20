@@ -33,7 +33,7 @@ class Scribble(private val path: String, private val tts: Int = 15) {
     private var job: Job? = null
 
     init {
-        on<GameEvent.Stop> {
+        on<GameEvent.Stop> (Int.MAX_VALUE) {
             runBlocking {
                 job?.cancelAndJoin()
                 save()

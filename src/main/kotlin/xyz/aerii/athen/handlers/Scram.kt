@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.CharacterEvent
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
+import tech.thatgravyboat.skyblockapi.helpers.McClient
 import xyz.aerii.athen.handlers.Texter.literal
 
 /**
@@ -93,5 +94,9 @@ abstract class Scram(
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontal: Double, vertical: Double): Boolean {
         return if (onScramMouseScroll(mouseX.toInt(), mouseY.toInt(), horizontal, vertical)) true else super.mouseScrolled(mouseX, mouseY, horizontal, vertical)
+    }
+
+    fun open() {
+        McClient.setScreen(this)
     }
 }
