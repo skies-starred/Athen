@@ -13,12 +13,9 @@ import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.fabric.event.HypixelModAPICallback
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.network.protocol.game.ClientboundContainerClosePacket
-import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
-import net.minecraft.network.protocol.game.ServerboundContainerClosePacket
 import tech.thatgravyboat.skyblockapi.api.SkyBlockAPI
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.entity.EntityAttributesUpdateEvent
@@ -32,7 +29,6 @@ import tech.thatgravyboat.skyblockapi.api.events.screen.ItemTooltipEvent
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.*
 import xyz.aerii.athen.events.core.on
-import xyz.aerii.athen.utils.EMPTY_COMPONENT
 import xyz.aerii.athen.utils.mainThread
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
 import kotlin.jvm.optionals.getOrNull
@@ -63,18 +59,6 @@ object Signal {
             mainThread {
                 (if (this@on.overlay) MessageEvent.ActionBar(content) else MessageEvent.Chat.Receive(content)).post()
             }
-        }
-
-        on<PacketEvent.Receive, ClientboundOpenScreenPacket> {
-            GuiEvent.Container.Open(title ?: EMPTY_COMPONENT, containerId, type).post()
-        }
-
-        on<PacketEvent.Send, ServerboundContainerClosePacket> {
-            GuiEvent.Container.Close.post()
-        }
-
-        on<PacketEvent.Receive, ClientboundContainerClosePacket> {
-            GuiEvent.Container.Close.post()
         }
 
         on<PacketEvent.Process.Pre, ClientboundSetTitleTextPacket> {

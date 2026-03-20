@@ -14,12 +14,12 @@ public class FontMixin {
     *///? } else {
     @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
     //? }
-    private FormattedCharSequence athen$prepareSequence(FormattedCharSequence seq) {
+    private FormattedCharSequence athen$prepareText$sequence(FormattedCharSequence seq) {
         return VisualWords.INSTANCE.getEnabled() ? VisualWords.fn(seq) : seq;
     }
 
     @ModifyVariable(method = "width(Lnet/minecraft/util/FormattedCharSequence;)I", at = @At("HEAD"), argsOnly = true)
-    private FormattedCharSequence athen$widthSequence(FormattedCharSequence seq) {
+    private FormattedCharSequence athen$width$sequence(FormattedCharSequence seq) {
         return VisualWords.INSTANCE.getEnabled() ? VisualWords.fn(seq) : seq;
     }
 }
