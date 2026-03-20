@@ -24,5 +24,10 @@ sealed class InputEvent {
         data class Release(
             val buttonInfo: MouseButtonInfo
         ) : Event()
+
+        data class Move(
+            val x: Double,
+            val y: Double
+        ) : CancellableEvent()
     }
 }
