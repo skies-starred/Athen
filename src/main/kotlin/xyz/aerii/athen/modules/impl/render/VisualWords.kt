@@ -26,6 +26,7 @@ import xyz.aerii.athen.handlers.Typo.repeatBreak
 import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
+import xyz.aerii.athen.utils.EMPTY_COMPONENT
 import xyz.aerii.athen.utils.kotlin.CopyOnWriteMap
 
 @Load
@@ -57,9 +58,7 @@ object VisualWords : Module(
 
     init {
         nick = nickname.value.parse(true).visualOrderText
-        nickname.state.onChange {
-            nick = it.parse(true).visualOrderText
-        }
+        nickname.state.onChange { nick = it.parse(true).visualOrderText }
 
         Beacon.get("https://raw.githubusercontent.com/skies-starred/athen-assets/refs/heads/main/cool.json") {
             onJsonSuccess { json ->
@@ -81,8 +80,13 @@ object VisualWords : Module(
         on<CommandRegistration> {
             event.register(Athen.modId) {
                 then("visuals") {
-                    callback { help() }
-                    thenCallback("help") { help() }
+                    callback {
+                        help()
+                    }
+
+                    thenCallback("help") {
+                        help()
+                    }
 
                     then("add") {
                         then("word", StringArgumentType.string()) {
@@ -268,10 +272,10 @@ object VisualWords : Module(
         copy().withStyle(style.withInsertion(SKIP))
 
     private fun FormattedCharSequence.toComponent(): Component {
-        val builder = Component.literal("")
+        val builder = EMPTY_COMPONENT.copy()
 
         accept { _, style, cp ->
-            builder.append(Component.literal(Character.toString(cp)).withStyle(style))
+            builder.append(Character.toString(cp).literal().withStyle(style))
             true
         }
 
