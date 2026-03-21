@@ -199,12 +199,12 @@ object PartyFinder : Module(
             }
         }.runWhen(highlight.state)
 
-        on<GuiEvent.Container.Open> {
+        on<GuiEvent.Open.Container> {
             inPartyFinder = stripped == "Party Finder"
             inMainGate = stripped == "Catacombs Gate"
         }
 
-        on<GuiEvent.Container.Close> {
+        on<GuiEvent.Close.Container> {
             reset()
         }
 

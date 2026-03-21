@@ -330,12 +330,10 @@ object RadialMenu : Module(
             graphics.drawOutline(mx - 5, my - 5, tw + 10, client.font.lineHeight + 10, 1, Mocha.Mauve.argb)
             graphics.text(label, mx, my, false, Mocha.Text.argb)
         }.runWhen(open)
-    }
 
-    @JvmStatic
-    fun react(v: Boolean, bool: Boolean) {
-        open.value = v
-        if (v) client.mouseHandler.releaseMouse() else if (bool) client.mouseHandler.grabMouse()
+        on<GuiEvent.Open.Any> {
+            react(false, bool = false)
+        }
     }
 
     fun disk() {
@@ -371,6 +369,11 @@ object RadialMenu : Module(
         val data = configs.remove(old) ?: return
         configs[new] = data
         if (active == old) active = new
+    }
+
+    private fun react(v: Boolean, bool: Boolean) {
+        open.value = v
+        if (v) client.mouseHandler.releaseMouse() else if (bool) client.mouseHandler.grabMouse()
     }
 
     private fun help() {

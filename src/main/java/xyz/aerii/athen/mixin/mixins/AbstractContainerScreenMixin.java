@@ -24,16 +24,6 @@ public class AbstractContainerScreenMixin {
     @Nullable
     private Slot athen$previousHoveredSlot = null;
 
-    @Inject(method = "init", at = @At("HEAD"), cancellable = true)
-    private void athen$init(CallbackInfo ci) {
-        if (new GuiEvent.Container.Open((AbstractContainerScreen) (Object) this).post()) ci.cancel();
-    }
-
-    @Inject(method = "onClose", at = @At("HEAD"))
-    private void athen$onClose(CallbackInfo ci) {
-        GuiEvent.Container.Close.INSTANCE.post();
-    }
-
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     //? >= 1.21.11 {
     /*private void athen$onRenderSlot$pre(GuiGraphics guiGraphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {

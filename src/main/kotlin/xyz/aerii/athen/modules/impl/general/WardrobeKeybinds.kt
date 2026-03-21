@@ -86,7 +86,7 @@ object WardrobeKeybinds : Module(
     }
 
     init {
-        on<GuiEvent.Container.Open> {
+        on<GuiEvent.Open.Container> {
             menuRegex.findOrNull(stripped, "cur", "max") { (cur, max) ->
                 inMenu = true
                 currentPage = cur.toInt()
@@ -94,7 +94,7 @@ object WardrobeKeybinds : Module(
             }
         }
 
-        on<GuiEvent.Container.Close> {
+        on<GuiEvent.Close.Container> {
             reset()
         }
 

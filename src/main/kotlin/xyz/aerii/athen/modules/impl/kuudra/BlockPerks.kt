@@ -45,11 +45,11 @@ object BlockPerks : Module(
         perks3.state.onChange(::r)
         perks4.state.onChange(::r)
 
-        on<GuiEvent.Container.Open> {
+        on<GuiEvent.Open.Container> {
             inGui = stripped == "Perk Menu"
         }
 
-        on<GuiEvent.Container.Close> {
+        on<GuiEvent.Close.Container> {
             inGui = false
         }
 

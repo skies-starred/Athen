@@ -1,6 +1,7 @@
 package xyz.aerii.athen.events
 
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
@@ -30,13 +31,43 @@ sealed class GuiEvent {
             ) : CancellableEvent()
         }
 
+        @Deprecated("Use GuiEvent.Open")
         data class Open(
             val screen: AbstractContainerScreen<*>
         ) : Event() {
             val stripped = screen.title.stripped()
         }
 
+        @Deprecated("Use GuiEvent.Close")
         data object Close : Event()
+    }
+
+    sealed class Open {
+        data class Container(
+            val screen: AbstractContainerScreen<*>
+        ) : Event() {
+            val stripped = screen.title.stripped()
+        }
+
+        data class Any(
+            val screen: Screen
+        ) : Event() {
+            val stripped = screen.title.stripped()
+        }
+    }
+
+    sealed class Close {
+        data class Container(
+            val screen: AbstractContainerScreen<*>
+        ) : Event() {
+            val stripped = screen.title.stripped()
+        }
+
+        data class Any(
+            val screen: Screen
+        ) : Event() {
+            val stripped = screen.title.stripped()
+        }
     }
 
     sealed class Slots {

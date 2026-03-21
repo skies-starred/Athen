@@ -74,7 +74,7 @@ object CustomTooltip : Module(
             if (`scroll$reset`) reset()
         }
 
-        on<GuiEvent.Container.Close> {
+        on<GuiEvent.Close.Any> {
             hover = null
             color = `border$color`.rgb
             name = false

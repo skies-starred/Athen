@@ -33,7 +33,7 @@ object Itemizer {
     }
 
     init {
-        on<GuiEvent.Container.Close> {
+        on<GuiEvent.Close.Container> {
             `cache$slot`.clear()
             `cache$tooltip`.clear()
         }
