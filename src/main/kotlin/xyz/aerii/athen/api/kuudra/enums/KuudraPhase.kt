@@ -1,16 +1,18 @@
 package xyz.aerii.athen.api.kuudra.enums
 
 import xyz.aerii.athen.api.kuudra.KuudraAPI
+import xyz.aerii.athen.events.KuudraEvent
+import xyz.aerii.athen.events.core.Event
 import xyz.aerii.athen.handlers.Chronos
 
-enum class KuudraPhase(val tiers: IntRange = KuudraTier.BASIC.int..KuudraTier.INFERNAL.int) {
-    Supply,
-    Build,
-    Fuel,
-    Stun(KuudraTier.BURNING.int..KuudraTier.INFERNAL.int),
-    DPS(KuudraTier.BURNING.int..KuudraTier.INFERNAL.int),
-    Skip(KuudraTier.INFERNAL.int..KuudraTier.INFERNAL.int),
-    Kill;
+enum class KuudraPhase(val event: Event, val tiers: IntRange = KuudraTier.BASIC.int..KuudraTier.INFERNAL.int) {
+    Supply(KuudraEvent.Phase.Supply),
+    Build(KuudraEvent.Phase.Build),
+    Fuel(KuudraEvent.Phase.Fuel),
+    Stun(KuudraEvent.Phase.Stun, KuudraTier.BURNING.int..KuudraTier.INFERNAL.int),
+    DPS(KuudraEvent.Phase.DPS, KuudraTier.BURNING.int..KuudraTier.INFERNAL.int),
+    Skip(KuudraEvent.Phase.Skip, KuudraTier.INFERNAL.int..KuudraTier.INFERNAL.int),
+    Kill(KuudraEvent.Phase.Kill);
 
     var startTick: Int = 0
     var startTime: Long = 0

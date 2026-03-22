@@ -65,7 +65,14 @@ object KuudraAPI {
 
     @JvmStatic
     var phase: KuudraPhase? = null
-        private set
+        private set(value) {
+            if (field == value) return
+            field = value
+
+            if (value == null) return
+            value.event.post()
+            KuudraEvent.Phase.Any(value).post()
+        }
 
     @JvmStatic
     val kuudra: MagmaCube? by _k
@@ -190,7 +197,7 @@ object KuudraAPI {
             }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
 
-        on<MessageEvent.Chat.Receive> {
+        on<MessageEvent.Chat.Receive>(Int.MIN_VALUE) {
             when {
                 stripped == "[NPC] Elle: Okay adventurers, I will go and fish up Kuudra!" -> {
                     KuudraEvent.Start.post()
