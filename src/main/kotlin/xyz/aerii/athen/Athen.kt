@@ -8,7 +8,9 @@ import net.fabricmc.api.ClientModInitializer
 import net.minecraft.SharedConstants
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.onClick
 import xyz.aerii.athen.annotations.AnnotationLoader
+import xyz.aerii.athen.config.ConfigManager
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.*
@@ -20,8 +22,10 @@ import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.handlers.Typo.repeatBreak
 import xyz.aerii.athen.modules.impl.Dev
+import xyz.aerii.athen.modules.impl.render.VisualWords
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.updater.ModUpdater
+import xyz.aerii.athen.utils.EMPTY_COMPONENT
 import kotlin.time.Duration.Companion.hours
 
 object Athen : ClientModInitializer {
@@ -52,7 +56,7 @@ object Athen : ClientModInitializer {
 
         on<LocationEvent.Server.Connect> {
             Chronos.Tick after 20 then {
-                if (Dev.lastVersion != modVersion) li()
+                li()
                 "Debug mode is enabled -> Run \"/$modId toggle dev\" to toggle.".devMessage()
             }
 
@@ -64,7 +68,7 @@ object Athen : ClientModInitializer {
             Chronos.Time every 1.hours repeat {
                 broadcast()
             }
-        }.once()
+        }
     }
 
     private fun li() {
@@ -73,19 +77,22 @@ object Athen : ClientModInitializer {
         val divider = ("§8§m" + "-".repeatBreak()).literal()
 
         divider.lie()
-        "§d§lWelcome to $modName!".centeredText().lie()
+        "§d§l$modName".centeredText().lie()
         divider.lie()
-        "".lie()
-        "§7Thank you for installing $modName §8(v$modVersion)§7.".lie()
-        "".lie()
-        "§7Quick Start:".lie()
-        "  §b/$modId config §7- Open configuration menu".lie()
-        "  §b/$modId hud §7- Position HUD elements".lie()
-        "  §b/$modId help §7- View all commands".lie()
-        "".lie()
+        "<gray>Thank you for installing $modName <dark_gray>(v$modVersion)<gray>.".parse().lie()
+        EMPTY_COMPONENT.lie()
+        "<gray>Quick Start:".parse().lie()
+        "  <aqua>/$modId config <gray>- Open configuration menu".parse().lie()
+        "  <aqua>/$modId hud <gray>- Position HUD elements".parse().lie()
+        "  <aqua>/$modId help <gray>- View all commands".parse().lie()
+        EMPTY_COMPONENT.lie()
 
         "<hover:<${Mocha.Lavender.argb}>Click to join!><click:url:$discordUrl><gray>Need help? Click to join our Discord!".parse().lie()
 
+        divider.lie()
+
+        if (VisualWords.enabled) return
+        "<hover:<green>Click to enable!>A lot of time and effort goes into maintaining Athen. Enable <${Mocha.Mauve.argb}>Visual Words<r> to highlight the amazing people who support its development! <gray>Click on this message to enable!".parse().onClick { ConfigManager.updateConfig("visualWords", true) }.lie()
         divider.lie()
     }
 

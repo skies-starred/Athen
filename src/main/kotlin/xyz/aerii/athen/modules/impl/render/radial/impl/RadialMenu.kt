@@ -385,6 +385,8 @@ object RadialMenu : Module(
         " <dark_gray>• <${Mocha.Green.argb}>/${Athen.modId} import radial <gray>- Imports config from clipboard".parse().lie()
         " <dark_gray>• <${Mocha.Green.argb}>/${Athen.modId} export radial <gray>- Exports current config to clipboard".parse().lie()
         divider.lie()
+        "Want to explore <red>presets<r>? Join the <hover:<red>Click to join!><click:url:${Athen.discordUrl}><${Mocha.Mauve.argb}>discord!"
+        divider.lie()
     }
 
     private fun fn(): List<Pair<Int, ISlot>> {

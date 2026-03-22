@@ -33,13 +33,14 @@ import xyz.aerii.athen.utils.kotlin.CopyOnWriteMap
 object VisualWords : Module(
     "Visual words",
     "Visually modify words!",
-    Category.RENDER
+    Category.RENDER,
+    true
 ) {
     private class Entry(val cps: IntArray, val len: Int, val seq: FormattedCharSequence)
 
     private val unused by config.textParagraph("Use the command \"/athen visuals help\" to learn more about the available commands!")
-    private val nickHider by config.switch("Nick hider")
-    private val nickname = config.textInput("Nickname", "cooluser4").dependsOn { nickHider }.custom("nickname")
+    private val nameChanger by config.switch("Name changer")
+    private val nickname = config.textInput("Nickname", "cooluser4").dependsOn { nameChanger }.custom("nickname")
 
     private const val SKIP = "\u0000vw_bypass"
 
@@ -141,9 +142,9 @@ object VisualWords : Module(
 
     @JvmStatic
     fun fn(seq: FormattedCharSequence): FormattedCharSequence {
-        if (replace.isEmpty() && !nickHider) return seq
+        if (replace.isEmpty() && !nameChanger) return seq
 
-        val a = nickHider
+        val a = nameChanger
         val chars = IntArray(256)
         val styles = ArrayList<Style>(256)
         var size = 0
