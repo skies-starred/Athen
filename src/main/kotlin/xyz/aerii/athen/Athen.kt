@@ -56,7 +56,7 @@ object Athen : ClientModInitializer {
 
         on<LocationEvent.Server.Connect> {
             Chronos.Tick after 20 then {
-                li()
+                if (Dev.lastVersion != modVersion) li()
                 "Debug mode is enabled -> Run \"/$modId toggle dev\" to toggle.".devMessage()
             }
 
@@ -68,7 +68,7 @@ object Athen : ClientModInitializer {
             Chronos.Time every 1.hours repeat {
                 broadcast()
             }
-        }
+        }.once()
     }
 
     private fun li() {
