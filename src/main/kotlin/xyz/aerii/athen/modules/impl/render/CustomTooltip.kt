@@ -53,7 +53,7 @@ object CustomTooltip : Module(
     private val background by config.switch("Background", true).childOf { renderExpandable }
     private val `background$color` by config.colorPicker("Background color", Color(Catppuccin.Mocha.Surface0.withAlpha(0.9f), true)).dependsOn { background }.childOf { renderExpandable }
 
-    private val onlyName by config.keybind("Only name toggle", GLFW.GLFW_KEY_LEFT_ALT).childOf { renderExpandable }
+    private val onlyName by config.keybind("Only name toggle").childOf { renderExpandable }
     private val `onlyName$unused` by config.textParagraph("Toggling only name mode will hide the actual tooltip and show only the name when it's toggled on.").childOf { renderExpandable }
 
     val `text$shadow` by config.switch("Text shadows", true).childOf { renderExpandable }
