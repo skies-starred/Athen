@@ -3,13 +3,11 @@ package xyz.aerii.athen.modules.impl.general.keybinds
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import xyz.aerii.athen.annotations.Load
-import xyz.aerii.athen.api.location.LocationAPI
-import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.InputEvent
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Typo.command
+import xyz.aerii.athen.handlers.Typo.clientCommand
 import xyz.aerii.athen.handlers.Typo.message
 import xyz.aerii.athen.modules.Module
 
@@ -28,11 +26,10 @@ object Keybinds : Module(
 
     val storage = Scribble("features/Keybinds")
     var bindings = storage.mutableList("bindings", KeybindEntry.CODEC)
+    var categories = storage.mutableList("categories", CategoryEntry.CODEC)
 
     init {
         on<InputEvent.Keyboard.Press> {
-            if (client.screen != null) return@on
-
             keys.add(keyEvent.key)
             check()
         }
@@ -43,8 +40,6 @@ object Keybinds : Module(
         }
 
         on<InputEvent.Mouse.Press> {
-            if (client.screen != null) return@on
-
             val mouseCode = -(buttonInfo.button + 1)
             buttons.add(mouseCode)
             check()
@@ -58,19 +53,23 @@ object Keybinds : Module(
 
     private fun check() {
         val all = (keys + buttons).toHashSet()
-        val currentIsland = LocationAPI.island.value
+        val disabled = categories.value.filter { !it.enabled }.map { it.name }
 
         for (binding in bindings.value) {
+            if (!binding.condition.eval()) continue
+
             val ks = binding.keys
-            if (ks.isEmpty() || binding in triggered) continue
+            if (ks.isEmpty()) continue
+            if (binding in triggered) continue
+            if (!binding.enabled) continue
+            if (binding.category.isNotEmpty() && binding.category in disabled) continue
             if (!ks.all(all::contains)) continue
-            if (binding.island != null && binding.island != currentIsland) continue
 
             triggered.add(binding)
 
             val command = binding.command
             if (command.isEmpty()) continue
-            if (command[0] == '/') command.command() else command.message()
+            if (command[0] == '/') command.clientCommand() else command.message()
         }
     }
 
@@ -79,42 +78,63 @@ object Keybinds : Module(
         triggered.removeIf { b -> b.keys.any { it !in pressed } }
     }
 
-    fun List<Int>.add(command: String, island: SkyBlockIsland?): Boolean {
+    fun List<Int>.add(command: String, category: String = "", condition: KeybindCondition = KeybindCondition()): Boolean {
         if (command.isBlank() || isEmpty()) return false
-
-        bindings.update { add(KeybindEntry(this@add, command, island)) }
+        bindings.update { add(KeybindEntry(this@add, command, true, category, condition)) }
         return true
     }
 
     fun Int.remove(): Boolean {
         if (this !in bindings.value.indices) return false
-
         bindings.update { removeAt(this@remove) }
         return true
     }
 
-    fun Int.update(keys: List<Int>, command: String, island: SkyBlockIsland?): Boolean {
+    fun Int.update(keys: List<Int>, command: String, enabled: Boolean, category: String = "", condition: KeybindCondition): Boolean {
         if (this !in bindings.value.indices || command.isBlank() || keys.isEmpty()) return false
         val int = this
-
-        bindings.update { set(int, KeybindEntry(keys, command, island)) }
+        bindings.update { set(int, KeybindEntry(keys, command, enabled, category, condition)) }
         return true
+    }
+
+    fun addCategory(name: String): Boolean {
+        if (name.isBlank() || categories.value.any { it.name == name }) return false
+        categories.update { add(CategoryEntry(name)) }
+        return true
+    }
+
+    fun removeCategory(name: String) {
+        categories.update { removeIf { it.name == name } }
+        bindings.update {
+            val updated = map { if (it.category == name) it.copy(category = "") else it }
+            clear()
+            addAll(updated)
+        }
+    }
+
+    fun toggleCategory(name: String) {
+        categories.update {
+            val idx = indexOfFirst { it.name == name }
+            if (idx >= 0) set(idx, get(idx).copy(enabled = !get(idx).enabled))
+        }
     }
 
     data class KeybindEntry(
         val keys: List<Int>,
         val command: String,
-        val island: SkyBlockIsland? = null
+        val enabled: Boolean = true,
+        val category: String = "",
+        val condition: KeybindCondition = KeybindCondition()
     ) {
         companion object {
             val CODEC: Codec<KeybindEntry> = RecordCodecBuilder.create { inst ->
                 inst.group(
                     Codec.INT.listOf().fieldOf("keys").forGetter(KeybindEntry::keys),
                     Codec.STRING.fieldOf("command").forGetter(KeybindEntry::command),
-                    Codec.STRING.optionalFieldOf("island").forGetter { it.island?.id?.let { id -> java.util.Optional.of(id) } ?: java.util.Optional.empty() }
-                ).apply(inst) { keys, command, islandId ->
-                    KeybindEntry(keys, command, islandId.map { SkyBlockIsland.getByKey(it) }.orElse(null))
-                }
+                    Codec.BOOL.optionalFieldOf("enabled", true).forGetter(KeybindEntry::enabled),
+                    Codec.STRING.optionalFieldOf("category", "").forGetter(KeybindEntry::category),
+                    KeybindCondition.CODEC.optionalFieldOf("condition", KeybindCondition()).forGetter(KeybindEntry::condition)
+                ).apply(inst, ::KeybindEntry)
             }
         }
     }
