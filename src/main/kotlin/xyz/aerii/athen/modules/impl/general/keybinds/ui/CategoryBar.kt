@@ -3,6 +3,8 @@ package xyz.aerii.athen.modules.impl.general.keybinds.ui
 import net.minecraft.client.gui.GuiGraphics
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds
+import xyz.aerii.athen.ui.InputField
+import xyz.aerii.athen.ui.UIZone
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
@@ -89,12 +91,12 @@ class CategoryBar(
             if (cat.enabled) guiGraphics.drawRectangle(tx + 2, ty + 2, 6, 6, Mocha.Green.argb)
 
             zones.add(UIZone(tx, ty, 10, 10, UIZoneType.CATEGORY_TOGGLE, i))
-            zones.add(UIZone(lx, cy, lw - 18, rowH, UIZoneType.CATEGORY_TAB, i, cat.name))
+            zones.add(UIZone(lx, cy, lw - 18, rowH, UIZoneType.CATEGORY_TAB, i, category = cat.name))
             cy += rowH
         }
 
         if (creating) {
-            nameField.draw(guiGraphics, mx, my, lx, cy + 2, lw, UIZoneType.CATEGORY_ADD, 0, zones)
+            nameField.draw(guiGraphics, mx, my, lx, cy + 2, lw) { zx, zy, zw, zh -> zones.add(UIZone(zx, zy, zw, zh, UIZoneType.CATEGORY_ADD)) }
         } else {
             val addHov = !modalOpen && mx in lx until lx + lw && my in cy + 2 until cy + 16
             if (addHov) guiGraphics.drawRectangle(lx, cy + 2, lw, 14, Mocha.Surface0.withAlpha(0.5f))

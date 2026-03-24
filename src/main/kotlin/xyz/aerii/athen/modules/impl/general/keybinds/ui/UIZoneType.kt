@@ -1,6 +1,8 @@
 package xyz.aerii.athen.modules.impl.general.keybinds.ui
 
-enum class UIZoneType {
+import xyz.aerii.athen.ui.IZoneType
+
+enum class UIZoneType : IZoneType {
     BUTTON_CREATE,
     ENTRY_EDIT,
     ENTRY_DELETE,

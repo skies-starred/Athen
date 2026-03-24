@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.gui.GuiGraphics
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds
+import xyz.aerii.athen.ui.UIZone
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle

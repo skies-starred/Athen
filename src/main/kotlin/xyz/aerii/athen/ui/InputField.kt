@@ -1,4 +1,4 @@
-package xyz.aerii.athen.modules.impl.general.keybinds.ui
+package xyz.aerii.athen.ui
 
 import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import net.minecraft.client.gui.GuiGraphics
@@ -28,7 +28,7 @@ class InputField(val placeholder: String) {
     val selectionBool: Boolean
         get() = selectionStart != -1 && selectionStart != cursor
 
-    fun draw(guiGraphics: GuiGraphics, mx: Int, my: Int, x: Int, y: Int, w: Int, type: UIZoneType, id: Int, zones: MutableList<UIZone>) {
+    fun draw(guiGraphics: GuiGraphics, mx: Int, my: Int, x: Int, y: Int, w: Int, onZone: ((Int, Int, Int, Int) -> Unit)? = null) {
         val fh = 16
         val hovered = mx in x until x + w && my in y until y + fh
         guiGraphics.drawRectangle(x, y, w, fh, if (focused) Mocha.Surface2.argb else if (hovered) Mocha.Surface1.argb else Mocha.Surface0.argb)
@@ -64,7 +64,7 @@ class InputField(val placeholder: String) {
         }
 
         guiGraphics.disableScissor()
-        zones.add(UIZone(x, y, w, fh, type, id))
+        onZone?.invoke(x, y, w, fh)
     }
 
     fun updateClick(mx: Int, bx: Int) {
@@ -210,6 +210,14 @@ class InputField(val placeholder: String) {
         cursor++
 
         return true
+    }
+
+    fun reset() {
+        value = ""
+        cursor = 0
+        selectionStart = -1
+        scrollOffset = 0
+        focused = false
     }
 
     private fun deleteSel(): Boolean {

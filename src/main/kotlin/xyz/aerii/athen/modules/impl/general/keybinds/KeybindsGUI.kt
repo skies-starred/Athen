@@ -8,6 +8,7 @@ import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds.add
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds.remove
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds.update
 import xyz.aerii.athen.modules.impl.general.keybinds.ui.*
+import xyz.aerii.athen.ui.UIZone
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle

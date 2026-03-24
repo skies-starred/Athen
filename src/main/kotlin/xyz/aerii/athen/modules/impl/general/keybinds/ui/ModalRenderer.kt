@@ -9,6 +9,8 @@ import xyz.aerii.athen.modules.impl.general.keybinds.KeybindCondition
 import xyz.aerii.athen.modules.impl.general.keybinds.KeybindWorkIn
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds
 import xyz.aerii.athen.modules.impl.general.keybinds.ui.BindingsListRenderer.Companion.str
+import xyz.aerii.athen.ui.InputField
+import xyz.aerii.athen.ui.UIZone
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
@@ -76,7 +78,7 @@ class ModalRenderer(
         guiGraphics.text("Keys", mx0 + padding + halfW + 8, cy, false, Mocha.Subtext0.argb)
         cy += client.font.lineHeight + 2
 
-        cmdField.draw(guiGraphics, mx, my, mx0 + padding, cy, halfW, UIZoneType.MODAL_CMD, 0, zones)
+        cmdField.draw(guiGraphics, mx, my, mx0 + padding, cy, halfW) { zx, zy, zw, zh -> zones.add(UIZone(zx, zy, zw, zh, UIZoneType.MODAL_CMD)) }
         drawKeysField(guiGraphics, mx, my, mx0 + padding + halfW + 8, cy, halfW, zones)
         cy += fh + 8
 
