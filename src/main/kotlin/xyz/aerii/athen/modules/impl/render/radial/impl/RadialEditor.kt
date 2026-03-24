@@ -181,10 +181,10 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
         for (i in 0 until num) {
             val s = i * step + gap * .5f + off
             val e = (i + 1) * step - gap * .5f + off
-            val c0 = Mth.cos(s)
-            val s0 = Mth.sin(s)
-            val c1 = Mth.cos(e)
-            val s1 = Mth.sin(e)
+            val c0 = Mth.cos(s/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
+            val s0 = Mth.sin(s/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
+            val c1 = Mth.cos(e/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
+            val s1 = Mth.sin(e/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
             val x0 = cx + outer * c0
             val y0 = cy + outer * s0
             val x1 = cx + inner * c0
