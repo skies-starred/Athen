@@ -203,7 +203,7 @@ object ColoredEnchants : Module(
             return buildString {
                 if (s.bold) append("<bold>")
                 if (s.italic) append("<italic>")
-                if (s.underline) append("<underlined>")
+                if (s.underline) append("<underline>")
                 if (s.strike) append("<strikethrough>")
                 append("<${c.rgb}>")
             }
