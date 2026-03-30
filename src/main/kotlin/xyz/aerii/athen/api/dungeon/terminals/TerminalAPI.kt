@@ -25,6 +25,7 @@ import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.React
+import xyz.aerii.athen.handlers.React.Companion.and
 import xyz.aerii.athen.handlers.React.Companion.or
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Typo.devMessage
@@ -107,7 +108,7 @@ object TerminalAPI {
             if (System.currentTimeMillis() - openTime >= TerminalSolver.fcDelay) return@on
 
             it.cancel()
-        }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
+        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.react)
 
         on<PacketEvent.Send, ServerboundContainerClosePacket> {
             if (!terminalOpen.value) return@on
@@ -120,13 +121,11 @@ object TerminalAPI {
             if (entity.displayName?.stripped() != "Inactive Terminal") return@on
 
             if (cd > 0 || lastId != -1) it.cancel() else cd = 15
-        }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
+        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.react)
 
         on<TickEvent.Server> {
-            if (cd <= 0) return@on
-
-            cd--
-        }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
+            if (cd > 0) cd--
+        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.react)
     }
 
     private fun reset() {
