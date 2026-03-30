@@ -24,6 +24,7 @@ import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.EMPTY_COMPONENT
 import xyz.aerii.athen.utils.compress
+import xyz.aerii.athen.utils.data
 import xyz.aerii.athen.utils.decompress
 import xyz.aerii.athen.utils.enchants
 import java.awt.Color
@@ -75,7 +76,7 @@ object ColoredEnchants : Module(
     private val enchants = mutableMapOf<String, Enchant>()
 
     init {
-        Beacon.get("https://raw.githubusercontent.com/Fix3dll/SkyblockAddons-Data/main/skyblock/enchants.json") {
+        Beacon.get("enchants/sba.json".data) {
             onSuccess<Map<String, Any>> { str ->
                 for ((a, b) in str) {
                     val c = b as? Map<String, Map<String, Any?>> ?: continue

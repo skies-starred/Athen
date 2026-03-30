@@ -27,6 +27,7 @@ import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.EMPTY_COMPONENT
+import xyz.aerii.athen.utils.data
 import xyz.aerii.athen.utils.kotlin.CopyOnWriteMap
 
 @Load
@@ -61,7 +62,7 @@ object VisualWords : Module(
         nick = nickname.value.parse(true).visualOrderText
         nickname.state.onChange { nick = it.parse(true).visualOrderText }
 
-        Beacon.get("https://raw.githubusercontent.com/skies-starred/athen-assets/refs/heads/main/cool.json") {
+        Beacon.get("donators.json".data) {
             onJsonSuccess { json ->
                 val map = json.entrySet().associate { it.key to it.value.asString.parse().visualOrderText }
                 replace += map

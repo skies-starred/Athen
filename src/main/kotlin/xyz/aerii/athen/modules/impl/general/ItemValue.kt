@@ -52,7 +52,7 @@ object ItemValue : Module(
 
             if (price == null) return@on
             if (lbin && bool) run {
-                val long = price.lbin?.takeIf { it != 0L } ?: return@run
+                val long = price.auction?.lbin?.takeIf { it != 0L } ?: return@run
                 tooltip.add(`lbin$style`.prs(long))
             }
 

@@ -8,6 +8,9 @@ import moe.nea.libautoupdate.UpdateTarget
 import net.minecraft.SharedConstants
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Priority
+import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.core.on
+import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Typo.PrefixType
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.impl.Dev
@@ -22,36 +25,16 @@ object ModUpdater {
     private val context = UpdateContext(
         ModrinthUpdateSource("avbpWn0t", SharedConstants.getCurrentVersion().name()),
         UpdateTarget.deleteAndSaveInTheSameFolder(Athen::class.java),
-        getCurrent(),
+        current(),
         Athen.modId
     )
 
     init {
         context.cleanup()
-    }
 
-    private fun getCurrent() = object : CurrentVersion {
-        override fun display() = Athen.modVersion
-
-        override fun isOlderThan(element: JsonElement): Boolean {
-            if (!element.isJsonPrimitive) return true
-
-            fun String.parse() = removePrefix("v").split('.', '-').map { it.toIntOrNull() ?: 0 }
-
-            val local = Athen.modVersion.parse()
-            val remote = element.asString.parse()
-
-            val maxLength = maxOf(local.size, remote.size)
-            val l = local + List(maxLength - local.size) { 0 }
-            val r = remote + List(maxLength - remote.size) { 0 }
-
-            for (i in 0 until maxLength) {
-                if (l[i] < r[i]) return true
-                if (l[i] > r[i]) return false
-            }
-
-            return false
-        }
+        on<LocationEvent.Server.Connect> {
+            Chronos.Tick after 60 then ::checkAndNotify
+        }.once()
     }
 
     fun checkForUpdate(stream: String = "release"): CompletableFuture<PotentialUpdate> {
@@ -95,6 +78,30 @@ object ModUpdater {
             "Update failed: ${it.message}".modMessage(PrefixType.ERROR)
             Athen.LOGGER.error("Failed to install update: ${it.message}")
             false
+        }
+    }
+
+    private fun current() = object : CurrentVersion {
+        override fun display() = Athen.modVersion
+
+        override fun isOlderThan(element: JsonElement): Boolean {
+            if (!element.isJsonPrimitive) return true
+
+            fun String.parse() = removePrefix("v").split('.', '-').map { it.toIntOrNull() ?: 0 }
+
+            val local = Athen.modVersion.parse()
+            val remote = element.asString.parse()
+
+            val maxLength = maxOf(local.size, remote.size)
+            val l = local + List(maxLength - local.size) { 0 }
+            val r = remote + List(maxLength - remote.size) { 0 }
+
+            for (i in 0 until maxLength) {
+                if (l[i] < r[i]) return true
+                if (l[i] > r[i]) return false
+            }
+
+            return false
         }
     }
 }

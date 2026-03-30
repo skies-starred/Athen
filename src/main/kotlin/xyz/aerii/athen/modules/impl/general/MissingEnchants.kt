@@ -18,6 +18,7 @@ import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.EMPTY_COMPONENT
+import xyz.aerii.athen.utils.data
 import xyz.aerii.athen.utils.enchants
 import xyz.aerii.athen.utils.isBound
 import xyz.aerii.athen.utils.isPressed
@@ -39,7 +40,7 @@ object MissingEnchants : Module(
     private var enchantPools: List<List<String>>? = null
 
     init {
-        Beacon.get("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/refs/heads/master/constants/enchants.json") {
+        Beacon.get("enchants/neu.json".data) {
             onJsonSuccess { json ->
                 allEnchants = json["enchants"]?.asJsonObject?.entrySet()?.associate { (key, value) ->
                     key to value.asJsonArray.map { it.asString.lowercase() }

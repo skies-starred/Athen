@@ -1,3 +1,5 @@
+@file:Suppress("Unused")
+
 package xyz.aerii.athen.handlers
 
 import com.google.gson.Gson
@@ -132,7 +134,7 @@ object Beacon {
 
         fun onJsonSuccess(block: (JsonObject) -> Unit) = apply {
             onSuccess = { response ->
-                val json = JsonParser().parse(response).asJsonObject
+                val json = JsonParser.parseString(response).asJsonObject
                 block(json)
             }
         }
@@ -185,8 +187,9 @@ object Beacon {
 
         private fun createConnection(): HttpURLConnection {
             return URI(url).toURL().openConnection().apply {
+                if ("gzip=true" in this@RequestBuilder.url) header("Accept-Encoding", "gzip")
                 setRequestProperty("Accept", "*/*")
-                headers.forEach { (key, value) -> setRequestProperty(key, value) }
+                for ((k, v) in headers) setRequestProperty(k, v)
                 this.connectTimeout = this@RequestBuilder.connectTimeout
                 this.readTimeout = this@RequestBuilder.readTimeout
                 (this as HttpURLConnection).requestMethod = method
