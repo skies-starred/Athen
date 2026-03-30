@@ -39,10 +39,6 @@ object Texter {
         ChatFormatting.entries.mapNotNull { f -> net.minecraft.network.chat.TextColor.fromLegacyFormat(f)?.let { it to f } }.toMap()
 
     @JvmStatic
-    @Deprecated("Use ParserKt.parse()")
-    fun String.parse(): MutableComponent = parse(false)
-
-    @JvmStatic
     fun Component.colorCoded(): String {
         val sb = StringBuilder()
         parse(sb)
@@ -60,7 +56,7 @@ object Texter {
 
     @JvmStatic
     fun MutableComponent.onHover(text: String): MutableComponent = apply {
-        hover = Component.literal(text)
+        hover = text.parse()
     }
 
     @JvmStatic
