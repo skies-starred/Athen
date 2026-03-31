@@ -1,6 +1,6 @@
 package xyz.aerii.athen.utils
 
-const val apiUrl: String = "https://api.aerii.xyz"
+const val apiUrl: String = "https://athen.aerii.xyz"
 const val dataUrl: String = "https://data.aerii.xyz"
 
 inline val String.api: String

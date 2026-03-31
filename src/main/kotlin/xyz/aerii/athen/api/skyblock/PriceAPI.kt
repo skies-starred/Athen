@@ -10,12 +10,15 @@ import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.handlers.Beacon
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.modules.impl.ModSettings
+import xyz.aerii.athen.utils.api
+import xyz.aerii.athen.utils.asJsonObjectOrNull
 import kotlin.time.Duration.Companion.minutes
 
 @Priority
 object PriceAPI {
     private val auctions = Int2ObjectOpenHashMap<Auction>(8192)
     private val bazaar = Int2ObjectOpenHashMap<Bazaar>(2048)
+    private val url = "prices?gzip=true".api
 
     private var task: Chronos.Task? = null
 
@@ -43,25 +46,21 @@ object PriceAPI {
     }
 
     private fun fn() {
-        Beacon.get("https://lb.tricked.dev/lowestbins", false) {
-            onSuccess<Map<String, Long>> {
+        Beacon.get(url, false) {
+            onJsonSuccess {
+                val ah = it["auction_house"].asJsonObjectOrNull ?: return@onJsonSuccess
+                val bz = it["bazaar"].asJsonObjectOrNull ?: return@onJsonSuccess
+
                 auctions.clear()
-                for ((k, v) in it) auctions[k.hashCode()] = Auction(v, 0, 0)
-            }
-        }
+                for ((k, v) in ah.entrySet()) {
+                    val a = v.asJsonObject
+                    auctions[k.hashCode()] = Auction(a["lbin"].asLong, a["p3d"].asLong, a["p7d"].asLong)
+                }
 
-        Beacon.get("https://api.hypixel.net/skyblock/bazaar", false) {
-            onSuccess<Map<String, Any>> {
-                val products = it["products"] as? Map<String, Any> ?: return@onSuccess
                 bazaar.clear()
-
-                for ((k, v) in products) {
-                    val a = (v as? Map<String, Any>)?.get("quick_status") as? Map<String, Any> ?: continue
-
-                    val b = (a["buyPrice"] as? Number)?.toInt() ?: continue
-                    val s = (a["sellPrice"] as? Number)?.toInt() ?: continue
-
-                    bazaar[k.hashCode()] = Bazaar(b, s, 0, 0)
+                for ((k, v) in bz.entrySet()) {
+                    val a = v.asJsonObject
+                    bazaar[k.hashCode()] = Bazaar(a["ib"].asNumber.toInt(), a["is"].asNumber.toInt(), a["tb"].asNumber.toInt(), a["ts"].asNumber.toInt())
                 }
             }
         }
