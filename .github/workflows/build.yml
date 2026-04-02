@@ -10,7 +10,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -46,13 +46,26 @@ jobs:
           name: build-artifacts
           path: build/libs/
 
+      - name: Zip build output
+        run: cd build/libs && zip -r ../../build-output.zip . && cd ../..
+
+      - name: Upload to builds.aerii.xyz
+        env:
+          UPLOAD_KEY: ${{ secrets.UPLOAD_KEY }}
+        run: |
+          curl -X POST https://internal.aerii.xyz/upload \
+            -H "Authorization: $UPLOAD_KEY" \
+            -F "file=@build-output.zip" \
+            -F "commit=${{ github.sha }}" \
+            -F "branch=${{ github.ref_name }}"
+
       - name: Notify Discord
         env:
-          TOKEN: ${{ secrets.TOKEN }}
+          NOTIFY_TOKEN: ${{ secrets.NOTIFY_TOKEN }}
         run: |
-          curl -X POST https://api.aerii.xyz/builds/notify \
+          curl -X POST "https://internal.aerii.xyz/notify?type=build" \
             -H "Content-Type: application/json" \
-            -H "Authorization: $TOKEN" \
+            -H "Authorization: $NOTIFY_TOKEN" \
             -d "{
               \"repo\": \"${{ github.repository }}\",
               \"branch\": \"${{ github.ref_name }}\",
