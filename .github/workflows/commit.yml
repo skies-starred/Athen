@@ -16,7 +16,7 @@ jobs:
             --arg repo "$REPO" \
             --argjson commits "$COMMITS" \
             '{repo: $repo, commits: $commits}' \
-          | curl -X POST "https://internal.aerii.xyz/notify?type=commit" \
+          | curl -X POST "https://builds.aerii.xyz/notify?type=commit" \
             -H "Content-Type: application/json" \
             -H "Authorization: $NOTIFY_TOKEN" \
             -d @-
