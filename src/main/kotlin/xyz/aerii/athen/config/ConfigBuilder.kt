@@ -221,17 +221,21 @@ class ConfigBuilder(
 
     class SoundHandle(
         key: String,
-        private val default: String
+        default: String
     ) {
-        var soundEvent: SoundEvent? = default.sound()
+        val ds = default.sound()
+
+        var soundEvent: SoundEvent? = ds
             private set
+
         var pitch: Float = 1f
             private set
+
         var volume: Float = 1f
             private set
 
         val sound: SoundEvent
-            get() = soundEvent ?: default.sound() ?: SoundEvents.CAT_PURR
+            get() = soundEvent ?: ds ?: SoundEvents.CAT_PURR
 
         init {
             ConfigManager.observe(key) { soundEvent = (it as? String)?.sound() }

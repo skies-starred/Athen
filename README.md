@@ -1,13 +1,6 @@
 # **Athen**
 
-A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.com/skies-starred)** purely for fun.
-
----
-
-## Branches
-
-``master`` - main branch for athen development.<br>
-``nebulune`` - main branch for nebulune development, check it out [here](https://github.com/skies-starred/Nebulune)
+A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.com/skies-starred)**.
 
 ---
 
@@ -18,12 +11,12 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
 * Colored enchants
 * Commission display
 * Item tweaks:
-    * Show item age
-    * Show item hex color
-    * Show stars as stack size
-    * Show cake numbers
-    * Remove gear score
-    * Remove vanilla enchants
+  * Show item age
+  * Show item hex color
+  * Show stars as stack size
+  * Show cake numbers
+  * Remove gear score
+  * Remove vanilla enchants
 * Item quality indicator
 * Item value: lowest bin, craft cost
 * Kat reminder
@@ -39,15 +32,19 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
 ### Render
 
 * Arrow hitboxes
+* Custom scale
 * Custom tooltip
 * Ichor pool area
 * Item name position
+* Item rarity background
+* Radial menus
 * Render optimiser
 * Visual words [Text replacer]
 
 ### Slayers
 
 * Carry tracker
+* Cocoon alert and timer
 * Miniboss alerts
 * Slayer display
 * Slayer highlights:
@@ -76,6 +73,7 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
 * Stun helper
 * Supply waypoints
 * Teammate highlights
+* Timers for build start, and supply spawn
 
 ### Dungeons
 
@@ -90,9 +88,3 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
   * Stats preview on join
 * Rare item alerts
 * Watcher helper
-
-## Credits
-
-These features would not have been possible without:
-
-- Item value: https://github.com/Tricked-dev/lowestbins
