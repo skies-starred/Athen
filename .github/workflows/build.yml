@@ -53,7 +53,7 @@ jobs:
         env:
           UPLOAD_KEY: ${{ secrets.UPLOAD_KEY }}
         run: |
-          curl -X POST https://internal.aerii.xyz/upload \
+          curl -X POST https://builds.aerii.xyz/upload \
             -H "Authorization: $UPLOAD_KEY" \
             -F "file=@build-output.zip" \
             -F "commit=${{ github.sha }}" \
@@ -63,7 +63,7 @@ jobs:
         env:
           NOTIFY_TOKEN: ${{ secrets.NOTIFY_TOKEN }}
         run: |
-          curl -X POST "https://internal.aerii.xyz/notify?type=build" \
+          curl -X POST "https://builds.aerii.xyz/notify?type=build" \
             -H "Content-Type: application/json" \
             -H "Authorization: $NOTIFY_TOKEN" \
             -d "{
