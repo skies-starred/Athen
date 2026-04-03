@@ -10,6 +10,7 @@ import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.handlers.Texter.literal
+import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 
 @Load
@@ -36,5 +37,5 @@ object ItemQuality : Module(
         .replace("#cur", cur)
         .replace("#max", "50")
         .replace("#floor", "Floor $f")
-        .literal()
+        .parse()
 }
