@@ -116,8 +116,8 @@ object EntityAPI {
 
         val list = (b as? EntityAccessor)?.`athen$attachments`() ?: return
 
-        list.removeIf { it.get() == null }
-        list.add(WeakReference(ent))
+        list.removeIf { it.get()?.isAlive != true }
+        if (!list.any { it.get() == ent }) list.add(WeakReference(ent))
         acc.`athen$attach`(b)
 
         EntityEvent.Update.Attach(lit, ent).post()

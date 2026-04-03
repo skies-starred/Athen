@@ -124,12 +124,20 @@ public abstract class EntityMixin implements EntityAccessor {
     private void athen$tick(CallbackInfo ci) {
         Entity entity = entity();
 
+        if (athen$ticks-- > 0) return;
+        athen$ticks = 20;
+
+        if (athen$attachments != null) {
+            athen$attachments.removeIf(ref -> {
+                final Entity a = ref.get();
+                return a == null || !a.isAlive();
+            });
+        }
+
         if (!(entity instanceof ArmorStand stand)) return;
         if (!stand.hasCustomName()) return;
-        if (athen$ticks-- > 0) return;
 
         EntityAPI.attach(entity);
-        athen$ticks = 20;
     }
 
     @Inject(method = "onRemoval", at = @At("RETURN"))
