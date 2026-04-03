@@ -98,7 +98,7 @@ object MissingEnchants : Module(
                     if (!s.r()) continue
 
                     val ls = l.siblings?.lastOrNull() ?: continue
-                    if (ls.color == 11184810 && !ls.bold) continue
+                    if ((ls.color == 11184810  || ls.color == 0) && !ls.bold) continue
 
                     se = true
                     continue
