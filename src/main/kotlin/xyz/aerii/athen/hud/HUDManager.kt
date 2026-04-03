@@ -11,6 +11,7 @@ import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.athen.modules.impl.ModSettings
 
 @Priority(-2)
 object HUDManager {
@@ -20,6 +21,7 @@ object HUDManager {
     init {
         on<GuiEvent.Render.Pre> {
             if (client.screen is HUDEditor) return@on
+            if (client.options.hideGui && ModSettings.hideGuis) return@on
 
             Resolute.push(graphics)
 
