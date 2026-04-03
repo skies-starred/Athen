@@ -8,9 +8,7 @@ import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.handlers.Scram
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.render.radial.base.ISlot
-import xyz.aerii.athen.modules.impl.render.radial.base.actions.impl.CommandAction
-import xyz.aerii.athen.modules.impl.render.radial.base.actions.impl.MessageAction
-import xyz.aerii.athen.modules.impl.render.radial.base.actions.impl.NoAction
+import xyz.aerii.athen.modules.impl.render.radial.base.actions.IAction
 import xyz.aerii.athen.modules.impl.render.radial.impl.RadialMenu.configs
 import xyz.aerii.athen.ui.InputField
 import xyz.aerii.athen.ui.UIZone
@@ -102,19 +100,9 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
         itemField.value = s.itemId
         itemField.cursor = s.itemId.length
 
-        type = when (s.action) {
-            is CommandAction -> 1
-            is MessageAction -> 2
-            else -> 0
-        }
-
-        val actionVal = when (val a = s.action) {
-            is CommandAction -> a.command
-            is MessageAction -> a.message
-            else -> ""
-        }
-        valField.value = actionVal
-        valField.cursor = actionVal.length
+        type = s.action.id
+        valField.value = s.action.serializable
+        valField.cursor = s.action.serializable.length
 
         val tex = s.text ?: ""
         texField.value = tex
@@ -126,11 +114,7 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
         s.name = nameField.value
         s.itemId = itemField.value
         s.text = texField.value.ifBlank { null }
-        s.action = when (type) {
-            1 -> CommandAction(valField.value)
-            2 -> MessageAction(valField.value)
-            else -> NoAction
-        }
+        s.action = IAction.create(type, valField.value)
     }
 
     private fun unfocusAll() {
@@ -478,22 +462,25 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
         fy += client.font.lineHeight + 2
 
         val aw = 55
-        for ((i, l) in listOf("None", "Command", "Message").withIndex()) {
+        val actions = IAction.all()
+
+        for (a in actions) {
+            val i = a.id
             val ax = rx + i * (aw + 4)
             val selected = type == i
             val hovered = mouseX in ax until ax + aw && mouseY in fy until fy + 14
 
             guiGraphics.drawRectangle(ax, fy, aw, 14, if (selected) Mocha.Mauve.argb else if (hovered) Mocha.Surface2.argb else Mocha.Surface1.argb)
             guiGraphics.drawOutline(ax, fy, aw, 14, 1, if (selected) Mocha.Mauve.argb else Mocha.Overlay0.argb)
-            guiGraphics.text(l, ax + (aw - client.font.width(l)) / 2, fy + (14 - client.font.lineHeight) / 2 + 1, false, if (selected) Mocha.Base.argb else Mocha.Text.argb)
+            guiGraphics.text(a.name, ax + (aw - client.font.width(a.name)) / 2, fy + (14 - client.font.lineHeight) / 2 + 1, false, if (selected) Mocha.Base.argb else Mocha.Text.argb)
 
-            zones.add(UIZone(ax, fy, aw, 14, ZoneType.TYPE, i))
+            zones.add(UIZone(ax, fy, aw, 14, ZoneType.TYPE, a.id))
         }
 
         fy += 14 + 4
 
         if (type != 0) {
-            guiGraphics.text(if (type == 1) "Command" else "Message", rx, fy, false, Mocha.Subtext0.argb)
+            guiGraphics.text(IAction.all().firstOrNull { it.id == type }?.name ?: "Value", rx, fy, false, Mocha.Subtext0.argb)
             fy += client.font.lineHeight + 2
             valField.draw(guiGraphics, mouseX, mouseY, rx, fy, fw) { zx, zy, zw, zh -> zones.add(UIZone(zx, zy, zw, zh, ZoneType.FIELD_VALUE)) }
             fy += 16 + 4
