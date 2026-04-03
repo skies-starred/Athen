@@ -52,6 +52,7 @@ import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer./*? >= 1.21.11 {*//*rendertype.RenderTypes*//*? } else {*/RenderType/*? }*/
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.core.BlockPos
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.ARGB
 import net.minecraft.util.Mth
@@ -60,6 +61,7 @@ import net.minecraft.world.phys.Vec3
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.utils.markerAABB
 import xyz.aerii.athen.utils.render.pipelines.StarredPipelines
 import java.awt.Color
@@ -77,7 +79,7 @@ private data class QueuedLine(val start: Vec3, val end: Vec3, val color: Color, 
 private data class QueuedBox(val aabb: AABB, val color: Color, val width: Float)
 private data class QueuedFilledBox(val aabb: AABB, val color: Color)
 private data class QueuedBeaconBeam(val pos: BlockPos, val color: Int)
-private data class QueuedText(val text: String, val pos: Vec3, val color: Int, val bgColor: Int, val scale: Float, val shadow: Boolean, val depth: Boolean)
+private data class QueuedText(val text: Component, val pos: Vec3, val color: Int, val bgColor: Int, val scale: Float, val shadow: Boolean, val depth: Boolean)
 private data class QueuedCircle(val center: Vec3, val radius: Double, val segments: Int, val color: Color, val width: Float, val normal: Vec3)
 private data class QueuedFilledCircle(val center: Vec3, val radius: Double, val segments: Int, val color: Color, val normal: Vec3)
 
@@ -544,6 +546,27 @@ object Render3D {
     @JvmOverloads
     fun drawString(
         text: String,
+        pos: Vec3,
+        color: Int = -1,
+        backgroundColor: Int = 0,
+        scale: Float = 1f,
+        depthTest: Boolean = true,
+        shadow: Boolean = true,
+        increase: Boolean = false
+    ) {
+        var scale = scale
+        if (increase) {
+            val p = client.gameRenderer.mainCamera.position/*? >= 1.21.11 { *//*()*//*? }*/
+            scale *= p.distanceTo(pos).toFloat() / 3f
+        }
+
+        queue.texts.add(QueuedText(text.literal(), pos, color, backgroundColor, scale, shadow, depthTest))
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun drawString(
+        text: Component,
         pos: Vec3,
         color: Int = -1,
         backgroundColor: Int = 0,
