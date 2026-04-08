@@ -1,9 +1,9 @@
 package xyz.aerii.athen.ui
 
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import net.minecraft.client.gui.GuiGraphics
 import org.lwjgl.glfw.GLFW
 import tech.thatgravyboat.skyblockapi.helpers.McClient
+import xyz.aerii.athen.handlers.KeyEater
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
@@ -80,7 +80,7 @@ class InputField(val placeholder: String) {
             best = i
         }
 
-        selectionStart = if (OmniKeyboard.isShiftKeyPressed) selectionStart.takeIf { it != -1 } ?: cursor else -1
+        selectionStart = if (KeyEater.shift) selectionStart.takeIf { it != -1 } ?: cursor else -1
         cursor = best
     }
 

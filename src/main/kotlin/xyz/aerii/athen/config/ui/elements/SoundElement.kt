@@ -2,10 +2,10 @@
 
 package xyz.aerii.athen.config.ui.elements
 
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import net.minecraft.util.StringUtil
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
+import xyz.aerii.athen.handlers.KeyEater
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Smoothie.play
@@ -236,7 +236,7 @@ class SoundElement(
             GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER -> listening = false
 
             GLFW.GLFW_KEY_V -> {
-                if (OmniKeyboard.isCtrlKeyPressed) {
+                if (KeyEater.ctrl) {
                     val clip = client.keyboardHandler?.clipboard ?: ""
                     val clean = StringUtil.filterText(clip)
                     if (clean.isNotEmpty()) {

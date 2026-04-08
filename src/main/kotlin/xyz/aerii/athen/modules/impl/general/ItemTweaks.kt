@@ -2,11 +2,8 @@
 
 package xyz.aerii.athen.modules.impl.general
 
-import net.minecraft.client.gui.Font
-import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
@@ -20,13 +17,13 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Itemizer.`watch$tooltip`
+import xyz.aerii.athen.handlers.KeyEater.bound
+import xyz.aerii.athen.handlers.KeyEater.pressed
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.colorCoded
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
-import xyz.aerii.athen.utils.isBound
-import xyz.aerii.athen.utils.isPressed
 import xyz.aerii.athen.utils.render.Render2D.text
 import xyz.aerii.athen.utils.toDurationFromMillis
 import java.awt.Color
@@ -103,7 +100,7 @@ object ItemTweaks : Module(
         }
 
         on<GuiEvent.Tooltip.Update> {
-            if (`showItemHex$keybind`.isBound() && !`showItemHex$keybind`.isPressed()) return@on
+            if (`showItemHex$keybind`.bound && !`showItemHex$keybind`.pressed) return@on
 
             val rgb = item.get(DataComponents.DYED_COLOR)?.rgb ?: return@on
             tooltip.add(1, rgb.hex())

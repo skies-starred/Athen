@@ -2,9 +2,9 @@
 
 package xyz.aerii.athen.config.ui.elements
 
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
+import xyz.aerii.athen.handlers.KeyEater
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
@@ -146,7 +146,7 @@ class SliderElement(
             }
 
             GLFW.GLFW_KEY_V -> {
-                if (!OmniKeyboard.isCtrlKeyPressed) return true
+                if (!KeyEater.ctrl) return true
                 val clipboard = client.keyboardHandler?.clipboard ?: ""
                 val clean = clipboard.filter { it.isDigit() || (it == '.' && showDouble) }
                 if (clean.isNotEmpty()) {

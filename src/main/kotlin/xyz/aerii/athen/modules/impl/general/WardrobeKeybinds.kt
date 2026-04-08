@@ -14,11 +14,11 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.CancellableEvent
 import xyz.aerii.athen.events.core.runWhen
+import xyz.aerii.athen.handlers.KeyEater.bound
+import xyz.aerii.athen.handlers.KeyEater.pressed
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.mixin.accessors.KeyMappingAccessor
 import xyz.aerii.athen.modules.Module
-import xyz.aerii.athen.utils.isBound
-import xyz.aerii.athen.utils.isPressed
 
 @Load
 @OnlyIn(skyblock = true)
@@ -112,7 +112,7 @@ object WardrobeKeybinds : Module(
     }
 
     private fun CancellableEvent.fn(key: Int) {
-        if (cancelAll && (!override.isBound() || !override.isPressed()) && key != (client.options.keyInventory as KeyMappingAccessor).boundKey.value && key != GLFW.GLFW_KEY_ESCAPE) cancel()
+        if (cancelAll && (!override.bound || !override.pressed) && key != (client.options.keyInventory as KeyMappingAccessor).boundKey.value && key != GLFW.GLFW_KEY_ESCAPE) cancel()
 
         if (System.currentTimeMillis() - lastClick < ping) return
         val player = client.player ?: return

@@ -15,10 +15,10 @@ import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
+import xyz.aerii.athen.handlers.KeyEater.bound
+import xyz.aerii.athen.handlers.KeyEater.pressed
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
-import xyz.aerii.athen.utils.isBound
-import xyz.aerii.athen.utils.isPressed
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
 import java.awt.Color
@@ -82,7 +82,7 @@ object CustomTooltip : Module(
         }
 
         on<GuiEvent.Input.Key.Press> {
-            if (!onlyName.isBound()) return@on
+            if (!onlyName.bound) return@on
             if (keyEvent.key != onlyName) return@on
             if (hover == null) return@on
 
@@ -95,13 +95,13 @@ object CustomTooltip : Module(
             if (hover?.item?.isEmpty != false) return@on
             if (name) return@on
 
-            if (`scroll$scale` && `scroll$scale$key`.isBound() && `scroll$scale$key`.isPressed()) {
+            if (`scroll$scale` && `scroll$scale$key`.bound && `scroll$scale$key`.pressed) {
                 scale += amount * 0.1
                 scale = scale.coerceIn(0.5, 3.0)
                 return@on
             }
 
-            if (`scroll$horizontal` && `scroll$horizontal$key`.isBound() && `scroll$horizontal$key`.isPressed()) xo += amount * `scroll$horizontal$speed`
+            if (`scroll$horizontal` && `scroll$horizontal$key`.bound && `scroll$horizontal$key`.pressed) xo += amount * `scroll$horizontal$speed`
             else yo = (yo + amount * `scroll$vertical$speed`).coerceIn(mss, msx)
         }
     }

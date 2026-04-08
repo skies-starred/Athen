@@ -4,9 +4,9 @@ package xyz.aerii.athen.config.ui.elements
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
+import xyz.aerii.athen.handlers.KeyEater
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.handlers.Smoothie.client
@@ -344,7 +344,7 @@ class ColorPickerElement(
             }
 
             GLFW.GLFW_KEY_V -> {
-                if (!OmniKeyboard.isCtrlKeyPressed) return false
+                if (!KeyEater.ctrl) return false
 
                 val clean = client.keyboardHandler.clipboard.trim().removePrefix("#").take(8).uppercase()
                 val len = clean.length

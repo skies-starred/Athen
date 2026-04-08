@@ -2,8 +2,8 @@
 
 package xyz.aerii.athen.modules.impl.general
 
-import dev.deftu.omnicore.api.client.input.OmniKeys
 import net.minecraft.network.chat.Component
+import org.lwjgl.glfw.GLFW
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.bold
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.italic
@@ -13,6 +13,8 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.handlers.Beacon
 import xyz.aerii.athen.handlers.Itemizer.`watch$tooltip`
+import xyz.aerii.athen.handlers.KeyEater.bound
+import xyz.aerii.athen.handlers.KeyEater.pressed
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
@@ -20,8 +22,6 @@ import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.EMPTY_COMPONENT
 import xyz.aerii.athen.utils.data
 import xyz.aerii.athen.utils.enchants
-import xyz.aerii.athen.utils.isBound
-import xyz.aerii.athen.utils.isPressed
 
 @Load
 @OnlyIn(skyblock = true)
@@ -30,7 +30,7 @@ object MissingEnchants : Module(
     "Shows missing enchants on the item you hover over.",
     Category.GENERAL
 ) {
-    private val keybind: Int by config.keybind("Keybind", OmniKeys.KEY_LEFT_SHIFT.code).`watch$tooltip`()
+    private val keybind: Int by config.keybind("Keybind", GLFW.GLFW_KEY_LEFT_SHIFT).`watch$tooltip`()
     private val _unused by config.textParagraph("You can unbind the keybind to always show.")
 
     private val typeRegex = Regex("""\b(?:COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC|DIVINE|SPECIAL|VERY SPECIAL)\b\s+(?:DUNGEON\s+)?([A-Z]+(?: [A-Z]+)*)""") // https://regex101.com/r/MOQHMf/1
@@ -53,7 +53,7 @@ object MissingEnchants : Module(
         }
 
         on<GuiEvent.Tooltip.Update> {
-            if (keybind.isBound() && !keybind.isPressed()) return@on
+            if (keybind.bound && !keybind.pressed) return@on
 
             val a = allEnchants ?: return@on
             val b = enchantPools ?: return@on

@@ -21,12 +21,12 @@ import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.PlayerEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.CancellableEvent
+import xyz.aerii.athen.handlers.KeyEater.bound
+import xyz.aerii.athen.handlers.KeyEater.pressed
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
-import xyz.aerii.athen.utils.isBound
-import xyz.aerii.athen.utils.isPressed
 import xyz.aerii.athen.utils.render.Render3D
 import xyz.aerii.athen.utils.render.renderPos
 import java.awt.Color
@@ -62,7 +62,7 @@ object StunHelper : Module(
             if (!blockAbility) return@on
             if (!KuudraAPI.inRun) return@on
             if (item.getData(DataTypes.COOLDOWN_ABILITY)?.first != "Pickobulus") return@on
-            if (blockOverride.isBound() && blockOverride.isPressed()) return@on
+            if (blockOverride.bound && blockOverride.pressed) return@on
 
             val tier = KuudraAPI.tier?.int ?: return@on
             if (tier < KuudraTier.BURNING.int) return@on

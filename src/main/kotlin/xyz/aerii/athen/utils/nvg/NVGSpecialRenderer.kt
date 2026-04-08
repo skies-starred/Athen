@@ -37,7 +37,6 @@ import com.mojang.blaze3d.opengl.GlStateManager
 import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
-import dev.deftu.omnicore.api.client.render.state.OmniRenderStates
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
@@ -74,14 +73,11 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource)
         state.renderContent()
         NVGRenderer.endFrame()
 
+        GlStateManager._disableCull()
+
         //? if >= 1.21.11 {
         /*glBindSampler(0, prevSampler)
         *///? }
-
-        OmniRenderStates.syncBlend()
-        OmniRenderStates.syncDepth()
-        OmniRenderStates.syncCull()
-        OmniRenderStates.syncColorMask()
     }
 
     override fun getTranslateY(height: Int, windowScaleFactor: Int): Float = height / 2f

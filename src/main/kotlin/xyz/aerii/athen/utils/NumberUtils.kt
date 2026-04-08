@@ -1,7 +1,7 @@
 package xyz.aerii.athen.utils
 
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
-import dev.deftu.omnicore.api.client.input.OmniMouse
+import xyz.aerii.athen.handlers.KeyEater.bound
+import xyz.aerii.athen.handlers.KeyEater.pressed
 
 @JvmName("timesIntPair")
 operator fun Pair<Int, Int>.times(k: Number): Pair<Int, Int> =
@@ -15,13 +15,11 @@ operator fun Pair<Float, Float>.times(k: Number): Pair<Float, Float> =
 operator fun Pair<Double, Double>.times(k: Number): Pair<Double, Double> =
     first * k.toDouble() to second * k.toDouble()
 
-fun Int.isPressed(): Boolean = when {
-    this == -1 -> false
-    this > 0 -> OmniKeyboard.isPressed(this)
-    else -> OmniMouse.isPressed(this)
-}
+@Deprecated("Use KeyEater#Int.pressed")
+fun Int.isPressed(): Boolean = pressed
 
-fun Int.isBound(): Boolean = this != -1
+@Deprecated("Use KeyEater#Int.bound")
+fun Int.isBound(): Boolean = bound
 
 /**
  * Abbreviates large numbers with K, M, B suffixes.

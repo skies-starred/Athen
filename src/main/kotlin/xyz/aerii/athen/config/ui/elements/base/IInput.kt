@@ -33,10 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package xyz.aerii.athen.config.ui.elements.base
 
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import net.minecraft.util.StringUtil
 import org.lwjgl.glfw.GLFW
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
+import xyz.aerii.athen.handlers.KeyEater
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
@@ -193,7 +193,7 @@ open class IInput(
 
         if (selection != caret) {
             deleteSelection()
-        } else if (OmniKeyboard.isShiftKeyPressed) {
+        } else if (KeyEater.shift) {
             val previousSpace = getPreviousSpace()
             value = value.remove(previousSpace, caret)
             caret = previousSpace
@@ -212,7 +212,7 @@ open class IInput(
         val hadContent = selection != caret || caret != value.length
 
         if (selection != caret) deleteSelection()
-        else if (OmniKeyboard.isCtrlKeyPressed) value = value.remove(caret, getNextSpace())
+        else if (KeyEater.ctrl) value = value.remove(caret, getNextSpace())
         else if (caret != value.length) value = value.dropAt(caret, 1)
 
         clearSelection()
@@ -223,32 +223,32 @@ open class IInput(
 
     private fun handleRight(): Boolean {
         if (caret == value.length) return false
-        caret = if (OmniKeyboard.isCtrlKeyPressed) getNextSpace() else caret + 1
-        if (!OmniKeyboard.isShiftKeyPressed) selection = caret
+        caret = if (KeyEater.ctrl) getNextSpace() else caret + 1
+        if (!KeyEater.shift) selection = caret
         return true
     }
 
     private fun handleLeft(): Boolean {
         if (caret == 0) return false
-        caret = if (OmniKeyboard.isCtrlKeyPressed) getPreviousSpace() else caret - 1
-        if (!OmniKeyboard.isShiftKeyPressed) selection = caret
+        caret = if (KeyEater.ctrl) getPreviousSpace() else caret - 1
+        if (!KeyEater.shift) selection = caret
         return true
     }
 
     private fun handleHome(): Boolean {
         caret = 0
-        if (!OmniKeyboard.isShiftKeyPressed) selection = caret
+        if (!KeyEater.shift) selection = caret
         return true
     }
 
     private fun handleEnd(): Boolean {
         caret = value.length
-        if (!OmniKeyboard.isShiftKeyPressed) selection = caret
+        if (!KeyEater.shift) selection = caret
         return true
     }
 
     private fun handleControlKeys(keyCode: Int): Boolean {
-        if (!OmniKeyboard.isCtrlKeyPressed || OmniKeyboard.isShiftKeyPressed) return false
+        if (!KeyEater.ctrl || KeyEater.shift) return false
 
         return when (keyCode) {
             GLFW.GLFW_KEY_V -> {

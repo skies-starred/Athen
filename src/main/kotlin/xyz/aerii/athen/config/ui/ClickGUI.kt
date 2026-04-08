@@ -2,7 +2,6 @@
 
 package xyz.aerii.athen.config.ui
 
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import net.minecraft.client.gui.GuiGraphics
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Priority
@@ -11,6 +10,7 @@ import xyz.aerii.athen.config.ConfigManager.updateConfig
 import xyz.aerii.athen.config.ui.elements.FeatureTooltip
 import xyz.aerii.athen.config.ui.elements.HelpTooltip
 import xyz.aerii.athen.config.ui.panels.Panel
+import xyz.aerii.athen.handlers.KeyEater
 import xyz.aerii.athen.handlers.Scram
 import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.handlers.Scurry.rawX
@@ -109,7 +109,7 @@ object ClickGUI : Scram("Config [Click UI - Athen]") {
     }
 
     override fun onScramMouseScroll(mouseX: Int, mouseY: Int, horizontal: Double, vertical: Double): Boolean {
-        if (OmniKeyboard.isShiftKeyPressed) {
+        if (KeyEater.shift) {
             val scroll = vertical.toFloat() * 20f
             val leftmost = panels.minOfOrNull { it.x } ?: 0f
             val rightmost = panels.maxOfOrNull { it.x + 240f } ?: 0f

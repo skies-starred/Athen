@@ -2,7 +2,6 @@
 
 package xyz.aerii.athen.modules.impl.dungeon.terminals.solver
 
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.annotations.Load
@@ -13,6 +12,7 @@ import xyz.aerii.athen.events.DungeonEvent
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.core.runWhen
+import xyz.aerii.athen.handlers.KeyEater
 import xyz.aerii.athen.handlers.Scurry
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.mixin.accessors.KeyMappingAccessor
@@ -118,7 +118,7 @@ object TerminalSolver : Module(
                 }
 
                 (client.options?.keyDrop as? KeyMappingAccessor)?.boundKey?.value if (dropKey) -> {
-                    c(mouse = if (!OmniKeyboard.isCtrlKeyPressed) 0 else 1)
+                    c(mouse = if (!KeyEater.ctrl) 0 else 1)
                     cancel()
                 }
             }
