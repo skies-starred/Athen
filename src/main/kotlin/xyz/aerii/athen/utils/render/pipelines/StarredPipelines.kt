@@ -1,51 +1,57 @@
 package xyz.aerii.athen.utils.render.pipelines
 
-import dev.deftu.omnicore.api.client.render.DrawMode
-import dev.deftu.omnicore.api.client.render.pipeline.IrisShaderType
-import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipeline
-import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelineSnippets
-import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelines
-import net.minecraft.resources.ResourceLocation
+import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.blaze3d.platform.DepthTestFunction
+import com.mojang.blaze3d.vertex.DefaultVertexFormat
+import com.mojang.blaze3d.vertex.VertexFormat
+import net.minecraft.client.renderer.RenderPipelines
 import xyz.aerii.athen.Athen
 
 object StarredPipelines {
-    val lines = OmniRenderPipelines.builderWithDefaultShader(
-        location = ResourceLocation.fromNamespaceAndPath(Athen.modId, "pipeline/lines"),
-        snippets = arrayOf(OmniRenderPipelineSnippets.LINES)
-    )
-        .setCulling(false)
-        .setIrisType(IrisShaderType.LINES)
-        .build()
+    private fun string(s: String): String {
+        return "${Athen.modId}/$s"
+    }
 
-    val linesNoDepth = OmniRenderPipelines.builderWithDefaultShader(
-        location = ResourceLocation.fromNamespaceAndPath(Athen.modId, "pipeline/lines_nodepth"),
-        snippets = arrayOf(OmniRenderPipelineSnippets.LINES)
+    val LINES: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
+            .withLocation("pipeline/depth/line")
+            .build()
     )
-        .setCulling(false)
-        .setDepthTest(OmniRenderPipeline.DepthTest.DISABLED)
-        .setIrisType(IrisShaderType.LINES)
-        .build()
 
-    val triangleStrip = OmniRenderPipelines.builderWithDefaultShader(
-        location = ResourceLocation.fromNamespaceAndPath(Athen.modId, "pipeline/filled"),
-        snippets = arrayOf(
-            OmniRenderPipelineSnippets.builder(OmniRenderPipelineSnippets.POSITION_COLOR)
-                .setDrawMode(DrawMode.TRIANGLE_STRIP)
-                .build()
-        )
+    val LINES_DEPTHLESS: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withLocation(string("pipeline/depthless/line"))
+            .build()
     )
-        .setIrisType(IrisShaderType.BASIC)
-        .build()
 
-    val triangleStripNoDepth = OmniRenderPipelines.builderWithDefaultShader(
-        location = ResourceLocation.fromNamespaceAndPath(Athen.modId, "pipeline/filled_nodepth"),
-        snippets = arrayOf(
-            OmniRenderPipelineSnippets.builder(OmniRenderPipelineSnippets.POSITION_COLOR)
-                .setDrawMode(DrawMode.TRIANGLE_STRIP)
-                .build()
-        )
+    val DEBUG_FILLED: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
+            .withLocation(string("pipeline/depth/debug_filled"))
+            .build()
     )
-        .setDepthTest(OmniRenderPipeline.DepthTest.DISABLED)
-        .setIrisType(IrisShaderType.BASIC)
-        .build()
+
+    val DEBUG_FILLED_DEPTHLESS: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withLocation(string("pipeline/depthless/debug_filled"))
+            .build()
+    )
+
+    val TRIANGLE_FAN: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
+            .withLocation(string("pipeline/depth/triangle_fan"))
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
+            .withCull(false)
+            .build()
+    )
+
+    val TRIANGLE_FAN_DEPTHLESS: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
+            .withLocation(string("pipeline/depthless/triangle_fan"))
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withCull(false)
+            .build()
+    )
 }

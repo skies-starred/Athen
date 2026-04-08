@@ -36,16 +36,13 @@
  * Read our license at: https://github.com/skies-starred/Athen/blob/master/LICENSE
  */
 
-@file:Suppress("UNUSED", "UnstableApiUsage")
+@file:Suppress("UNUSED", "UnstableApiUsage", "FunctionName")
 
 package xyz.aerii.athen.utils.render
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.math.Axis
-import dev.deftu.omnicore.api.client.render.stack.OmniPoseStack
-import dev.deftu.omnicore.api.client.render.stack.OmniPoseStacks
-import dev.deftu.omnicore.api.client.render.vertex.OmniBufferBuilder
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.MultiBufferSource
@@ -58,42 +55,36 @@ import net.minecraft.util.ARGB
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
+import org.joml.Vector3f
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.utils.markerAABB
-import xyz.aerii.athen.utils.render.pipelines.StarredPipelines
+import xyz.aerii.athen.utils.render.pipelines.StarredRenderTypes
 import java.awt.Color
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-//? >= 1.21.11 {
-/*import net.minecraft.gizmos.GizmoStyle
-import net.minecraft.gizmos.Gizmos
-*///? }
-
-private data class QueuedLine(val start: Vec3, val end: Vec3, val color: Color, val width: Float)
-private data class QueuedBox(val aabb: AABB, val color: Color, val width: Float)
-private data class QueuedFilledBox(val aabb: AABB, val color: Color)
+private data class QueuedLine(val start: Vector3f, val end: Vector3f, val color: Int, val width: Float)
+private data class QueuedBox(val aabb: AABB, val color: Int, val width: Float)
 private data class QueuedBeaconBeam(val pos: BlockPos, val color: Int)
 private data class QueuedText(val text: Component, val pos: Vec3, val color: Int, val bgColor: Int, val scale: Float, val shadow: Boolean, val depth: Boolean)
-private data class QueuedCircle(val center: Vec3, val radius: Double, val segments: Int, val color: Color, val width: Float, val normal: Vec3)
-private data class QueuedFilledCircle(val center: Vec3, val radius: Double, val segments: Int, val color: Color, val normal: Vec3)
+private data class QueuedCircle(val center: Vec3, val radius: Double, val segments: Int, val color: Int, val width: Float, val normal: Vec3)
 
-private class RenderQueue {
+private object RenderQueue {
     val linesDepth = mutableListOf<QueuedLine>()
     val linesNoDepth = mutableListOf<QueuedLine>()
     val boxesDepth = mutableListOf<QueuedBox>()
     val boxesNoDepth = mutableListOf<QueuedBox>()
-    val filledBoxesDepth = mutableListOf<QueuedFilledBox>()
-    val filledBoxesNoDepth = mutableListOf<QueuedFilledBox>()
+    val filledBoxesDepth = mutableListOf<QueuedBox>()
+    val filledBoxesNoDepth = mutableListOf<QueuedBox>()
     val circlesDepth = mutableListOf<QueuedCircle>()
     val circlesNoDepth = mutableListOf<QueuedCircle>()
-    val filledCirclesDepth = mutableListOf<QueuedFilledCircle>()
-    val filledCirclesNoDepth = mutableListOf<QueuedFilledCircle>()
+    val filledCirclesDepth = mutableListOf<QueuedCircle>()
+    val filledCirclesNoDepth = mutableListOf<QueuedCircle>()
     val beaconBeams = mutableListOf<QueuedBeaconBeam>()
     val texts = mutableListOf<QueuedText>()
 
@@ -115,7 +106,6 @@ private class RenderQueue {
 
 object Render3D {
     private val beam = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/entity/beacon_beam.png")
-    private val queue = RenderQueue()
 
     private val BOX_EDGES = arrayOf(
         intArrayOf(0, 0, 0, 1, 0, 0), intArrayOf(1, 0, 0, 1, 0, 1),
@@ -133,18 +123,18 @@ object Render3D {
             pose.pushPose()
             pose.translate(-camera.x, -camera.y, -camera.z)
 
-            val poseStack = OmniPoseStacks.vanilla(pose)
-            flushLines(poseStack)
-            flushBoxes(poseStack)
-            flushFilledBoxes(poseStack)
-            flushCircles(poseStack)
-            flushFilledCircles(poseStack)
+            val last = pose.last()
+            last.lines(consumers)
+            last.boxes(consumers)
+            last.boxes0(consumers)
+            last.circles(consumers)
+            last.circles0(consumers)
 
-            flushBeaconBeams(pose, camera, consumers)
-            flushTexts(pose, consumers)
+            pose.beacons(camera, consumers)
+            pose.texts(consumers)
 
             pose.popPose()
-            queue.clear()
+            RenderQueue.clear()
         }
     }
 
@@ -158,282 +148,199 @@ object Render3D {
         if (noDepthList.isNotEmpty()) block(false, noDepthList)
     }
 
-    private fun tangentsFor(normal: Vec3): Pair<Vec3, Vec3> {
-        val n = normal.normalize()
+    private fun Vec3.tangents(): Pair<Vec3, Vec3> {
+        val n = normalize()
         val arbitrary = if (abs(n.x) < 0.9) Vec3(1.0, 0.0, 0.0) else Vec3(0.0, 1.0, 0.0)
         val u = n.cross(arbitrary).normalize()
         val v = n.cross(u).normalize()
         return u to v
     }
 
-    private fun circlePoints(center: Vec3, radius: Double, segments: Int, normal: Vec3): Array<Vec3> {
-        val (u, v) = tangentsFor(normal)
+    private fun Vec3.points( radius: Double, segments: Int, normal: Vec3): Array<Vector3f> {
+        val (u, v) = normal.tangents()
         return Array(segments + 1) { i ->
             val angle = 2.0 * Math.PI * i / segments
             val cos = cos(angle)
             val sin = sin(angle)
-            Vec3(
-                center.x + radius * (u.x * cos + v.x * sin),
-                center.y + radius * (u.y * cos + v.y * sin),
-                center.z + radius * (u.z * cos + v.z * sin)
+            Vector3f(
+                (x + radius * (u.x * cos + v.x * sin)).toFloat(),
+                (y + radius * (u.y * cos + v.y * sin)).toFloat(),
+                (z + radius * (u.z * cos + v.z * sin)).toFloat()
             )
         }
     }
 
-    //? >= 1.21.11 {
-    /*private fun flushLines(poseStack: OmniPoseStack) { // does not need posestack
-        forDepth(queue.linesDepth, queue.linesNoDepth) { depth, lines ->
+    private fun PoseStack.Pose.lines(consumers: MultiBufferSource.BufferSource) {
+        forDepth(RenderQueue.linesDepth, RenderQueue.linesNoDepth) { depth, lines ->
             if (lines.isEmpty()) return@forDepth
-
-            for (l in lines) {
-                Gizmos.line(l.start, l.end, l.color.rgb, l.width).apply {
-                    if (!depth) setAlwaysOnTop()
-                }
-            }
-        }
-    }
-    *///? } else {
-    private fun flushLines(poseStack: OmniPoseStack) {
-        forDepth(queue.linesDepth, queue.linesNoDepth) { depth, lines ->
-            if (lines.isEmpty()) return@forDepth
-
-            val pipeline = if (depth) StarredPipelines.lines else StarredPipelines.linesNoDepth
+            val renderType = if (depth) StarredRenderTypes.LINES else StarredRenderTypes.LINES_DEPTHLESS
+            val buffer = consumers.getBuffer(renderType)
 
             for (line in lines) {
-                val buffer = pipeline.createBufferBuilder()
-
-                addLineVertices(
+                vertex(
                     buffer,
-                    poseStack,
-                    line.start.x, line.start.y, line.start.z,
-                    line.end.x, line.end.y, line.end.z,
+                    line.start.x,
+                    line.start.y,
+                    line.start.z,
+                    line.end.x,
+                    line.end.y,
+                    line.end.z,
+                    line.width,
                     line.color
                 )
-
-                buffer.buildOrThrow().drawAndClose(pipeline) { setLineWidth(line.width) }
             }
         }
     }
-    //? }
 
-    //? >= 1.21.11 {
-    /*private fun flushBoxes(poseStack: OmniPoseStack) { // does not need posestack
-        forDepth(queue.boxesDepth, queue.boxesNoDepth) { depth, boxes ->
+    private fun PoseStack.Pose.boxes(consumers: MultiBufferSource.BufferSource) {
+        forDepth(RenderQueue.boxesDepth, RenderQueue.boxesNoDepth) { depth, boxes ->
             if (boxes.isEmpty()) return@forDepth
-
-            for (b in boxes) {
-                Gizmos.cuboid(b.aabb, GizmoStyle.stroke(b.color.rgb, b.width)).apply {
-                    if (!depth) setAlwaysOnTop()
-                }
-            }
-        }
-    }
-    *///? } else {
-    private fun flushBoxes(poseStack: OmniPoseStack) {
-        forDepth(queue.boxesDepth, queue.boxesNoDepth) { depth, boxes ->
-            if (boxes.isEmpty()) return@forDepth
-            val pipeline = if (depth) StarredPipelines.lines else StarredPipelines.linesNoDepth
+            val renderType = if (depth) StarredRenderTypes.LINES else StarredRenderTypes.LINES_DEPTHLESS
+            val buffer = consumers.getBuffer(renderType)
 
             for (box in boxes) {
-                val buffer = pipeline.createBufferBuilder()
-
                 val aabb = box.aabb
-                val x0 = aabb.minX
-                val x1 = aabb.maxX
-                val y0 = aabb.minY
-                val y1 = aabb.maxY
-                val z0 = aabb.minZ
-                val z1 = aabb.maxZ
+                val x0 = aabb.minX.toFloat()
+                val x1 = aabb.maxX.toFloat()
+                val y0 = aabb.minY.toFloat()
+                val y1 = aabb.maxY.toFloat()
+                val z0 = aabb.minZ.toFloat()
+                val z1 = aabb.maxZ.toFloat()
 
                 for (edge in BOX_EDGES) {
-                    addLineVertices(
+                    vertex(
                         buffer,
-                        poseStack,
                         if (edge[0] == 0) x0 else x1,
                         if (edge[1] == 0) y0 else y1,
                         if (edge[2] == 0) z0 else z1,
                         if (edge[3] == 0) x0 else x1,
                         if (edge[4] == 0) y0 else y1,
                         if (edge[5] == 0) z0 else z1,
+                        box.width,
                         box.color
                     )
                 }
-
-                buffer.buildOrThrow().drawAndClose(pipeline) { setLineWidth(box.width) }
             }
         }
     }
-    //? }
 
-    //? >= 1.21.11 {
-    /*private fun flushFilledBoxes(poseStack: OmniPoseStack) { // does not need posestack
-        forDepth(queue.filledBoxesDepth, queue.filledBoxesNoDepth) { depth, boxes ->
+    private fun PoseStack.Pose.boxes0(consumers: MultiBufferSource.BufferSource) {
+        forDepth(RenderQueue.filledBoxesDepth, RenderQueue.filledBoxesNoDepth) { depth, boxes ->
             if (boxes.isEmpty()) return@forDepth
+            val type = if (depth) StarredRenderTypes.DEBUG_FILLED else StarredRenderTypes.DEBUG_FILLED_DEPTHLESS
+            val buffer = consumers.getBuffer(type)
 
-            for (b in boxes) {
-                Gizmos.cuboid(b.aabb, GizmoStyle.fill(b.color.rgb)).apply {
-                    if (!depth) setAlwaysOnTop()
-                }
+            fun buff(x: Float, y: Float, z: Float, color: Int) {
+                buffer.addVertex(this, x, y, z).setColor(color)
             }
-        }
-    }
-    *///? } else {
-    private fun flushFilledBoxes(poseStack: OmniPoseStack) {
-        forDepth(queue.filledBoxesDepth, queue.filledBoxesNoDepth) { depth, boxes ->
-            if (boxes.isEmpty()) return@forDepth
-
-            val pipeline = if (depth) StarredPipelines.triangleStrip else StarredPipelines.triangleStripNoDepth
-            val buffer = pipeline.createBufferBuilder()
 
             for (box in boxes) {
                 val aabb = box.aabb
-                val x0 = aabb.minX
-                val x1 = aabb.maxX
-                val y0 = aabb.minY
-                val y1 = aabb.maxY
-                val z0 = aabb.minZ
-                val z1 = aabb.maxZ
+                val color = box.color
 
-                buffer.vertex(poseStack, x0, y0, z0).color(box.color).next()
-                buffer.vertex(poseStack, x0, y0, z0).color(box.color).next()
-                buffer.vertex(poseStack, x0, y0, z0).color(box.color).next()
+                val x1 = aabb.minX.toFloat()
+                val x2 = aabb.maxX.toFloat()
+                val y1 = aabb.minY.toFloat()
+                val y2 = aabb.maxY.toFloat()
+                val z1 = aabb.minZ.toFloat()
+                val z2 = aabb.maxZ.toFloat()
 
-                buffer.vertex(poseStack, x0, y0, z1).color(box.color).next()
-                buffer.vertex(poseStack, x0, y1, z0).color(box.color).next()
-                buffer.vertex(poseStack, x0, y1, z1).color(box.color).next()
+                buff(x1, y1, z1, color)
+                buff(x1, y1, z2, color)
+                buff(x1, y2, z2, color)
+                buff(x1, y2, z1, color)
 
-                buffer.vertex(poseStack, x0, y1, z1).color(box.color).next()
+                buff(x2, y1, z2, color)
+                buff(x2, y1, z1, color)
+                buff(x2, y2, z1, color)
+                buff(x2, y2, z2, color)
 
-                buffer.vertex(poseStack, x0, y0, z1).color(box.color).next()
-                buffer.vertex(poseStack, x1, y1, z1).color(box.color).next()
-                buffer.vertex(poseStack, x1, y0, z1).color(box.color).next()
+                buff(x1, y1, z1, color)
+                buff(x1, y2, z1, color)
+                buff(x2, y2, z1, color)
+                buff(x2, y1, z1, color)
 
-                buffer.vertex(poseStack, x1, y0, z1).color(box.color).next()
+                buff(x2, y1, z2, color)
+                buff(x2, y2, z2, color)
+                buff(x1, y2, z2, color)
+                buff(x1, y1, z2, color)
 
-                buffer.vertex(poseStack, x1, y0, z0).color(box.color).next()
-                buffer.vertex(poseStack, x1, y1, z1).color(box.color).next()
-                buffer.vertex(poseStack, x1, y1, z0).color(box.color).next()
+                buff(x1, y1, z1, color)
+                buff(x2, y1, z1, color)
+                buff(x2, y1, z2, color)
+                buff(x1, y1, z2, color)
 
-                buffer.vertex(poseStack, x1, y1, z0).color(box.color).next()
-
-                buffer.vertex(poseStack, x1, y0, z0).color(box.color).next()
-                buffer.vertex(poseStack, x0, y1, z0).color(box.color).next()
-                buffer.vertex(poseStack, x0, y0, z0).color(box.color).next()
-
-                buffer.vertex(poseStack, x0, y0, z0).color(box.color).next()
-
-                buffer.vertex(poseStack, x1, y0, z0).color(box.color).next()
-                buffer.vertex(poseStack, x0, y0, z1).color(box.color).next()
-                buffer.vertex(poseStack, x1, y0, z1).color(box.color).next()
-
-                buffer.vertex(poseStack, x1, y0, z1).color(box.color).next()
-
-                buffer.vertex(poseStack, x0, y1, z0).color(box.color).next()
-                buffer.vertex(poseStack, x0, y1, z0).color(box.color).next()
-                buffer.vertex(poseStack, x0, y1, z1).color(box.color).next()
-                buffer.vertex(poseStack, x1, y1, z0).color(box.color).next()
-                buffer.vertex(poseStack, x1, y1, z1).color(box.color).next()
-
-                buffer.vertex(poseStack, x1, y1, z1).color(box.color).next()
-                buffer.vertex(poseStack, x1, y1, z1).color(box.color).next()
-            }
-
-            buffer.buildOrThrow().drawAndClose(pipeline)
-        }
-    }
-    //? }
-
-    //? >= 1.21.11 {
-    /*private fun flushCircles(poseStack: OmniPoseStack) {
-        forDepth(queue.circlesDepth, queue.circlesNoDepth) { depth, circles ->
-            if (circles.isEmpty()) return@forDepth
-
-            for (c in circles) {
-                Gizmos.circle(c.center, c.radius.toFloat(), GizmoStyle.stroke(c.color.rgb, c.width))
+                buff(x1, y2, z2, color)
+                buff(x2, y2, z2, color)
+                buff(x2, y2, z1, color)
+                buff(x1, y2, z1, color)
             }
         }
     }
-    *///? } else {
-    private fun flushCircles(poseStack: OmniPoseStack) {
-        forDepth(queue.circlesDepth, queue.circlesNoDepth) { depth, circles ->
-            if (circles.isEmpty()) return@forDepth
 
-            val pipeline = if (depth) StarredPipelines.lines else StarredPipelines.linesNoDepth
+    private fun PoseStack.Pose.circles(consumers: MultiBufferSource.BufferSource) {
+        forDepth(RenderQueue.circlesDepth, RenderQueue.circlesNoDepth) { depth, circles ->
+            if (circles.isEmpty()) return@forDepth
+            val type = if (depth) StarredRenderTypes.LINES else StarredRenderTypes.LINES_DEPTHLESS
+            val buffer = consumers.getBuffer(type)
 
             for (circle in circles) {
-                val buffer = pipeline.createBufferBuilder()
-                val pts = circlePoints(circle.center, circle.radius, circle.segments, circle.normal)
+                val pts = circle.center.points(circle.radius, circle.segments, circle.normal)
 
                 for (i in 0 until circle.segments) {
-                    addLineVertices(
-                        buffer, poseStack,
-                        pts[i].x, pts[i].y, pts[i].z,
-                        pts[i + 1].x, pts[i + 1].y, pts[i + 1].z,
+                    vertex(
+                        buffer,
+                        pts[i].x,
+                        pts[i].y,
+                        pts[i].z,
+                        pts[i + 1].x,
+                        pts[i + 1].y,
+                        pts[i + 1].z,
+                        circle.width,
                         circle.color
                     )
                 }
-
-                buffer.buildOrThrow().drawAndClose(pipeline) { setLineWidth(circle.width) }
             }
         }
     }
-    //? }
 
-    //? >= 1.21.11 {
-    /*private fun flushFilledCircles(poseStack: OmniPoseStack) {
-        forDepth(queue.filledCirclesDepth, queue.filledCirclesNoDepth) { depth, circles ->
+    private fun PoseStack.Pose.circles0(consumers: MultiBufferSource.BufferSource) {
+        forDepth(RenderQueue.filledCirclesDepth, RenderQueue.filledCirclesNoDepth) { depth, circles ->
             if (circles.isEmpty()) return@forDepth
 
-            for (c in circles) {
-                Gizmos.circle(c.center, c.radius.toFloat(), GizmoStyle.fill(c.color.rgb))
-            }
-        }
-    }
-    *///? } else {
-    private fun flushFilledCircles(poseStack: OmniPoseStack) {
-        forDepth(queue.filledCirclesDepth, queue.filledCirclesNoDepth) { depth, circles ->
-            if (circles.isEmpty()) return@forDepth
-
-            val pipeline = if (depth) StarredPipelines.triangleStrip else StarredPipelines.triangleStripNoDepth
-            val buffer = pipeline.createBufferBuilder()
+            val type = if (depth) StarredRenderTypes.TRIANGLE_FAN else StarredRenderTypes.TRIANGLE_FAN_DEPTHLESS
+            val buffer = consumers.getBuffer(type)
 
             for (circle in circles) {
-                val pts = circlePoints(circle.center, circle.radius, circle.segments, circle.normal)
-                val n = circle.segments
+                val (u, v) = circle.normal.tangents()
+                val center = circle.center
 
-                val indices = buildList {
-                    var lo = 0
-                    var hi = n - 1
-                    while (lo <= hi) {
-                        add(lo++)
-                        if (lo <= hi) add(hi--)
-                    }
+                buffer.addVertex(this, center.x.toFloat(), center.y.toFloat(), center.z.toFloat()).setColor(circle.color)
+
+                val segments = circle.segments
+                val radius = circle.radius
+
+                for (i in 0..segments) {
+                    val angle = 2.0 * Math.PI * i / segments
+                    val cos = cos(angle)
+                    val sin = sin(angle)
+
+                    val x = center.x + radius * (u.x * cos + v.x * sin)
+                    val y = center.y + radius * (u.y * cos + v.y * sin)
+                    val z = center.z + radius * (u.z * cos + v.z * sin)
+
+                    buffer.addVertex(this, x.toFloat(), y.toFloat(), z.toFloat()).setColor(circle.color)
                 }
-
-                val first = pts[indices[0]]
-                buffer.vertex(poseStack, first.x, first.y, first.z).color(circle.color).next()
-                buffer.vertex(poseStack, first.x, first.y, first.z).color(circle.color).next()
-
-                for (idx in indices) {
-                    val p = pts[idx]
-                    buffer.vertex(poseStack, p.x, p.y, p.z).color(circle.color).next()
-                }
-
-                val last = pts[indices.last()]
-                buffer.vertex(poseStack, last.x, last.y, last.z).color(circle.color).next()
-                buffer.vertex(poseStack, last.x, last.y, last.z).color(circle.color).next()
             }
-
-            buffer.buildOrThrow().drawAndClose(pipeline)
         }
     }
-    //? }
 
     /**
      * @see net.minecraft.client.renderer.blockentity.BeaconRenderer
      */
-    private fun flushBeaconBeams(pose: PoseStack, camera: Vec3, consumers: MultiBufferSource.BufferSource) {
-        if (queue.beaconBeams.isEmpty()) return
+    private fun PoseStack.beacons(camera: Vec3, consumers: MultiBufferSource.BufferSource) {
+        if (RenderQueue.beaconBeams.isEmpty()) return
+        val last = last()
 
         val partialTick = client.deltaTracker.getGameTimeDeltaPartialTick(false)
         val animationTime = ((client.level?.gameTime ?: 0L) % 40).toFloat() + partialTick
@@ -448,7 +355,7 @@ object Render3D {
         val translucentType = RenderType.beaconBeam(beam, true)
         //? }
 
-        for (beacon in queue.beaconBeams) {
+        for (beacon in RenderQueue.beaconBeams) {
             val pos = beacon.pos
             val hdx = pos.x + 0.5
             val hdz = pos.z + 0.5
@@ -456,53 +363,58 @@ object Render3D {
             val beamRadius = 0.2f * radiusScale
             val glowRadius = 0.25f * radiusScale
 
-            pose.pushPose()
-            pose.translate(pos.x + 0.5, pos.y.toDouble(), pos.z + 0.5)
+            pushPose()
+            translate(pos.x + 0.5, pos.y.toDouble(), pos.z + 0.5)
 
-            pose.pushPose()
-            pose.mulPose(Axis.YP.rotationDegrees(animationTime * 2.25f - 45f))
-            renderBeaconPart(pose.last(), consumers.getBuffer(opaqueType), beacon.color, 0f, beamRadius, beamRadius, 0f, -beamRadius, 0f, 0f, -beamRadius, 320 * (0.5f / beamRadius) + s, s)
-            pose.popPose()
+            pushPose()
+            mulPose(Axis.YP.rotationDegrees(animationTime * 2.25f - 45f))
+            last.`beacon$part`(consumers.getBuffer(opaqueType), beacon.color, 0f, beamRadius, beamRadius, 0f, -beamRadius, 0f, 0f, -beamRadius, 320 * (0.5f / beamRadius) + s, s)
+            popPose()
 
-            renderBeaconPart(pose.last(), consumers.getBuffer(translucentType), ARGB.color(32, beacon.color), -glowRadius, -glowRadius, glowRadius, -glowRadius, -glowRadius, glowRadius, glowRadius, glowRadius, 320f + s, s)
+            last.`beacon$part`(consumers.getBuffer(translucentType), ARGB.color(32, beacon.color), -glowRadius, -glowRadius, glowRadius, -glowRadius, -glowRadius, glowRadius, glowRadius, glowRadius, 320f + s, s)
 
-            pose.popPose()
+            popPose()
         }
 
         consumers.endBatch(opaqueType)
         consumers.endBatch(translucentType)
     }
 
-    private fun renderBeaconPart(pose: PoseStack.Pose, consumer: VertexConsumer, color: Int, x1: Float, z1: Float, x2: Float, z2: Float, x3: Float, z3: Float, x4: Float, z4: Float, minV: Float, maxV: Float) {
-        renderBeaconQuad(pose, consumer, color, x1, z1, x2, z2, minV, maxV)
-        renderBeaconQuad(pose, consumer, color, x4, z4, x3, z3, minV, maxV)
-        renderBeaconQuad(pose, consumer, color, x2, z2, x4, z4, minV, maxV)
-        renderBeaconQuad(pose, consumer, color, x3, z3, x1, z1, minV, maxV)
+    private fun PoseStack.Pose.`beacon$part`(consumer: VertexConsumer, color: Int, x1: Float, z1: Float, x2: Float, z2: Float, x3: Float, z3: Float, x4: Float, z4: Float, minV: Float, maxV: Float) {
+        `beacon$quad`(consumer, color, x1, z1, x2, z2, minV, maxV)
+        `beacon$quad`(consumer, color, x4, z4, x3, z3, minV, maxV)
+        `beacon$quad`(consumer, color, x2, z2, x4, z4, minV, maxV)
+        `beacon$quad`(consumer, color, x3, z3, x1, z1, minV, maxV)
     }
 
-    private fun renderBeaconQuad(pose: PoseStack.Pose, consumer: VertexConsumer, color: Int, minX: Float, minZ: Float, maxX: Float, maxZ: Float, minV: Float, maxV: Float) {
-        addBeaconVertex(pose, consumer, color, 320, minX, minZ, 1f, minV)
-        addBeaconVertex(pose, consumer, color, 0, minX, minZ, 1f, maxV)
-        addBeaconVertex(pose, consumer, color, 0, maxX, maxZ, 0f, maxV)
-        addBeaconVertex(pose, consumer, color, 320, maxX, maxZ, 0f, minV)
+    private fun PoseStack.Pose.`beacon$quad`(consumer: VertexConsumer, color: Int, minX: Float, minZ: Float, maxX: Float, maxZ: Float, minV: Float, maxV: Float) {
+        `beacon$vertex`(consumer, color, 320, minX, minZ, 1f, minV)
+        `beacon$vertex`(consumer, color, 0, minX, minZ, 1f, maxV)
+        `beacon$vertex`(consumer, color, 0, maxX, maxZ, 0f, maxV)
+        `beacon$vertex`(consumer, color, 320, maxX, maxZ, 0f, minV)
     }
 
-    private fun addBeaconVertex(pose: PoseStack.Pose, consumer: VertexConsumer, color: Int, y: Int, x: Float, z: Float, u: Float, v: Float) {
-        consumer.addVertex(pose, x, y.toFloat(), z).setColor(color).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0f, 1f, 0f)
+    private fun PoseStack.Pose.`beacon$vertex`(consumer: VertexConsumer, color: Int, y: Int, x: Float, z: Float, u: Float, v: Float) {
+        consumer
+            .addVertex(this, x, y.toFloat(), z)
+            .setColor(color)
+            .setUv(u, v)
+            .setOverlay(OverlayTexture.NO_OVERLAY)
+            .setLight(LightTexture.FULL_BRIGHT)
+            .setNormal(this, 0f, 1f, 0f)
     }
 
-    private fun flushTexts(pose: PoseStack, consumers: MultiBufferSource.BufferSource) {
+    private fun PoseStack.texts(consumers: MultiBufferSource.BufferSource) {
         val cam = client.gameRenderer.mainCamera
+        val pose = last().pose()
 
-        for (text in queue.texts) {
-            pose.pushPose()
+        for (text in RenderQueue.texts) {
+            pushPose()
 
             val scale = text.scale * 0.025f
-            pose.translate(text.pos.x, text.pos.y, text.pos.z)
-            pose.mulPose(cam.rotation())
-            pose.scale(scale, -scale, scale)
-
-            val matrix = pose.last().pose()
+            translate(text.pos.x, text.pos.y, text.pos.z)
+            mulPose(cam.rotation())
+            scale(scale, -scale, scale)
 
             client.font.drawInBatch(
                 text.text,
@@ -510,35 +422,39 @@ object Render3D {
                 0f,
                 text.color,
                 text.shadow,
-                matrix,
+                pose,
                 consumers,
                 if (text.depth) Font.DisplayMode.NORMAL else Font.DisplayMode.SEE_THROUGH,
                 text.bgColor,
                 LightTexture.FULL_BRIGHT
             )
 
-            pose.popPose()
+            popPose()
         }
     }
 
-    private fun addLineVertices(
-        buffer: OmniBufferBuilder,
-        poseStack: OmniPoseStack,
-        x1: Double, y1: Double, z1: Double,
-        x2: Double, y2: Double, z2: Double,
-        color: Color
+    private fun PoseStack.Pose.vertex(
+        buffer: VertexConsumer,
+        x1: Float,
+        y1: Float,
+        z1: Float,
+        x2: Float,
+        y2: Float,
+        z2: Float,
+        width: Float,
+        color: Int
     ) {
-        val dx = (x2 - x1).toFloat()
-        val dy = (y2 - y1).toFloat()
-        val dz = (z2 - z1).toFloat()
+        val dx = x2 - x1
+        val dy = y2 - y1
+        val dz = z2 - z1
         val length = sqrt(dx * dx + dy * dy + dz * dz)
 
         val nx = if (length > 0) dx / length else 0f
         val ny = if (length > 0) dy / length else 0f
         val nz = if (length > 0) dz / length else 0f
 
-        buffer.vertex(poseStack, x1, y1, z1).color(color).normal(poseStack, nx, ny, nz).next()
-        buffer.vertex(poseStack, x2, y2, z2).color(color).normal(poseStack, nx, ny, nz).next()
+        buffer.addVertex(this, x1, y1, z1).setColor(color).setNormal(this, nx, ny, nz)/*? >= 1.21.11 {*//*.setLineWidth(width)*//*? }*/
+        buffer.addVertex(this, x2, y2, z2).setColor(color).setNormal(this, nx, ny, nz)/*? >= 1.21.11 {*//*.setLineWidth(width)*//*? }*/
     }
     // </editor-fold>
 
@@ -560,7 +476,7 @@ object Render3D {
             scale *= p.distanceTo(pos).toFloat() / 3f
         }
 
-        queue.texts.add(QueuedText(text.literal(), pos, color, backgroundColor, scale, shadow, depthTest))
+        RenderQueue.texts.add(QueuedText(text.literal(), pos, color, backgroundColor, scale, shadow, depthTest))
     }
 
     @JvmStatic
@@ -581,7 +497,7 @@ object Render3D {
             scale *= p.distanceTo(pos).toFloat() / 3f
         }
 
-        queue.texts.add(QueuedText(text, pos, color, backgroundColor, scale, shadow, depthTest))
+        RenderQueue.texts.add(QueuedText(text, pos, color, backgroundColor, scale, shadow, depthTest))
     }
 
     @JvmStatic
@@ -592,8 +508,8 @@ object Render3D {
         lineWidth: Float = 2f,
         depthTest: Boolean = true
     ) {
-        val boxQueue = if (depthTest) queue.boxesDepth else queue.boxesNoDepth
-        boxQueue.add(QueuedBox(aabb, color, lineWidth))
+        val boxQueue = if (depthTest) RenderQueue.boxesDepth else RenderQueue.boxesNoDepth
+        boxQueue.add(QueuedBox(aabb, color.rgb, lineWidth))
     }
 
     @JvmStatic
@@ -603,8 +519,8 @@ object Render3D {
         color: Color,
         depthTest: Boolean = true
     ) {
-        val filledQueue = if (depthTest) queue.filledBoxesDepth else queue.filledBoxesNoDepth
-        filledQueue.add(QueuedFilledBox(aabb, color))
+        val filledQueue = if (depthTest) RenderQueue.filledBoxesDepth else RenderQueue.filledBoxesNoDepth
+        filledQueue.add(QueuedBox(aabb, color.rgb, 1f))
     }
 
     @JvmStatic
@@ -634,7 +550,7 @@ object Render3D {
 
     @JvmStatic
     fun drawBeaconBeam(pos: BlockPos, color: Int) {
-        queue.beaconBeams.add(QueuedBeaconBeam(pos, color))
+        RenderQueue.beaconBeams.add(QueuedBeaconBeam(pos, color))
     }
 
     @JvmStatic
@@ -646,8 +562,8 @@ object Render3D {
         lineWidth: Float = 2f,
         depthTest: Boolean = true
     ) {
-        val lineQueue = if (depthTest) queue.linesDepth else queue.linesNoDepth
-        lineQueue.add(QueuedLine(from, to, color, lineWidth))
+        val lineQueue = if (depthTest) RenderQueue.linesDepth else RenderQueue.linesNoDepth
+        lineQueue.add(QueuedLine(Vector3f(from.x.toFloat(), from.y.toFloat(), from.z.toFloat()), Vector3f(to.x.toFloat(), to.y.toFloat(), to.z.toFloat()), color.rgb, lineWidth))
     }
 
     @JvmStatic
@@ -659,12 +575,12 @@ object Render3D {
         depthTest: Boolean = true
     ) {
         if (points.size < 2) return
-        val lineQueue = if (depthTest) queue.linesDepth else queue.linesNoDepth
+        val lineQueue = if (depthTest) RenderQueue.linesDepth else RenderQueue.linesNoDepth
 
         for (i in 0 until points.size - 1) {
             val from = points[i]
             val to = points[i + 1]
-            lineQueue.add(QueuedLine(from, to, color, lineWidth))
+            lineQueue.add(QueuedLine(Vector3f(from.x.toFloat(), from.y.toFloat(), from.z.toFloat()), Vector3f(to.x.toFloat(), to.y.toFloat(), to.z.toFloat()), color.rgb, lineWidth))
         }
     }
 
@@ -699,8 +615,8 @@ object Render3D {
         lineWidth: Float = 2f,
         depthTest: Boolean = true
     ) {
-        val circleQueue = if (depthTest) queue.circlesDepth else queue.circlesNoDepth
-        circleQueue.add(QueuedCircle(center, radius, segments, color, lineWidth, normal))
+        val circleQueue = if (depthTest) RenderQueue.circlesDepth else RenderQueue.circlesNoDepth
+        circleQueue.add(QueuedCircle(center, radius, segments, color.rgb, lineWidth, normal))
     }
 
     @JvmStatic
@@ -713,8 +629,8 @@ object Render3D {
         normal: Vec3 = Vec3(0.0, 1.0, 0.0),
         depthTest: Boolean = true
     ) {
-        val filledQueue = if (depthTest) queue.filledCirclesDepth else queue.filledCirclesNoDepth
-        filledQueue.add(QueuedFilledCircle(center, radius, segments, color, normal))
+        val filledQueue = if (depthTest) RenderQueue.filledCirclesDepth else RenderQueue.filledCirclesNoDepth
+        filledQueue.add(QueuedCircle(center, radius, segments, color.rgb, 1f, normal))
     }
 
     @JvmStatic

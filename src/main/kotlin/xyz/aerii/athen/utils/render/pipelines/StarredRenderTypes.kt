@@ -10,78 +10,116 @@ import net.minecraft.client.renderer.RenderType
 //? }
 
 object StarredRenderTypes {
-    val LINES_DEPTH =
+    val LINES: RenderType =
         //? if >= 1.21.11 {
         /*RenderType.create(
-            "starred_lines_depth",
-            RenderSetup.builder(StarredPipelines.lines.vanilla)
+            "starred_lines",
+            RenderSetup.builder(StarredPipelines.LINES)
                 .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
                 .createRenderSetup()
         )
         *///? } else {
         RenderType.create(
-            "starred_lines_depth",
+            "starred_lines",
             RenderType.TRANSIENT_BUFFER_SIZE,
             false,
             true,
-            StarredPipelines.lines.vanilla,
+            StarredPipelines.LINES,
             RenderType.CompositeState.builder().createCompositeState(false)
         )
         //? }
 
-    val LINES_NO_DEPTH =
+    val LINES_DEPTHLESS: RenderType =
         //? if >= 1.21.11 {
         /*RenderType.create(
-            "starred_lines_no_depth",
-            RenderSetup.builder(StarredPipelines.linesNoDepth.vanilla)
+            "starred_lines_depthless",
+            RenderSetup.builder(StarredPipelines.LINES_DEPTHLESS)
                 .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
                 .createRenderSetup()
         )
         *///? } else {
         RenderType.create(
-            "starred_lines_no_depth",
+            "starred_lines_depthless",
             RenderType.TRANSIENT_BUFFER_SIZE,
             false,
             true,
-            StarredPipelines.linesNoDepth.vanilla,
+            StarredPipelines.LINES_DEPTHLESS,
             RenderType.CompositeState.builder().createCompositeState(false)
         )
         //? }
 
-    val TRIANGLE_STRIP =
+    val DEBUG_FILLED: RenderType =
         //? if >= 1.21.11 {
         /*RenderType.create(
-            "starred_triangle_depth",
-            RenderSetup.builder(StarredPipelines.triangleStrip.vanilla)
+            "starred_debug_filled",
+            RenderSetup.builder(StarredPipelines.DEBUG_FILLED)
                 .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
                 .createRenderSetup()
         )
         *///? } else {
         RenderType.create(
-            "starred_triangle_depth",
+            "starred_debug_filled",
             RenderType.TRANSIENT_BUFFER_SIZE,
             false,
             true,
-            StarredPipelines.triangleStrip.vanilla,
+            StarredPipelines.DEBUG_FILLED,
             RenderType.CompositeState.builder().createCompositeState(false)
         )
         //? }
 
-    val TRIANGLE_STRIP_NO_DEPTH =
+    val DEBUG_FILLED_DEPTHLESS: RenderType =
         //? if >= 1.21.11 {
         /*RenderType.create(
-            "starred_triangle_no_depth",
-            RenderSetup.builder(StarredPipelines.triangleStripNoDepth.vanilla)
+            "starred_debug_filled_depthless",
+            RenderSetup.builder(StarredPipelines.DEBUG_FILLED_DEPTHLESS)
                 .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
                 .createRenderSetup()
         )
         *///? } else {
         RenderType.create(
-            "starred_triangle_no_depth",
+            "starred_debug_filled_depthless",
             RenderType.TRANSIENT_BUFFER_SIZE,
             false,
             true,
-            StarredPipelines.triangleStripNoDepth.vanilla,
+            StarredPipelines.DEBUG_FILLED_DEPTHLESS,
+            RenderType.CompositeState.builder().createCompositeState(false)
+        )
+        //? }
+
+    val TRIANGLE_FAN: RenderType =
+        //? if >= 1.21.11 {
+        /*RenderType.create(
+            "starred_triangle_fan",
+            RenderSetup.builder(StarredPipelines.TRIANGLE_FAN)
+                .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                .createRenderSetup()
+        )
+        *///? } else {
+        RenderType.create(
+            "starred_triangle_fan",
+            RenderType.TRANSIENT_BUFFER_SIZE,
+            false,
+            true,
+            StarredPipelines.TRIANGLE_FAN,
+            RenderType.CompositeState.builder().createCompositeState(false)
+        )
+        //? }
+
+    val TRIANGLE_FAN_DEPTHLESS: RenderType =
+        //? if >= 1.21.11 {
+        /*RenderType.create(
+            "starred_triangle_fan_depthless",
+            RenderSetup.builder(StarredPipelines.TRIANGLE_FAN_DEPTHLESS)
+                .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                .createRenderSetup()
+        )
+        *///? } else {
+        RenderType.create(
+            "starred_triangle_fan_depthless",
+            RenderType.TRANSIENT_BUFFER_SIZE,
+            false,
+            true,
+            StarredPipelines.TRIANGLE_FAN_DEPTHLESS,
             RenderType.CompositeState.builder().createCompositeState(false)
         )
         //? }
