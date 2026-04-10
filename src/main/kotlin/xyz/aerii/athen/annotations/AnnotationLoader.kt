@@ -4,14 +4,14 @@ import io.github.classgraph.ClassGraph
 import xyz.aerii.athen.events.GameEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.modules.Module
-import xyz.aerii.athen.utils.safely
+import xyz.aerii.library.utils.safely
 
 object AnnotationLoader {
     fun load() {
         ClassGraph()
             .enableClassInfo()
             .enableAnnotationInfo()
-            .acceptPackages("xyz.aerii")
+            .acceptPackages("xyz.aerii.athen", "xyz.aerii.nebulune")
             .scan()
             .use { scanResult ->
                 val sortedPriority = scanResult
@@ -26,19 +26,15 @@ object AnnotationLoader {
                 val modules = scanResult.getSubclasses(Module::class.java.name)
 
                 sortedPriority.forEach { klass ->
-                    try {
-                        Class.forName(klass.name)
-                    } catch (_: Exception) {}
+                    safely { Class.forName(klass.name) }
                 }
 
                 toLoad.forEach { klass ->
-                    try {
-                        Class.forName(klass.name)
-                    } catch (_: Exception) {}
+                    safely { Class.forName(klass.name) }
                 }
 
                 on<GameEvent.Start> {
-                    for (m in modules) safely { (m.loadClass().kotlin.objectInstance as? Module)?.react }
+                    for (m in modules) safely { (m.loadClass().kotlin.objectInstance as? Module)?.observable }
                 }.once()
             }
     }

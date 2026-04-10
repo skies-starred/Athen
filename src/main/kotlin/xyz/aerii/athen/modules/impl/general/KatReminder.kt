@@ -15,13 +15,15 @@ import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Commander
 import xyz.aerii.athen.handlers.Scribble
-import xyz.aerii.athen.handlers.Smoothie.showTitle
 import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
-import xyz.aerii.athen.utils.fromLongDuration
-import xyz.aerii.athen.utils.toDurationFromMillis
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.handlers.time.Task
+import xyz.aerii.library.handlers.time.client
+import xyz.aerii.library.utils.fromLongDuration
+import xyz.aerii.library.utils.showTitle
+import xyz.aerii.library.utils.toDurationFromMillis
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
@@ -48,7 +50,7 @@ object KatReminder : Module(
     private val remindRegex = Regex("^\\[NPC] Kat: I'm currently taking care of your (?<pet>\\w+)!$")
     private val durationRemindRegex = Regex("^\\[NPC] Kat: You can pick it up in (?<duration>.+)\\.$")
 
-    private var task: Chronos.Task? = null
+    private var task: Task? = null
 
     init {
         fn()
@@ -84,7 +86,7 @@ object KatReminder : Module(
             if (time <= 0) return@on
             if (time > System.currentTimeMillis()) return@on
 
-            Chronos.Tick after 10 then {
+            Chronos.schedule(10.client) {
                 fn0()
             }
         }
@@ -135,7 +137,7 @@ object KatReminder : Module(
         task?.cancel()
 
         val delay = (time - System.currentTimeMillis()).takeIf { it > 0 } ?: return
-        task = Chronos.Time after delay.milliseconds then { fn0() }
+        task = Chronos.schedule(delay.milliseconds) { fn0() }
     }
 
     private fun fn1(days: Duration) {

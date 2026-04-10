@@ -21,15 +21,16 @@ import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo
-import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.fcs
-import xyz.aerii.athen.utils.toDuration
-import xyz.aerii.athen.utils.toDurationFromMillis
+import xyz.aerii.library.api.lie
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.handlers.time.client
+import xyz.aerii.library.utils.toDuration
+import xyz.aerii.library.utils.toDurationFromMillis
 import kotlin.math.abs
 
 @Load
@@ -42,7 +43,7 @@ object KuudraSplits : Module(
     private val chat by config.switch("Send to chat", true)
     private val _hud = config.hud("Splits display") {
         if (it) return@hud sizedText(fcs)
-        sizedText(display() ?: return@hud null)
+        sizedText(display.value ?: return@hud null)
     }
 
     private val estimatePace by config.switch("Estimate run pace")
@@ -142,7 +143,7 @@ object KuudraSplits : Module(
             PB.set(tier, null, splits.sumOf { it.durTime })
 
             if (!chat) return@on
-            Chronos.Tick after 2 then {
+            Chronos.schedule(2.client) {
                 "Split breakdown:".modMessage()
 
                 for (s in splits) {

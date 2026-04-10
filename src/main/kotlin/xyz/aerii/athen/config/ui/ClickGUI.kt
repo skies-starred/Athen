@@ -10,18 +10,18 @@ import xyz.aerii.athen.config.ConfigManager.updateConfig
 import xyz.aerii.athen.config.ui.elements.FeatureTooltip
 import xyz.aerii.athen.config.ui.elements.HelpTooltip
 import xyz.aerii.athen.config.ui.panels.Panel
-import xyz.aerii.athen.handlers.KeyEater
 import xyz.aerii.athen.handlers.Scram
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
-import xyz.aerii.athen.handlers.Scurry.rawX
-import xyz.aerii.athen.handlers.Scurry.rawY
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.timedValue
-import xyz.aerii.athen.utils.url
+import xyz.aerii.library.api.client
+import xyz.aerii.library.api.shift
+import xyz.aerii.library.utils.hovered
+import xyz.aerii.library.utils.mouseRX
+import xyz.aerii.library.utils.mouseRY
+import xyz.aerii.library.utils.open
 import kotlin.math.sign
 
 @Priority(-3)
@@ -65,8 +65,8 @@ object ClickGUI : Scram("Config [Click UI - Athen]") {
 
     override fun isPauseScreen() = false
 
-    override fun onScramRender(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
-        NVGSpecialRenderer.draw(guiGraphics, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight()) {
+    override fun onScramRender(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+        NVGSpecialRenderer.draw(graphics, 0, 0, graphics.guiWidth(), graphics.guiHeight()) {
             val width = client.window.width
             val height = client.window.height
             val t = `anim$open`.value
@@ -83,11 +83,11 @@ object ClickGUI : Scram("Config [Click UI - Athen]") {
             NVGRenderer.translate(-width / 2f, -height / 2f)
             NVGRenderer.globalAlpha(t)
 
-            panels.forEach { it.draw(rawX, rawY) }
-            searchBar.draw(width / 2f - 175f, height - 110f, rawX, rawY)
+            panels.forEach { it.draw(mouseRX, mouseRY) }
+            searchBar.draw(width / 2f - 175f, height - 110f, mouseRX, mouseRY)
             drawDiscordButton(width / 2f - 55f, height - 60f)
-            featureTooltip.draw(rawX, rawY)
-            helpTooltip.draw(rawX, rawY)
+            featureTooltip.draw(mouseRX, mouseRY)
+            helpTooltip.draw(mouseRX, mouseRY)
 
             NVGRenderer.pop()
         }
@@ -109,7 +109,7 @@ object ClickGUI : Scram("Config [Click UI - Athen]") {
     }
 
     override fun onScramMouseScroll(mouseX: Int, mouseY: Int, horizontal: Double, vertical: Double): Boolean {
-        if (KeyEater.shift) {
+        if (shift) {
             val scroll = vertical.toFloat() * 20f
             val leftmost = panels.minOfOrNull { it.x } ?: 0f
             val rightmost = panels.maxOfOrNull { it.x + 240f } ?: 0f
@@ -130,15 +130,15 @@ object ClickGUI : Scram("Config [Click UI - Athen]") {
             val width = client.window.width
             val height = client.window.height
 
-            if (isAreaHovered(width / 2f - 55f, height - 60f, 110f, 40f)) {
-                Athen.discordUrl.url()
+            if (hovered(width / 2f - 55f, height - 60f, 110f, 40f)) {
+                Athen.discordUrl.open()
                 return true
             }
         }
 
-        if (helpTooltip.mouseClicked(rawX, rawY, button)) return true
-        searchBar.mouseClicked(rawX, rawY, button)
-        return panels.reversed().any { it.mouseClicked(rawX, rawY, button) } || super.onScramMouseClick(mouseX, mouseY, button)
+        if (helpTooltip.mouseClicked(mouseRX, mouseRY, button)) return true
+        searchBar.mouseClicked(mouseRX, mouseRY, button)
+        return panels.reversed().any { it.mouseClicked(mouseRX, mouseRY, button) } || super.onScramMouseClick(mouseX, mouseY, button)
     }
 
     override fun onScramMouseRelease(mouseX: Int, mouseY: Int, button: Int): Boolean {
@@ -148,9 +148,9 @@ object ClickGUI : Scram("Config [Click UI - Athen]") {
         return super.onScramMouseRelease(mouseX, mouseY, button)
     }
 
-    override fun onScramCharType(char: Char, modifiers: Int): Boolean {
+    override fun onScramCharType(char: Char): Boolean {
         searchBar.keyTyped(char)
-        return panels.reversed().any { it.keyTyped(char) } || super.onScramCharType(char, modifiers)
+        return panels.reversed().any { it.keyTyped(char) } || super.onScramCharType(char)
     }
 
     override fun onScramKeyPress(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {

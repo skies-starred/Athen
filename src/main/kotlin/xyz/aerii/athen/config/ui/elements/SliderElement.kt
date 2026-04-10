@@ -4,12 +4,12 @@ package xyz.aerii.athen.config.ui.elements
 
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
-import xyz.aerii.athen.handlers.KeyEater
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.springValue
+import xyz.aerii.library.api.client
+import xyz.aerii.library.api.ctrl
+import xyz.aerii.library.utils.hovered
 
 class SliderElement(
     name: String,
@@ -50,7 +50,7 @@ class SliderElement(
         val textW = textWidth(valueText)
         val textX = x + width - textW - 6f
         val textY = y + 8f
-        val isHovered = isAreaHovered(lastX, lastY + 20f, width, 16f)
+        val isHovered = hovered(lastX, lastY + 20f, width, 16f)
 
         `anim$tooltip`.value = if (isHovered && !editing) 1f else 0f
         drawText(rawText, textX, textY, color = if (editing) Mocha.Text.argb else Mocha.Subtext0.argb)
@@ -89,7 +89,7 @@ class SliderElement(
         val textX = lastX + width - textW - 6f
         val textY = lastY + 8f
 
-        if (isAreaHovered(textX - 4f, textY - 2f, textW + 8f, 20f)) {
+        if (hovered(textX - 4f, textY - 2f, textW + 8f, 20f)) {
             editing = true
             editText = str
             caretBlink = System.currentTimeMillis()
@@ -97,7 +97,7 @@ class SliderElement(
         }
 
         editing = false
-        if (isAreaHovered(lastX, lastY + 20f, width, 16f)) {
+        if (hovered(lastX, lastY + 20f, width, 16f)) {
             dragging = true
             return true
         }
@@ -146,7 +146,7 @@ class SliderElement(
             }
 
             GLFW.GLFW_KEY_V -> {
-                if (!KeyEater.ctrl) return true
+                if (!ctrl) return true
                 val clipboard = client.keyboardHandler?.clipboard ?: ""
                 val clean = clipboard.filter { it.isDigit() || (it == '.' && showDouble) }
                 if (clean.isNotEmpty()) {

@@ -12,13 +12,13 @@ import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Texter.onHover
-import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.repeatBreak
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.toDuration
+import xyz.aerii.library.api.lie
+import xyz.aerii.library.api.repeat
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.toDuration
 
 @Load
 @OnlyIn(skyblock = true)
@@ -52,7 +52,7 @@ object SlayerTimers : Module(
         on<SlayerEvent.Boss.Spawn> {
             if (!slayerInfo.isOwnedByPlayer) return@on
 
-            startTick = Chronos.Ticker.tickServer
+            startTick = Chronos.ticks.server
             val spawnTime = System.currentTimeMillis()
             if (questStartTime <= 0) return@on
 
@@ -65,7 +65,7 @@ object SlayerTimers : Module(
 
             val time = entity.tickCount / 20.0
             val str0 = time.toDuration(secondsDecimals = 1)
-            val time0 = Chronos.Ticker.tickServer - startTick
+            val time0 = Chronos.ticks.server - startTick
             val str1 = (time0 / 20.0).toDuration(secondsDecimals = 1)
             val key = slayerInfo.str
             val pb = killPBs.value[key]
@@ -96,8 +96,8 @@ object SlayerTimers : Module(
             event.register(Athen.modId) {
                 then("times") {
                     thenCallback("slayers") {
-                        val b0 = "<gray>${"-".repeatBreak()}".parse()
-                        val b1 = "<dark_gray>${"-".repeatBreak()}".parse()
+                        val b0 = "<gray>${"-".repeat()}".parse()
+                        val b1 = "<dark_gray>${"-".repeat()}".parse()
 
                         b0.lie()
 

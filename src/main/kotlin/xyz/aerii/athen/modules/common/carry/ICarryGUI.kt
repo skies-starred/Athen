@@ -2,17 +2,17 @@ package xyz.aerii.athen.modules.common.carry
 
 import net.minecraft.client.gui.GuiGraphics
 import xyz.aerii.athen.handlers.Scram
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.brighten
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
-import xyz.aerii.athen.utils.plural
 import xyz.aerii.athen.utils.render.animations.SpringValue
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.springValue
 import xyz.aerii.athen.utils.render.animations.timedValue
+import xyz.aerii.library.api.client
+import xyz.aerii.library.utils.brighten
+import xyz.aerii.library.utils.hovered
+import xyz.aerii.library.utils.plural
 
 abstract class ICarryGUI<T : ITrackedCarry>(val screenName: String) : Scram(screenName) {
     private var scrollOffset = 0f
@@ -59,10 +59,10 @@ abstract class ICarryGUI<T : ITrackedCarry>(val screenName: String) : Scram(scre
 
     override fun isPauseScreen() = false
 
-    override fun onScramRender(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun onScramRender(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         tooltips.removeIf { System.currentTimeMillis() - it.timestamp > 5000 }
 
-        NVGSpecialRenderer.draw(guiGraphics, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight()) {
+        NVGSpecialRenderer.draw(graphics, 0, 0, graphics.guiWidth(), graphics.guiHeight()) {
             val width = client.window.width
             val height = client.window.height
             val progress = open.value
@@ -215,7 +215,7 @@ abstract class ICarryGUI<T : ITrackedCarry>(val screenName: String) : Scram(scre
         }
 
         private fun drawButton(x: Float, y: Float, text: String, colorAnim: SpringValue<Int>, scaleAnim: SpringValue<Float>) {
-            val isHovered = isAreaHovered(x, y, buttonSize, buttonSize)
+            val isHovered = hovered(x, y, buttonSize, buttonSize)
 
             val baseColor = when (colorAnim) {
                 addButtonAnim -> Mocha.Base.withAlpha(0.5f)
@@ -245,7 +245,7 @@ abstract class ICarryGUI<T : ITrackedCarry>(val screenName: String) : Scram(scre
             val startX = lastX + lastWidth - (buttonSize * 3 + buttonSpacing * 2 + 15f)
 
             when {
-                isAreaHovered(startX, lastY + 19f, buttonSize, buttonSize) -> {
+                hovered(startX, lastY + 19f, buttonSize, buttonSize) -> {
                     when (button) {
                         0 -> {
                             if (carry.completed >= carry.total - 1) return false
@@ -262,7 +262,7 @@ abstract class ICarryGUI<T : ITrackedCarry>(val screenName: String) : Scram(scre
                     return true
                 }
 
-                isAreaHovered(startX + buttonSize + buttonSpacing, lastY + 19f, buttonSize, buttonSize) -> {
+                hovered(startX + buttonSize + buttonSpacing, lastY + 19f, buttonSize, buttonSize) -> {
                     when (button) {
                         0 -> if (carry.completed > 0) {
                             carry.completed--
@@ -278,7 +278,7 @@ abstract class ICarryGUI<T : ITrackedCarry>(val screenName: String) : Scram(scre
                     return true
                 }
 
-                isAreaHovered(startX + (buttonSize + buttonSpacing) * 2, lastY + 19f, buttonSize, buttonSize) -> {
+                hovered(startX + (buttonSize + buttonSpacing) * 2, lastY + 19f, buttonSize, buttonSize) -> {
                     remove(carry.player)
                     entries.removeIf { it.carry.player == carry.player }
                     addTooltip(carry.player, 0, TooltipEntry.ActionType.CARRY_REMOVED)

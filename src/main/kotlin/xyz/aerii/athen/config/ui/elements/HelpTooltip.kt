@@ -3,13 +3,13 @@
 package xyz.aerii.athen.config.ui.elements
 
 import xyz.aerii.athen.Athen
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.modules.impl.Dev
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.springValue
 import xyz.aerii.athen.utils.render.animations.timedValue
+import xyz.aerii.library.utils.hovered
 
 class HelpTooltip {
     companion object {
@@ -71,7 +71,7 @@ class HelpTooltip {
 
         if (anim > 0f && anim < 1f) x = screenWidth - currentWidth - screenPadding
 
-        val isHovered = isAreaHovered(x, y, currentWidth, headerHeight)
+        val isHovered = hovered(x, y, currentWidth, headerHeight)
         `anim$headerHover`.value = if (isHovered && collapsed) Mocha.Base.withAlpha(0.7f) else Mocha.Base.withAlpha(0.5f)
 
         val fullContentHeight = getTotalHeight() - headerHeight
@@ -90,7 +90,7 @@ class HelpTooltip {
         val closeButtonX = x + currentWidth - 24f
         val closeButtonY = y + 8f
         val closeButtonSize = 16f
-        val isCloseHovered = isAreaHovered(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize)
+        val isCloseHovered = hovered(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize)
 
         `anim$closeBg`.value = if (isCloseHovered) Mocha.Red.argb else 0x00000000
         `anim$closeScale`.value = if (isCloseHovered) 1.15f else 1f
@@ -128,7 +128,7 @@ class HelpTooltip {
         val currentWidth = collapsedWidth + (width - collapsedWidth) * anim
 
         if (collapsed) {
-            if (button == 0 && isAreaHovered(x, y, currentWidth, headerHeight)) {
+            if (button == 0 && hovered(x, y, currentWidth, headerHeight)) {
                 expand()
                 return true
             }
@@ -139,19 +139,19 @@ class HelpTooltip {
         val closeButtonY = y + 8f
         val closeButtonSize = 16f
 
-        if (button == 0 && isAreaHovered(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize)) {
+        if (button == 0 && hovered(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize)) {
             collapse()
             return true
         }
 
-        if (button == 0 && isAreaHovered(x, y, currentWidth, headerHeight)) {
+        if (button == 0 && hovered(x, y, currentWidth, headerHeight)) {
             dragDeltaX = x - mouseX
             dragDeltaY = y - mouseY
             dragging = true
             return true
         }
 
-        return isAreaHovered(x, y, currentWidth, getTotalHeight())
+        return hovered(x, y, currentWidth, getTotalHeight())
     }
 
     fun mouseReleased(button: Int) {

@@ -2,6 +2,7 @@
 
 package xyz.aerii.athen.modules.impl.general
 
+import com.google.gson.JsonObject
 import net.minecraft.network.chat.Component
 import org.lwjgl.glfw.GLFW
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.bold
@@ -11,17 +12,17 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
-import xyz.aerii.athen.handlers.Beacon
+import xyz.aerii.athen.handlers.Beacon.request
 import xyz.aerii.athen.handlers.Itemizer.`watch$tooltip`
-import xyz.aerii.athen.handlers.KeyEater.bound
-import xyz.aerii.athen.handlers.KeyEater.pressed
-import xyz.aerii.athen.handlers.Texter.literal
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.EMPTY_COMPONENT
 import xyz.aerii.athen.utils.data
 import xyz.aerii.athen.utils.enchants
+import xyz.aerii.library.api.EMPTY_COMPONENT
+import xyz.aerii.library.api.bound
+import xyz.aerii.library.api.pressed
+import xyz.aerii.library.utils.literal
+import xyz.aerii.library.utils.stripped
 
 @Load
 @OnlyIn(skyblock = true)
@@ -40,8 +41,8 @@ object MissingEnchants : Module(
     private var enchantPools: List<List<String>>? = null
 
     init {
-        Beacon.get("enchants/neu.json".data) {
-            onJsonSuccess { json ->
+        "enchants/neu.json".data.request {
+            onSuccess<JsonObject> { json ->
                 allEnchants = json["enchants"]?.asJsonObject?.entrySet()?.associate { (key, value) ->
                     key to value.asJsonArray.map { it.asString.lowercase() }
                 }

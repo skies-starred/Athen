@@ -36,12 +36,13 @@ package xyz.aerii.athen.config.ui.elements.base
 import net.minecraft.util.StringUtil
 import org.lwjgl.glfw.GLFW
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
-import xyz.aerii.athen.handlers.KeyEater
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.springValue
+import xyz.aerii.library.api.client
+import xyz.aerii.library.api.ctrl
+import xyz.aerii.library.api.shift
+import xyz.aerii.library.utils.hovered
 import kotlin.math.max
 import kotlin.math.min
 
@@ -96,7 +97,7 @@ open class IInput(
 
         drawText(name, x + 6f, y + 6f)
 
-        val isHovered = isAreaHovered(x + 10f, y + 28f, width - 20f, inputHeight)
+        val isHovered = hovered(x + 10f, y + 28f, width - 20f, inputHeight)
         `anim$hover`.value = if (isHovered) Mocha.Surface0.argb else Mocha.Base.argb
 
         NVGRenderer.drawRectangle(x + 10f, y + 28f, width - 20f, inputHeight, `anim$hover`.value, 5f)
@@ -127,7 +128,7 @@ open class IInput(
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (!isAreaHovered(inputX, inputY - 2f, inputWidth, inputHeight + 4f)) {
+        if (!hovered(inputX, inputY - 2f, inputWidth, inputHeight + 4f)) {
             resetState()
             return false
         }
@@ -193,7 +194,7 @@ open class IInput(
 
         if (selection != caret) {
             deleteSelection()
-        } else if (KeyEater.shift) {
+        } else if (shift) {
             val previousSpace = getPreviousSpace()
             value = value.remove(previousSpace, caret)
             caret = previousSpace
@@ -212,7 +213,7 @@ open class IInput(
         val hadContent = selection != caret || caret != value.length
 
         if (selection != caret) deleteSelection()
-        else if (KeyEater.ctrl) value = value.remove(caret, getNextSpace())
+        else if (ctrl) value = value.remove(caret, getNextSpace())
         else if (caret != value.length) value = value.dropAt(caret, 1)
 
         clearSelection()
@@ -223,32 +224,32 @@ open class IInput(
 
     private fun handleRight(): Boolean {
         if (caret == value.length) return false
-        caret = if (KeyEater.ctrl) getNextSpace() else caret + 1
-        if (!KeyEater.shift) selection = caret
+        caret = if (ctrl) getNextSpace() else caret + 1
+        if (!shift) selection = caret
         return true
     }
 
     private fun handleLeft(): Boolean {
         if (caret == 0) return false
-        caret = if (KeyEater.ctrl) getPreviousSpace() else caret - 1
-        if (!KeyEater.shift) selection = caret
+        caret = if (ctrl) getPreviousSpace() else caret - 1
+        if (!shift) selection = caret
         return true
     }
 
     private fun handleHome(): Boolean {
         caret = 0
-        if (!KeyEater.shift) selection = caret
+        if (!shift) selection = caret
         return true
     }
 
     private fun handleEnd(): Boolean {
         caret = value.length
-        if (!KeyEater.shift) selection = caret
+        if (!shift) selection = caret
         return true
     }
 
     private fun handleControlKeys(keyCode: Int): Boolean {
-        if (!KeyEater.ctrl || KeyEater.shift) return false
+        if (!ctrl || shift) return false
 
         return when (keyCode) {
             GLFW.GLFW_KEY_V -> {

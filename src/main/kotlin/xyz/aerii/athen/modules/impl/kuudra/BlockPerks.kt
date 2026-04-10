@@ -7,10 +7,10 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Itemizer.`watch$slot`
-import xyz.aerii.athen.handlers.KeyEater.bound
-import xyz.aerii.athen.handlers.KeyEater.pressed
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.library.api.bound
+import xyz.aerii.library.api.pressed
+import xyz.aerii.library.utils.stripped
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])

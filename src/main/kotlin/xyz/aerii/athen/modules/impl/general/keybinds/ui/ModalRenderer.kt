@@ -4,7 +4,6 @@ import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import xyz.aerii.athen.api.dungeon.enums.DungeonClass
 import xyz.aerii.athen.api.location.SkyBlockIsland
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.general.keybinds.KeybindCondition
 import xyz.aerii.athen.modules.impl.general.keybinds.KeybindWorkIn
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds
@@ -15,6 +14,7 @@ import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
 import xyz.aerii.athen.utils.render.Render2D.text
+import xyz.aerii.library.api.client
 
 class ModalRenderer(
     private val mw: Int,

@@ -9,11 +9,11 @@ import xyz.aerii.athen.api.kuudra.KuudraAPI
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.KuudraEvent
-import xyz.aerii.athen.handlers.Smoothie.alert
-import xyz.aerii.athen.handlers.Texter.literal
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.alert
+import xyz.aerii.library.utils.literal
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])
@@ -71,7 +71,7 @@ object KuudraTitles : Module(
         val f = (coerceIn(0, 100) * `barCharacter$total`) / 100
 
         return supplyStyle.value
-            .replace("#perc", this.toString())
+            .replace("#perc", toString())
             .replace("#bars", `barCharacter$filled`.repeat(f))
             .replace("#total", `barCharacter$left`.repeat(`barCharacter$total` - f))
             .parse()

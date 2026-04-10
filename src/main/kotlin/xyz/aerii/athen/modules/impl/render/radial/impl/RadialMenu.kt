@@ -7,6 +7,7 @@ import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import xyz.aerii.athen.Athen
+import xyz.aerii.athen.Athen.GSON
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.CommandRegistration
@@ -14,17 +15,8 @@ import xyz.aerii.athen.events.GameEvent
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.InputEvent
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.Beacon
-import xyz.aerii.athen.handlers.React
 import xyz.aerii.athen.handlers.Scribble
-import xyz.aerii.athen.handlers.Scurry
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Texter.literal
-import xyz.aerii.athen.handlers.Typo.centeredText
-import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.repeatBreak
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.render.radial.base.ISlot
 import xyz.aerii.athen.modules.impl.render.radial.base.SlotData
@@ -32,12 +24,16 @@ import xyz.aerii.athen.modules.impl.render.radial.base.toData
 import xyz.aerii.athen.modules.impl.render.radial.base.toSlot
 import xyz.aerii.athen.modules.impl.render.radial.impl.SlotsRenderState.Companion.tri
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.compress
-import xyz.aerii.athen.utils.decompress
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
 import xyz.aerii.athen.utils.render.Render2D.text
-import xyz.aerii.athen.utils.safely
+import xyz.aerii.library.api.center
+import xyz.aerii.library.api.client
+import xyz.aerii.library.api.lie
+import xyz.aerii.library.api.repeat
+import xyz.aerii.library.handlers.Observable
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.*
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -77,7 +73,7 @@ object RadialMenu : Module(
     val slots = mutableListOf<ISlot>()
     val configs = mutableMapOf<String, List<SlotData>>()
 
-    val open = React(false).onChange {
+    val open = Observable(false).onChange {
         if (it) return@onChange
 
         stack.clear()
@@ -97,7 +93,7 @@ object RadialMenu : Module(
             safely {
                 val raw = saved.takeIf { it.isNotBlank() }
                 if (raw != null) {
-                    val map: Map<String, List<SlotData>> = Beacon.gson.fromJson(raw, object : TypeToken<Map<String, List<SlotData>>>() {}.type)
+                    val map: Map<String, List<SlotData>> = GSON.fromJson(raw, object : TypeToken<Map<String, List<SlotData>>>() {}.type)
                     configs.clear()
                     configs.putAll(map)
                 }
@@ -134,10 +130,10 @@ object RadialMenu : Module(
                         val clipboard = McClient.clipboard
                         if (clipboard.isEmpty()) return@thenCallback "No data found in clipboard!".modMessage()
 
-                        val map: Map<String, Any> = Beacon.gson.fromJson(clipboard.decompress(), object : TypeToken<Map<String, Any>>() {}.type)
+                        val map: Map<String, Any> = GSON.fromJson(clipboard.decompress(), object : TypeToken<Map<String, Any>>() {}.type)
                         val name = map["name"] as? String ?: return@thenCallback "Invalid config data!".modMessage()
-                        val raw = Beacon.gson.toJson(map["slots"])
-                        val data: List<SlotData> = Beacon.gson.fromJson(raw, object : TypeToken<List<SlotData>>() {}.type)
+                        val raw = GSON.toJson(map["slots"])
+                        val data: List<SlotData> = GSON.fromJson(raw, object : TypeToken<List<SlotData>>() {}.type)
 
                         var n = name
                         var i = 1
@@ -154,7 +150,7 @@ object RadialMenu : Module(
                     thenCallback("radial") {
                         save()
                         val data = mapOf("name" to active, "slots" to slots.map { it.toData() })
-                        McClient.clipboard = Beacon.gson.toJson(data).compress()
+                        McClient.clipboard = GSON.toJson(data).compress()
                         "Exported config '$active' to clipboard!".modMessage()
                     }
                 }
@@ -185,8 +181,8 @@ object RadialMenu : Module(
         on<InputEvent.Mouse.Press> {
             val cx = client.window.guiScaledWidth / 2
             val cy = client.window.guiScaledHeight / 2
-            val dx = Scurry.x - cx
-            val dy = Scurry.y - cy
+            val dx = mouseSX - cx
+            val dy = mouseSY - cy
             val a = stack.isNotEmpty()
 
             if (dx * dx + dy * dy < 225f) {
@@ -245,8 +241,8 @@ object RadialMenu : Module(
 
             val cx = client.window.guiScaledWidth / 2
             val cy = client.window.guiScaledHeight / 2
-            val dx = Scurry.x - cx
-            val dy = Scurry.y - cy
+            val dx = mouseSX - cx
+            val dy = mouseSY - cy
 
             if (dx * dx + dy * dy < 225f) {
                 idx = -1
@@ -256,7 +252,7 @@ object RadialMenu : Module(
 
             if (subMenu == 2 && idx1 in current.indices) {
                 val pairs = fn()
-                val hit = SlotsRenderState.hitSub0(Scurry.x, Scurry.y, cx, cy, maxOf(3, current.size), 80f, pairs.map { it.first }, generalDirection)
+                val hit = SlotsRenderState.hitSub0(mouseSX, mouseSY, cx, cy, maxOf(3, current.size), 80f, pairs.map { it.first }, generalDirection)
                 if (hit != -1) {
                     idx0 = hit
                     return@on
@@ -264,7 +260,7 @@ object RadialMenu : Module(
             }
 
             if (subMenu == 1 && idx1 in current.indices) {
-                val hit = SlotsRenderState.hitSub(Scurry.x, Scurry.y, cx, cy, maxOf(3, current.size), 80f, idx1, current[idx1].sub.size)
+                val hit = SlotsRenderState.hitSub(mouseSX, mouseSY, cx, cy, maxOf(3, current.size), 80f, idx1, current[idx1].sub.size)
                 if (hit != -1) {
                     idx = idx1
                     idx0 = hit
@@ -307,8 +303,8 @@ object RadialMenu : Module(
                 }
             }
 
-            val dx = Scurry.x - cx
-            val dy = Scurry.y - cy
+            val dx = mouseSX - cx
+            val dy = mouseSY - cy
             val h = dx * dx + dy * dy < 144f
             val back = stack.isNotEmpty() || (subMenu == 2 && idx1 != -1)
             val str = if (back) "←" else "✕"
@@ -324,8 +320,8 @@ object RadialMenu : Module(
 
             val label = if (h) (if (back) "Back" else "Exit") else sel?.name ?: return@on
             val tw = client.font.width(label)
-            val mx = Scurry.x.toInt() + 12
-            val my = Scurry.y.toInt() - 4
+            val mx = mouseSX.toInt() + 12
+            val my = mouseSY.toInt() - 4
 
             graphics.drawRectangle(mx - 5, my - 5, tw + 10, client.font.lineHeight + 10, Mocha.Base.argb)
             graphics.drawOutline(mx - 5, my - 5, tw + 10, client.font.lineHeight + 10, 1, Mocha.Mauve.argb)
@@ -338,7 +334,7 @@ object RadialMenu : Module(
     }
 
     fun disk() {
-        saved = Beacon.gson.toJson(configs, object : TypeToken<Map<String, List<SlotData>>>() {}.type)
+        saved = GSON.toJson(configs, object : TypeToken<Map<String, List<SlotData>>>() {}.type)
     }
 
     fun save() {
@@ -378,9 +374,9 @@ object RadialMenu : Module(
     }
 
     private fun help() {
-        val divider = ("§8§m" + "-".repeatBreak()).literal()
+        val divider = ("§8§m" + "-".repeat()).literal()
         divider.lie()
-        "§bRadial Menu §7[Athen]".centeredText().lie()
+        "§bRadial Menu §7[Athen]".center().lie()
         divider.lie()
         " <dark_gray>• <${Mocha.Green.argb}>/${Athen.modId} radial edit <gray>- Opens editor".parse().lie()
         " <dark_gray>• <${Mocha.Green.argb}>/${Athen.modId} import radial <gray>- Imports config from clipboard".parse().lie()
@@ -405,8 +401,8 @@ object RadialMenu : Module(
     private fun slot(cx: Int, cy: Int, num: Int, inn: Float, out: Float, dir: Boolean = false): Int {
         if (num == 0) return -1
 
-        val mx = Scurry.x
-        val my = Scurry.y
+        val mx = mouseSX
+        val my = mouseSY
 
         val inner = inn * 1.3f
         val outer = out * 1.3f

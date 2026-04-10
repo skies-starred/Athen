@@ -5,14 +5,14 @@ package xyz.aerii.athen.config.ui.panels
 import xyz.aerii.athen.config.ConfigManager
 import xyz.aerii.athen.config.ui.ClickGUI
 import xyz.aerii.athen.config.ui.elements.base.IElement
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.brighten
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.linear
 import xyz.aerii.athen.utils.render.animations.springValue
 import xyz.aerii.athen.utils.render.animations.timedValue
+import xyz.aerii.library.utils.brighten
+import xyz.aerii.library.utils.hovered
 
 class SectionButton(
     val feature: ConfigManager.Feature,
@@ -74,7 +74,7 @@ class SectionButton(
     }
 
     fun draw(x: Float, y: Float, mouseX: Float, mouseY: Float): Float {
-        val isHovered = isAreaHovered(x, y, Panel.WIDTH, HEIGHT)
+        val isHovered = hovered(x, y, Panel.WIDTH, HEIGHT)
 
         `anim$color`.value = when {
             isHovered && isEnabled -> ENABLED_COLOR.brighten(0.9f)
@@ -122,7 +122,7 @@ class SectionButton(
         var y = panel.y + Panel.HEADER_HEIGHT + panel.scrollOffset
         panel.sections.filter { it.visible }.takeWhile { it != this }.forEach { y += it.getHeight() }
 
-        if (!isAreaHovered(x, y, Panel.WIDTH, HEIGHT)) {
+        if (!hovered(x, y, Panel.WIDTH, HEIGHT)) {
             if (extended) return elements.any { it.mouseClicked(mouseX, mouseY, button) }
             return false
         }

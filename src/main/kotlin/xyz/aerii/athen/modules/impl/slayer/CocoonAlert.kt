@@ -6,12 +6,12 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.MessageEvent
-import xyz.aerii.athen.handlers.Smoothie.alert
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.fcs
-import xyz.aerii.athen.utils.toDurationFromMillis
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.alert
+import xyz.aerii.library.utils.toDurationFromMillis
 
 @Load
 @OnlyIn(skyblock = true)

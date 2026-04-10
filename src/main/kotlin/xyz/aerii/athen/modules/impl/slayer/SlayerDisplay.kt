@@ -10,10 +10,10 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Ticking
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.fcs
+import xyz.aerii.library.utils.stripped
 
 @Load
 @OnlyIn(skyblock = true)
@@ -50,7 +50,7 @@ object SlayerDisplay : Module(
     init {
         config.hud("Display HUD") {
             if (it) return@hud sizedText(ex0, center = listOf(0))
-            sizedText(display() ?: return@hud null, center = listOf(0))
+            sizedText(display.value ?: return@hud null, center = listOf(0))
         }
 
         on<SlayerEvent.Boss.Spawn> {

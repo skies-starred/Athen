@@ -2,13 +2,13 @@ package xyz.aerii.athen.modules.impl.general.keybinds.ui
 
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.gui.GuiGraphics
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds
 import xyz.aerii.athen.ui.UIZone
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
 import xyz.aerii.athen.utils.render.Render2D.text
+import xyz.aerii.library.api.client
 
 class BindingsListRenderer(
     private val entryH: Int,

@@ -2,9 +2,9 @@ package xyz.aerii.athen.config.ui.panels
 
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.config.ConfigManager
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
+import xyz.aerii.library.utils.hovered
 
 class Panel(
     private val category: Category,
@@ -61,7 +61,7 @@ class Panel(
 
     fun handleScroll(amount: Int): Boolean {
         val contentHeight = sections.filter { it.visible }.sumOf { it.getHeight().toDouble() }.toFloat()
-        if (!isAreaHovered(x, y, WIDTH, HEADER_HEIGHT + contentHeight)) return false
+        if (!hovered(x, y, WIDTH, HEADER_HEIGHT + contentHeight)) return false
 
         val maxScroll = -(contentHeight - 72f).coerceAtLeast(0f)
         scrollOffset = (scrollOffset + amount).coerceIn(maxScroll, 0f)
@@ -71,7 +71,7 @@ class Panel(
     fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible) return false
 
-        if (isAreaHovered(x, y, WIDTH, HEADER_HEIGHT) && button == 0) {
+        if (hovered(x, y, WIDTH, HEADER_HEIGHT) && button == 0) {
             dragDeltaX = x - mouseX
             dragDeltaY = y - mouseY
             dragging = true

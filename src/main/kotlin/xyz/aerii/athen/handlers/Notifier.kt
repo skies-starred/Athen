@@ -7,8 +7,6 @@ import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.on
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Smoothie.play
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
 import xyz.aerii.athen.utils.render.Render2D.text
@@ -16,6 +14,9 @@ import xyz.aerii.athen.utils.render.animations.easeInOutCubic
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.linear
 import xyz.aerii.athen.utils.render.animations.timedValue
+import xyz.aerii.library.api.client
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.play
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.min
 

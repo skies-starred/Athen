@@ -15,18 +15,18 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.config.ConfigManager.updateConfig
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.GuiEvent
-import xyz.aerii.athen.handlers.Beacon
+import xyz.aerii.athen.handlers.Beacon.request
 import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.stripped
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
-import xyz.aerii.athen.utils.EMPTY_COMPONENT
-import xyz.aerii.athen.utils.compress
 import xyz.aerii.athen.utils.data
-import xyz.aerii.athen.utils.decompress
 import xyz.aerii.athen.utils.enchants
+import xyz.aerii.library.api.EMPTY_COMPONENT
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.compress
+import xyz.aerii.library.utils.decompress
+import xyz.aerii.library.utils.stripped
 import java.awt.Color
 
 @Load
@@ -76,7 +76,7 @@ object ColoredEnchants : Module(
     private val enchants = mutableMapOf<String, Enchant>()
 
     init {
-        Beacon.get("enchants/sba.json".data) {
+        "enchants/sba.json".data.request {
             onSuccess<Map<String, Any>> { str ->
                 for ((a, b) in str) {
                     val c = b as? Map<String, Map<String, Any?>> ?: continue

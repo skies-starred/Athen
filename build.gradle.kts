@@ -24,6 +24,7 @@ repositories {
     strictMaven("https://maven.deftu.dev/snapshots", "dev.deftu")
     strictMaven("https://maven.deftu.dev/releases", "dev.deftu")
     strictMaven("https://repo.nea.moe/releases", "moe.nea")
+    strictMaven("https://jitpack.io", "com.github.skies-starred")
 }
 
 fletchingTable {
@@ -52,6 +53,7 @@ dependencies {
     modImplementation(libs.hypixel.modapi)
     modImplementation(libs.hypixel.modapi.fabric)
 
+    shadow("library".mc(mc))
     shadow(libs.classgraph)
     shadow(libs.autoupdate)
     shadow(libs.lwjgl.nanovg)

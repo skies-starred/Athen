@@ -3,9 +3,9 @@
 package xyz.aerii.athen.modules.impl.render.radial.base.actions.impl
 
 import xyz.aerii.athen.annotations.Load
-import xyz.aerii.athen.handlers.Typo.message
 import xyz.aerii.athen.modules.impl.render.radial.base.actions.ActionType
 import xyz.aerii.athen.modules.impl.render.radial.base.actions.IAction
+import xyz.aerii.library.api.message
 
 @Load
 class MessageAction(val message: String) : IAction {

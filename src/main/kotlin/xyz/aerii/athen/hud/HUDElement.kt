@@ -3,7 +3,7 @@ package xyz.aerii.athen.hud
 import net.minecraft.client.gui.GuiGraphics
 import xyz.aerii.athen.config.ConfigBuilder
 import xyz.aerii.athen.config.ConfigManager
-import xyz.aerii.athen.utils.ZERO_PAIR
+import xyz.aerii.library.api.ZERO_PAIR
 
 data class HUDElement(
     val id: String,

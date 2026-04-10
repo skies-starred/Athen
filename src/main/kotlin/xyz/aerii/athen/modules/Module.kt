@@ -10,11 +10,11 @@ import xyz.aerii.athen.config.ConfigBuilder
 import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.core.Event
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.Initializer
-import xyz.aerii.athen.handlers.React
-import xyz.aerii.athen.handlers.React.Companion.and
-import xyz.aerii.athen.utils.ALWAYS_TRUE
-import xyz.aerii.athen.utils.toCamelCase
+import xyz.aerii.library.api.ALWAYS_TRUE
+import xyz.aerii.library.handlers.Observable
+import xyz.aerii.library.handlers.Observable.Companion.and
+import xyz.aerii.library.handlers.delegate.Deferred
+import xyz.aerii.library.utils.toCamelCase
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 
@@ -34,7 +34,7 @@ open class Module(
         ).also { it.module = this }
     }
 
-    private val _location: React<Boolean> = run {
+    private val _location: Observable<Boolean> = run {
         val onlyIn = this::class.findAnnotation<OnlyIn>() ?: return@run ALWAYS_TRUE
         when {
             onlyIn.floors.isNotEmpty() -> DungeonAPI.floor.map { it in onlyIn.floors }
@@ -45,7 +45,7 @@ open class Module(
         }
     }
 
-    val react: React<Boolean> by Initializer(::fn0) { if (redstone) ALWAYS_TRUE else config.state and _location }
+    val observable: Observable<Boolean> by Deferred(::fn0) { if (redstone) ALWAYS_TRUE else config.state and _location }
 
     val configKey: String? =
         name?.toCamelCase()
@@ -62,15 +62,15 @@ open class Module(
     protected inline fun <reified T : Event> on(
         priority: Int = 0,
         noinline handler: T.() -> Unit
-    ) = xyz.aerii.athen.events.core.on<T>(priority, handler).runWhen(react)
+    ) = xyz.aerii.athen.events.core.on<T>(priority, handler).runWhen(observable)
 
     protected inline fun <reified E : PacketEvent, reified P : Packet<*>> on(
         priority: Int = 0,
         noinline handler: P.(E) -> Unit
-    ) = xyz.aerii.athen.events.core.on<E, P>(priority, handler).runWhen(react)
+    ) = xyz.aerii.athen.events.core.on<E, P>(priority, handler).runWhen(observable)
 
     private fun fn0() {
-        enabled = react.value
-        react.onChange { enabled = it }
+        enabled = observable.value
+        observable.onChange { enabled = it }
     }
 }

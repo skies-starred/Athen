@@ -2,16 +2,16 @@ package xyz.aerii.athen.updater
 
 import net.minecraft.client.gui.GuiGraphics
 import xyz.aerii.athen.handlers.Scram
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.brighten
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.springValue
 import xyz.aerii.athen.utils.render.animations.timedValue
+import xyz.aerii.library.api.client
+import xyz.aerii.library.utils.brighten
+import xyz.aerii.library.utils.hovered
 
 class UpdateGUI(
     private val currentVersion: String,
@@ -35,8 +35,8 @@ class UpdateGUI(
 
     override fun isPauseScreen() = false
 
-    override fun onScramRender(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
-        NVGSpecialRenderer.draw(guiGraphics, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight()) {
+    override fun onScramRender(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+        NVGSpecialRenderer.draw(graphics, 0, 0, graphics.guiWidth(), graphics.guiHeight()) {
             val width = client.window.width
             val height = client.window.height
             val anim = openProgress.value
@@ -86,7 +86,7 @@ class UpdateGUI(
     }
 
     private fun drawButton(x: Float, y: Float, w: Float, h: Float, text: String, getScale: () -> Float, setScale: (Float) -> Unit, color: Int) {
-        val isHovered = isAreaHovered(x, y, w, h)
+        val isHovered = hovered(x, y, w, h)
 
         setScale(if (isHovered) 1.05f else 1f)
         val scale = getScale()
@@ -122,12 +122,13 @@ class UpdateGUI(
         val skipX = panelX + panelWidth - buttonWidth - 20f
 
         when {
-            isAreaHovered(updateX, buttonY, buttonWidth, buttonHeight) -> {
+            hovered(updateX, buttonY, buttonWidth, buttonHeight) -> {
                 onUpdate()
                 client.setScreen(null)
                 return true
             }
-            isAreaHovered(remindX, buttonY, buttonWidth, buttonHeight) -> {
+
+            hovered(remindX, buttonY, buttonWidth, buttonHeight) -> {
                 if (confirmingSkip) {
                     confirmingSkip = false
                     return true
@@ -138,7 +139,8 @@ class UpdateGUI(
                 client.setScreen(null)
                 return true
             }
-            isAreaHovered(skipX, buttonY, buttonWidth, buttonHeight) -> {
+
+            hovered(skipX, buttonY, buttonWidth, buttonHeight) -> {
                 if (confirmingSkip) {
                     onSkip()
                     "Skipped update for version $newVersion".modMessage()

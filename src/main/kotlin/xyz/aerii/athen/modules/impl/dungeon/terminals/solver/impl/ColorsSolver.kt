@@ -4,11 +4,11 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import xyz.aerii.athen.api.dungeon.terminals.TerminalAPI
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.TerminalSolver
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.base.Click
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.base.ITerminal
 import xyz.aerii.athen.utils.glint
+import xyz.aerii.library.utils.stripped
 
 object ColorsSolver : ITerminal(TerminalType.COLORS) {
     override fun render(ox: Float, oy: Float, headerH: Float, uiScale: Float) {

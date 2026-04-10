@@ -3,7 +3,6 @@ package xyz.aerii.athen.modules.impl.general.keybinds
 import net.minecraft.client.gui.GuiGraphics
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.handlers.Scram
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds.add
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds.remove
 import xyz.aerii.athen.modules.impl.general.keybinds.Keybinds.update
@@ -13,6 +12,7 @@ import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
 import xyz.aerii.athen.utils.render.Render2D.text
+import xyz.aerii.library.api.client
 
 object KeybindsGUI : Scram("Keybinds Manager [Athen]") {
     private val entries = mutableListOf<BindingEntry>()
@@ -31,27 +31,27 @@ object KeybindsGUI : Scram("Keybinds Manager [Athen]") {
 
     override fun isPauseScreen() = false
 
-    override fun onScramRender(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun onScramRender(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         zones.clear()
         for (e in entries) e.toggleAnim += ((if (e.binding.enabled) 1f else 0f) - e.toggleAnim) * delta * 0.4f
 
-        guiGraphics.drawRectangle(0, 0, width, height, Mocha.Crust.withAlpha(0.6f))
+        graphics.drawRectangle(0, 0, width, height, Mocha.Crust.withAlpha(0.6f))
 
         val px = (width - 576) / 2
         val py = (height - 300) / 2
 
-        categoryBar.draw(guiGraphics, mouseX, mouseY, px, py, 300, modal.open, zones)
+        categoryBar.draw(graphics, mouseX, mouseY, px, py, 300, modal.open, zones)
 
         val mainX = px + 116
-        guiGraphics.drawRectangle(mainX, py, 460, 300, Mocha.Base.argb)
-        guiGraphics.drawOutline(mainX, py, 460, 300, 1, Mocha.Surface0.argb)
+        graphics.drawRectangle(mainX, py, 460, 300, Mocha.Base.argb)
+        graphics.drawOutline(mainX, py, 460, 300, 1, Mocha.Surface0.argb)
 
         val list = categoryBar.selected?.let { s -> entries.filter { it.binding.category == s } } ?: entries
-        listRenderer.draw(guiGraphics, mouseX, mouseY, mainX + 6, py + 6, 448, 260, list, modal.open, zones)
-        drawFooter(guiGraphics, mouseX, mouseY, mainX, py)
+        listRenderer.draw(graphics, mouseX, mouseY, mainX + 6, py + 6, 448, 260, list, modal.open, zones)
+        drawFooter(graphics, mouseX, mouseY, mainX, py)
 
-        if (!modal.open) categoryBar.drawTooltip(guiGraphics)
-        if (modal.open) modal.draw(guiGraphics, mouseX, mouseY, width, height, zones)
+        if (!modal.open) categoryBar.drawTooltip(graphics)
+        if (modal.open) modal.draw(graphics, mouseX, mouseY, width, height, zones)
     }
 
     private fun drawFooter(guiGraphics: GuiGraphics, mx: Int, my: Int, mainX: Int, py: Int) {
@@ -296,7 +296,7 @@ object KeybindsGUI : Scram("Keybinds Manager [Athen]") {
         return super.onScramKeyPress(keyCode, scanCode, modifiers)
     }
 
-    override fun onScramCharType(char: Char, modifiers: Int): Boolean {
+    override fun onScramCharType(char: Char): Boolean {
         if (modal.open) {
             if (modal.cmdField.focused && modal.cmdField.handleChar(char)) return true
             return true
@@ -307,7 +307,7 @@ object KeybindsGUI : Scram("Keybinds Manager [Athen]") {
             return true
         }
 
-        return super.onScramCharType(char, modifiers)
+        return super.onScramCharType(char)
     }
 
     private fun saveModal() {

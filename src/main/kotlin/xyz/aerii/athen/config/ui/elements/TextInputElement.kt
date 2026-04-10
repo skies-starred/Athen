@@ -3,10 +3,10 @@
 package xyz.aerii.athen.config.ui.elements
 
 import xyz.aerii.athen.config.ui.elements.base.IInput
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.springValue
+import xyz.aerii.library.utils.hovered
 
 class TextInputElement(
     name: String,
@@ -35,7 +35,7 @@ class TextInputElement(
         val inputBoxY = y + 28f
         val inputBoxW = width - 20f
         val inputBoxH = 32f
-        val isHovered = isAreaHovered(inputBoxX, inputBoxY, inputBoxW, inputBoxH)
+        val isHovered = hovered(inputBoxX, inputBoxY, inputBoxW, inputBoxH)
 
         `anim$bg`.value = when {
             listening -> Mocha.Surface2.argb

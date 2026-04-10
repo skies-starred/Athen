@@ -11,8 +11,8 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.ConfigBuilder
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.on
-import xyz.aerii.athen.handlers.Smoothie.client
-import java.util.WeakHashMap
+import xyz.aerii.library.api.client
+import java.util.*
 
 @Load
 object Itemizer {

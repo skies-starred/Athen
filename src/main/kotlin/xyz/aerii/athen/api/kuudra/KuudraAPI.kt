@@ -10,25 +10,17 @@ import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.anyMatch
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findThenNull
 import xyz.aerii.athen.annotations.Priority
-import xyz.aerii.athen.api.kuudra.enums.AbstractSupply
-import xyz.aerii.athen.api.kuudra.enums.KuudraPlayer
-import xyz.aerii.athen.api.kuudra.enums.KuudraPhase
-import xyz.aerii.athen.api.kuudra.enums.KuudraSupply
-import xyz.aerii.athen.api.kuudra.enums.KuudraTier
+import xyz.aerii.athen.api.kuudra.enums.*
 import xyz.aerii.athen.api.location.SkyBlockIsland
-import xyz.aerii.athen.events.EntityEvent
-import xyz.aerii.athen.events.KuudraEvent
-import xyz.aerii.athen.events.LocationEvent
-import xyz.aerii.athen.events.MessageEvent
-import xyz.aerii.athen.events.ScoreboardEvent
-import xyz.aerii.athen.events.TickEvent
+import xyz.aerii.athen.events.*
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.React
-import xyz.aerii.athen.handlers.Schrodinger
-import xyz.aerii.athen.handlers.Smoothie
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.library.api.level
+import xyz.aerii.library.api.name
+import xyz.aerii.library.api.player
+import xyz.aerii.library.handlers.Observable
+import xyz.aerii.library.handlers.delegate.Expirable
+import xyz.aerii.library.utils.stripped
 
 @Priority
 object KuudraAPI {
@@ -45,10 +37,10 @@ object KuudraAPI {
     private val set0 = setOf(KuudraSupply.supply, KuudraSupply.fuel)
     val set = setOf(KuudraPhase.Supply, KuudraPhase.Fuel)
 
-    private val _k = Schrodinger(::fn) { !it.isAlive }
+    private val _k = Expirable(::fn) { !it.isAlive }
 
     @JvmStatic
-    var buildProgress: React<Int> = React(0)
+    var buildProgress: Observable<Int> = Observable(0)
         private set
 
     @JvmStatic
@@ -100,7 +92,7 @@ object KuudraAPI {
             if (!inRun) return@on
             if (ticks % 2 != 0) return@on
 
-            val player = client.player ?: return@on
+            val player = player ?: return@on
             if (KuudraPhase.Skip.active && player.position().y < 10) phase = KuudraPhase.Kill.start()
 
             if (phase !in set) return@on
@@ -243,7 +235,7 @@ object KuudraAPI {
 
                 else -> {
                     deathRegex.findThenNull(stripped, "username") { (username) ->
-                        val n = username.takeIf { it != "You" } ?: Smoothie.playerName ?: return@findThenNull
+                        val n = username.takeIf { it != "You" } ?: name
 
                         teammates.find { it.name == n }?.deaths++
                     } ?: return@on
@@ -279,7 +271,7 @@ object KuudraAPI {
     }
 
     private fun fn(): MagmaCube? =
-        client.level?.entitiesForRendering()?.find { it is MagmaCube && it.size == 30 && it.serverMaxHealth == 100_000f } as? MagmaCube
+        level?.entitiesForRendering()?.find { it is MagmaCube && it.size == 30 && it.serverMaxHealth == 100_000f } as? MagmaCube
 
     private fun reset() {
         tier = null

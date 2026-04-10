@@ -12,11 +12,11 @@ import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.React
-import xyz.aerii.athen.handlers.Smoothie
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
-import xyz.aerii.athen.utils.toDuration
+import xyz.aerii.library.api.held
+import xyz.aerii.library.handlers.Observable
+import xyz.aerii.library.utils.toDuration
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.CRIMSON_ISLE])
@@ -28,7 +28,7 @@ object VengeanceTimer : Module(
     private val compact by config.switch("Compact display")
     private val useTicks by config.switch("Use ticks", true)
     private val abilityIds = listOf("HEARTFIRE_DAGGER", "BURSTFIRE_DAGGER", "FIREDUST_DAGGER")
-    private var count: React<Boolean> = React(false)
+    private var count: Observable<Boolean> = Observable(false)
     private var countDown: Int = 120
 
     init {
@@ -56,7 +56,7 @@ object VengeanceTimer : Module(
 
             if (!slayerInfo.isOwnedByPlayer) return@on
             if (!stripped.contains("ASHEN ♨7")) return@on
-            if (Smoothie.heldItem?.getData(DataTypes.SKYBLOCK_ID)?.skyblockId !in abilityIds) return@on
+            if (held?.getData(DataTypes.SKYBLOCK_ID)?.skyblockId !in abilityIds) return@on
 
             count.value = true
         }

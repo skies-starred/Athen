@@ -14,7 +14,8 @@ import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Typo.PrefixType
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.impl.Dev
-import xyz.aerii.athen.utils.mainThread
+import xyz.aerii.library.api.mainThread
+import xyz.aerii.library.handlers.time.client
 import java.util.concurrent.CompletableFuture
 
 @Priority(-6)
@@ -33,7 +34,7 @@ object ModUpdater {
         context.cleanup()
 
         on<LocationEvent.Server.Connect> {
-            Chronos.Tick after 60 then ::checkAndNotify
+            Chronos.schedule(60.client) { checkAndNotify() }
         }.once()
     }
 

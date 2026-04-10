@@ -2,7 +2,7 @@ package xyz.aerii.athen.config.ui.elements
 
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
 import xyz.aerii.athen.config.ui.elements.base.ISwitch
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
+import xyz.aerii.library.utils.hovered
 
 class SwitchElement(
     name: String,
@@ -22,7 +22,7 @@ class SwitchElement(
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (button != 0 || !isAreaHovered(lastX + width - 45f, lastY + 8f, 40f, 16f)) return false
+        if (button != 0 || !hovered(lastX + width - 45f, lastY + 8f, 40f, 16f)) return false
         value = !value
         onUpdate(configKey, value)
         return true

@@ -24,15 +24,16 @@ import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Chronos
-import xyz.aerii.athen.handlers.React
-import xyz.aerii.athen.handlers.React.Companion.and
-import xyz.aerii.athen.handlers.React.Companion.or
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Typo.devMessage
-import xyz.aerii.athen.handlers.Typo.stripped
 import xyz.aerii.athen.mixin.accessors.ServerboundInteractPacketAccessor
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.TerminalSimulator
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.TerminalSolver
+import xyz.aerii.library.api.level
+import xyz.aerii.library.handlers.Observable
+import xyz.aerii.library.handlers.Observable.Companion.and
+import xyz.aerii.library.handlers.Observable.Companion.or
+import xyz.aerii.library.handlers.time.client
+import xyz.aerii.library.utils.stripped
 import java.util.concurrent.ConcurrentHashMap
 
 @Priority
@@ -42,7 +43,7 @@ object TerminalAPI {
     val currentItems = ConcurrentHashMap<Int, ItemStack>()
     val slotCounts = mutableMapOf<Int, Int>()
 
-    var terminalOpen: React<Boolean> = React(false)
+    var terminalOpen: Observable<Boolean> = Observable(false)
         private set
 
     var currentTerminal: TerminalType? = null
@@ -98,7 +99,7 @@ object TerminalAPI {
         }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
 
         on<PacketEvent.Process.Pre, ClientboundContainerClosePacket> {
-            if (terminalOpen.value) Chronos.Tick.run { reset() }
+            if (terminalOpen.value) Chronos.schedule(1.client) { reset() }
         }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
 
         on<PacketEvent.Send, ServerboundContainerClickPacket> {
@@ -108,7 +109,7 @@ object TerminalAPI {
             if (System.currentTimeMillis() - openTime >= TerminalSolver.fcDelay) return@on
 
             it.cancel()
-        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.react)
+        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.observable)
 
         on<PacketEvent.Send, ServerboundContainerClosePacket> {
             if (!terminalOpen.value) return@on
@@ -117,15 +118,15 @@ object TerminalAPI {
         }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
 
         on<PacketEvent.Send, ServerboundInteractPacket> {
-            val entity = client.level?.getEntity((this as ServerboundInteractPacketAccessor).entityId()) as? ArmorStand ?: return@on
+            val entity = level?.getEntity((this as ServerboundInteractPacketAccessor).entityId()) as? ArmorStand ?: return@on
             if (entity.displayName?.stripped() != "Inactive Terminal") return@on
 
             if (cd > 0 || lastId != -1) it.cancel() else cd = 15
-        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.react)
+        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.observable)
 
         on<TickEvent.Server> {
             if (cd > 0) cd--
-        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.react)
+        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.observable)
     }
 
     private fun reset() {

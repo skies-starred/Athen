@@ -62,7 +62,7 @@ object SlayerCarryStateTracker : ICarryStateTracker<SlayerCarryStateTracker.Trac
         fun onSpawn(boss: Entity): Boolean {
             if (entity != null) return false
             entity = boss
-            startTick = Chronos.Ticker.tickServer
+            startTick = Chronos.ticks.server
             return true
         }
 
@@ -77,7 +77,7 @@ object SlayerCarryStateTracker : ICarryStateTracker<SlayerCarryStateTracker.Trac
 
             return KillResult(
                 killTime = ent.tickCount / 20.0,
-                killTicks = Chronos.Ticker.tickServer - startTick,
+                killTicks = Chronos.ticks.server - startTick,
                 completed = completed >= total,
                 current = completed,
                 total = total,

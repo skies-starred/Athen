@@ -6,10 +6,10 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.InputEvent
 import xyz.aerii.athen.handlers.Scribble
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Typo.clientCommand
-import xyz.aerii.athen.handlers.Typo.message
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.library.api.client
+import xyz.aerii.library.api.command
+import xyz.aerii.library.api.message
 
 @Load
 object Keybinds : Module(
@@ -69,7 +69,7 @@ object Keybinds : Module(
 
             val command = binding.command
             if (command.isEmpty()) continue
-            if (command[0] == '/') command.clientCommand() else command.message()
+            if (command[0] == '/') command.command() else command.message()
         }
     }
 

@@ -2,16 +2,18 @@
 
 package xyz.aerii.athen.api.skyblock
 
+import com.google.gson.JsonObject
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.minecraft.world.item.ItemStack
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import xyz.aerii.athen.annotations.Priority
-import xyz.aerii.athen.handlers.Beacon
+import xyz.aerii.athen.handlers.Beacon.request
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.modules.impl.ModSettings
 import xyz.aerii.athen.utils.api
-import xyz.aerii.athen.utils.asJsonObjectOrNull
+import xyz.aerii.library.handlers.time.Task
+import xyz.aerii.library.utils.asJsonObjectOrNull
 import kotlin.time.Duration.Companion.minutes
 
 @Priority
@@ -20,15 +22,15 @@ object PriceAPI {
     private val bazaar = Int2ObjectOpenHashMap<Bazaar>(2048)
     private val url = "prices?gzip=true".api
 
-    private var task: Chronos.Task? = null
+    private var task: Task? = null
 
     init {
         fn()
 
-        task = Chronos.Time every ModSettings.priceFetch.value.minutes repeat ::fn
+        task = Chronos.repeat(ModSettings.priceFetch.value.minutes) { fn() }
         ModSettings.priceFetch.state.onChange {
             task?.cancel()
-            task = Chronos.Time every it.minutes repeat ::fn
+            task = Chronos.repeat(it.minutes) { fn() }
         }
     }
 
@@ -46,10 +48,10 @@ object PriceAPI {
     }
 
     private fun fn() {
-        Beacon.get(url, false) {
-            onJsonSuccess {
-                val ah = it["auction_house"].asJsonObjectOrNull ?: return@onJsonSuccess
-                val bz = it["bazaar"].asJsonObjectOrNull ?: return@onJsonSuccess
+        url.request(log = false) {
+            onSuccess<JsonObject> {
+                val ah = it["auction_house"].asJsonObjectOrNull ?: return@onSuccess
+                val bz = it["bazaar"].asJsonObjectOrNull ?: return@onSuccess
 
                 auctions.clear()
                 for ((k, v) in ah.entrySet()) {

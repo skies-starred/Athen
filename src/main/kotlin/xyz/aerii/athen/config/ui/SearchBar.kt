@@ -3,10 +3,10 @@
 package xyz.aerii.athen.config.ui
 
 import xyz.aerii.athen.config.ui.elements.base.IInput
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.springValue
+import xyz.aerii.library.utils.hovered
 
 class SearchBar(private val onSearch: (String) -> Unit) {
     private val textInput = object : IInput(
@@ -24,7 +24,7 @@ class SearchBar(private val onSearch: (String) -> Unit) {
             lastX = x
             lastY = y
 
-            val isHovered = isAreaHovered(x + 10f, y + 9f, 330f, 22f)
+            val isHovered = hovered(x + 10f, y + 9f, 330f, 22f)
             `anim$bg`.value = if (isHovered) Mocha.Surface0.argb else Mocha.Base.argb
 
             NVGRenderer.drawDropShadow(x, y, 350f, 40f, 10f, 0.75f, 9f)

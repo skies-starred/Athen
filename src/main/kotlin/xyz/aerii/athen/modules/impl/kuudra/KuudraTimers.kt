@@ -10,10 +10,10 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.handlers.Ticking
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
-import xyz.aerii.athen.utils.toDurationFromMillis
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.toDurationFromMillis
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])
@@ -35,7 +35,7 @@ object KuudraTimers : Module(
     private val spawn = config.hud("Supply spawn timer") {
         if (it) return@hud sizedText(ex0)
         if (t0 == 0L) return@hud null
-        sizedText(d0() ?: return@hud null)
+        sizedText(d0.value ?: return@hud null)
     }
 
     private val spawnStyle by config.textInput("Supply text style", "Supply in: <red>#time").dependsOn { spawn.enabled }
@@ -54,7 +54,7 @@ object KuudraTimers : Module(
     private val build = config.hud("Build start timer") {
         if (it) return@hud sizedText(ex1)
         if (t1 == 0L) return@hud null
-        sizedText(d1() ?: return@hud null)
+        sizedText(d1.value ?: return@hud null)
     }
 
     private val buildStyle by config.textInput("Build text style", "Build in: <red>#time").dependsOn { build.enabled }

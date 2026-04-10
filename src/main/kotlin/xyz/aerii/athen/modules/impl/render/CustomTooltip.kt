@@ -15,12 +15,12 @@ import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
-import xyz.aerii.athen.handlers.KeyEater.bound
-import xyz.aerii.athen.handlers.KeyEater.pressed
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
+import xyz.aerii.library.api.bound
+import xyz.aerii.library.api.pressed
 import java.awt.Color
 
 @Load

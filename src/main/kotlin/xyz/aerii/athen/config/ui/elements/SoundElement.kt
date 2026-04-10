@@ -5,15 +5,15 @@ package xyz.aerii.athen.config.ui.elements
 import net.minecraft.util.StringUtil
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
-import xyz.aerii.athen.handlers.KeyEater
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Smoothie.play
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.springValue
-import xyz.aerii.athen.utils.sound
-import xyz.aerii.athen.utils.url
+import xyz.aerii.library.api.client
+import xyz.aerii.library.api.ctrl
+import xyz.aerii.library.utils.hovered
+import xyz.aerii.library.utils.open
+import xyz.aerii.library.utils.play
+import xyz.aerii.library.utils.sound
 
 class SoundElement(
     name: String,
@@ -57,7 +57,7 @@ class SoundElement(
         val inputX = x + 10f
         val inputW = width - 20f
         val inputH = 30f
-        val inputHovered = isAreaHovered(inputX, cy, inputW, inputH)
+        val inputHovered = hovered(inputX, cy, inputW, inputH)
 
         `anim$inputBorder`.value = if (listening) Mocha.Mauve.argb else Mocha.Surface0.argb
         `anim$inputBg`.value = when {
@@ -105,7 +105,7 @@ class SoundElement(
         val btnW = (width - 26f) / 2f
         val btnH = 26f
 
-        val playHovered = isAreaHovered(x + 10f, cy, btnW, btnH)
+        val playHovered = hovered(x + 10f, cy, btnW, btnH)
         `anim$playBg`.value = if (playHovered) Mocha.Surface2.argb else Mocha.Base.argb
         `anim$playScale`.value = if (playHovered) 1.03f else 1f
 
@@ -114,7 +114,7 @@ class SoundElement(
         NVGRenderer.drawText("Play", playRect.x + playRect.w / 2f - w / 2f, playRect.y + 6f, 14f, Mocha.Text.argb, NVGRenderer.defaultFont)
 
         val linkBaseX = x + 16f + btnW
-        val linkHovered = isAreaHovered(linkBaseX, cy, btnW, btnH)
+        val linkHovered = hovered(linkBaseX, cy, btnW, btnH)
         `anim$linkBg`.value = if (linkHovered) Mocha.Surface2.argb else Mocha.Base.argb
 
         drawBox(linkBaseX, cy, btnW, btnH, `anim$linkBg`.value, Mocha.Surface0.argb, 5f)
@@ -151,7 +151,7 @@ class SoundElement(
         val inputW = width - 20f
         val inputH = 30f
 
-        if (isAreaHovered(inputX, cy, inputW, inputH)) {
+        if (hovered(inputX, cy, inputW, inputH)) {
             listening = true
             caret = soundId.length
             caretBlinkTime = System.currentTimeMillis()
@@ -162,14 +162,14 @@ class SoundElement(
 
         cy += inputH + 8f
 
-        if (isAreaHovered(lastX + 10f, cy + 20f, width - 20f, 12f)) {
+        if (hovered(lastX + 10f, cy + 20f, width - 20f, 12f)) {
             draggingPitch = true
             return true
         }
 
         cy += 34f
 
-        if (isAreaHovered(lastX + 10f, cy + 20f, width - 20f, 12f)) {
+        if (hovered(lastX + 10f, cy + 20f, width - 20f, 12f)) {
             draggingVolume = true
             return true
         }
@@ -179,14 +179,14 @@ class SoundElement(
         val btnW = (width - 26f) / 2f
         val btnH = 26f
 
-        if (isAreaHovered(lastX + 10f, cy, btnW, btnH)) {
+        if (hovered(lastX + 10f, cy, btnW, btnH)) {
             soundId.sound()?.play(volume.toFloat(), pitch.toFloat())
             return true
         }
 
         val linkX = lastX + 16f + btnW
-        if (isAreaHovered(linkX, cy, btnW, btnH)) {
-            "https://www.digminecraft.com/lists/sound_list_pc.php".url()
+        if (hovered(linkX, cy, btnW, btnH)) {
+            "https://www.digminecraft.com/lists/sound_list_pc.php".open()
             return true
         }
 
@@ -236,7 +236,7 @@ class SoundElement(
             GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER -> listening = false
 
             GLFW.GLFW_KEY_V -> {
-                if (KeyEater.ctrl) {
+                if (ctrl) {
                     val clip = client.keyboardHandler?.clipboard ?: ""
                     val clean = StringUtil.filterText(clip)
                     if (clean.isNotEmpty()) {

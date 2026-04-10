@@ -42,12 +42,8 @@ import org.lwjgl.stb.STBImage.stbi_load_from_memory
 import org.lwjgl.system.MemoryUtil.memAlloc
 import org.lwjgl.system.MemoryUtil.memFree
 import xyz.aerii.athen.handlers.Resourceful
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Texter
-import xyz.aerii.athen.utils.alpha
-import xyz.aerii.athen.utils.blue
-import xyz.aerii.athen.utils.green
-import xyz.aerii.athen.utils.red
+import xyz.aerii.library.api.client
+import xyz.aerii.library.utils.*
 import java.nio.ByteBuffer
 import kotlin.math.max
 import kotlin.math.min
@@ -402,7 +398,7 @@ object NVGRenderer {
 
             val end = text.indexOf('>', i + 1).takeIf { it != -1 } ?: break
             val tag = text.substring(i + 1, end).trim().lowercase()
-            color = if (tag == "r") 0xFFFFFF else Texter.COLORS[tag] ?: color
+            color = if (tag == "r") 0xFFFFFF else colors[tag] ?: color
             last = end + 1
             i = last
         }

@@ -30,7 +30,7 @@
  */
 package xyz.aerii.athen.api.location
 
-import xyz.aerii.athen.handlers.React
+import xyz.aerii.library.handlers.Observable
 
 enum class SkyBlockArea(val key: String, val displayName: String) {
     NONE("none", "None"),
@@ -297,14 +297,12 @@ enum class SkyBlockArea(val key: String, val displayName: String) {
     ABANDONED_QUARRY("abandoned_quarry", "Abandoned Quarry")
     ;
 
-    val inArea: React<Boolean>
+    val inArea: Observable<Boolean>
         get() = LocationAPI.area.map { it == this }
 
     override fun toString() = displayName
 
     companion object {
         fun getByKey(key: String) = entries.firstOrNull { it.displayName == key }
-
-        fun inAnyArea(vararg areas: SkyBlockArea) = LocationAPI.area.map { it in areas }
     }
 }

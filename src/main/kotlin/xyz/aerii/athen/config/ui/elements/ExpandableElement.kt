@@ -4,12 +4,12 @@ package xyz.aerii.athen.config.ui.elements
 
 import xyz.aerii.athen.config.ConfigManager
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.springValue
 import xyz.aerii.athen.utils.render.animations.timedValue
+import xyz.aerii.library.utils.hovered
 
 class ExpandableElement(
     name: String,
@@ -38,7 +38,7 @@ class ExpandableElement(
         `anim$chevron`.value = if (expanded) 90f else 0f
         `anim$text`.value = when {
             expanded -> Mocha.Mauve.argb
-            isAreaHovered(rowX, rowY, rowW, 26f) -> Mocha.Text.argb
+            hovered(rowX, rowY, rowW, 26f) -> Mocha.Text.argb
             else -> Mocha.Subtext0.argb
         }
 
@@ -58,7 +58,7 @@ class ExpandableElement(
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (button != 0) return false
-        if (!isAreaHovered(lastX + 6f, lastY + 4f, width - 12f, 26f)) return false
+        if (!hovered(lastX + 6f, lastY + 4f, width - 12f, 26f)) return false
 
         expanded = !expanded
         onUpdate(configKey, expanded)

@@ -8,7 +8,7 @@ import xyz.aerii.athen.api.dungeon.DungeonAPI
 import xyz.aerii.athen.api.dungeon.enums.DungeonClass
 import xyz.aerii.athen.api.location.LocationAPI
 import xyz.aerii.athen.api.location.SkyBlockIsland
-import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.library.api.client
 
 data class KeybindCondition(
     var workIn: KeybindWorkIn = KeybindWorkIn.OUTSIDE_GUI,

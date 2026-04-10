@@ -17,16 +17,9 @@ import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.*
 import xyz.aerii.athen.handlers.Notifier.notify
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Ticking
-import xyz.aerii.athen.handlers.Typo.centeredText
-import xyz.aerii.athen.handlers.Typo.command
-import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.repeatBreak
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryStateTracker.bossToPlayer
 import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryStateTracker.tracked
@@ -35,7 +28,10 @@ import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.Render3D
 import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.render.renderBoundingBox
-import xyz.aerii.athen.utils.toDuration
+import xyz.aerii.library.api.*
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.literal
+import xyz.aerii.library.utils.toDuration
 import java.awt.Color
 import java.util.concurrent.CompletableFuture
 import kotlin.math.abs
@@ -115,7 +111,7 @@ object SlayerCarryTracker : Module(
     init {
         config.hud("Slayer carry display") {
             if (it) return@hud sizedText(ex0)
-            sizedText(display() ?: return@hud null)
+            sizedText(display.value ?: return@hud null)
         }
 
         on<TickEvent.Client> {
@@ -334,10 +330,10 @@ object SlayerCarryTracker : Module(
             "/${Athen.modId} carry history [page=0]" to "Shows tracked history"
         )
 
-        val divider = ("§8§m" + ("-".repeatBreak())).literal()
+        val divider = ("§8§m" + ("-".repeat())).literal()
 
         divider.lie()
-        "§bAthen Carry Commands".centeredText().lie()
+        "§bAthen Carry Commands".center().lie()
         divider.lie()
 
         for ((c, d) in commands) "  <${Mocha.Green.argb}>$c <dark_gray>- <gray>$d".parse().lie()

@@ -43,7 +43,7 @@ import xyz.aerii.athen.events.ScoreboardEvent
 import xyz.aerii.athen.events.TabListEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.React
+import xyz.aerii.library.handlers.Observable
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -55,11 +55,11 @@ object LocationAPI {
 
     var forceOnSkyBlock: Boolean = false
 
-    val isOnSkyBlock = React(false).onChange { (if (it) LocationEvent.SkyBlockJoin else LocationEvent.SkyBlockLeave).post() }
+    val isOnSkyBlock = Observable(false).onChange { (if (it) LocationEvent.SkyBlockJoin else LocationEvent.SkyBlockLeave).post() }
 
-    val island = React<SkyBlockIsland?>(null)
+    val island = Observable<SkyBlockIsland?>(null)
 
-    val area = React(SkyBlockArea.NONE)
+    val area = Observable(SkyBlockArea.NONE)
 
     var serverId: String? = null
         private set

@@ -6,17 +6,17 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.handlers.Scram
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.render.radial.base.ISlot
 import xyz.aerii.athen.modules.impl.render.radial.base.actions.IAction
 import xyz.aerii.athen.modules.impl.render.radial.impl.RadialMenu.configs
+import xyz.aerii.athen.ui.IZoneType
 import xyz.aerii.athen.ui.InputField
 import xyz.aerii.athen.ui.UIZone
-import xyz.aerii.athen.ui.IZoneType
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
 import xyz.aerii.athen.utils.render.Render2D.text
+import xyz.aerii.library.api.client
 
 object RadialEditor : Scram("Radial menu editor [Athen]") {
     private enum class ZoneType : IZoneType {
@@ -136,21 +136,21 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
 
     private fun focusedField(): InputField? = fields.firstOrNull { it.focused } ?: if (cfgField.focused) cfgField else null
 
-    override fun onScramRender(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun onScramRender(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         zones.clear()
 
-        guiGraphics.drawRectangle(0, 0, width, height, Mocha.Crust.withAlpha(0.6f))
+        graphics.drawRectangle(0, 0, width, height, Mocha.Crust.withAlpha(0.6f))
 
         val px = (width - 906) / 2
         val py = (height - 320) / 2
 
-        drawSidebar(guiGraphics, mouseX, mouseY, px, py)
+        drawSidebar(graphics, mouseX, mouseY, px, py)
 
         val mx = px + 130 + 6
-        drawMainPanel(guiGraphics, mouseX, mouseY, mx, py)
+        drawMainPanel(graphics, mouseX, mouseY, mx, py)
 
         val prx = mx + 444 + 6
-        drawPreviewPanel(guiGraphics, mouseX, mouseY, prx, py)
+        drawPreviewPanel(graphics, mouseX, mouseY, prx, py)
     }
 
     private fun fnSub2(): List<Pair<Int, ISlot>> {
@@ -777,7 +777,7 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
         return handled
     }
 
-    override fun onScramCharType(char: Char, modifiers: Int): Boolean {
+    override fun onScramCharType(char: Char): Boolean {
         if (editing && cfgField.focused) return cfgField.handleChar(char)
 
         val f = focusedField() ?: return false

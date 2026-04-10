@@ -12,14 +12,15 @@ import xyz.aerii.athen.events.DungeonEvent
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.KeyEater
-import xyz.aerii.athen.handlers.Scurry
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.mixin.accessors.KeyMappingAccessor
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.impl.*
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
+import xyz.aerii.library.api.client
+import xyz.aerii.library.api.ctrl
+import xyz.aerii.library.utils.mouseRX
+import xyz.aerii.library.utils.mouseRY
 import java.awt.Color
 
 @Load
@@ -118,7 +119,7 @@ object TerminalSolver : Module(
                 }
 
                 (client.options?.keyDrop as? KeyMappingAccessor)?.boundKey?.value if (dropKey) -> {
-                    c(mouse = if (!KeyEater.ctrl) 0 else 1)
+                    c(mouse = if (!ctrl) 0 else 1)
                     cancel()
                 }
             }
@@ -140,8 +141,8 @@ object TerminalSolver : Module(
     private fun c(mouse: Int) {
         val solver = solvers[TerminalAPI.currentTerminal] ?: return
         val uiScale = 3f * `ui$scale`
-        val mx = Scurry.rawX / uiScale
-        val my = Scurry.rawY / uiScale
+        val mx = mouseRX / uiScale
+        val my = mouseRY / uiScale
 
         val width = client.window.width / uiScale
         val height = client.window.height / uiScale

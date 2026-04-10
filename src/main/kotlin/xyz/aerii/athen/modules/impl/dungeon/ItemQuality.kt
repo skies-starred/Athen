@@ -9,9 +9,8 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
-import xyz.aerii.athen.handlers.Texter.literal
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.library.handlers.parser.parse
 
 @Load
 @OnlyIn(skyblock = true)

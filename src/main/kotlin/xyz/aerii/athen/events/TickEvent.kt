@@ -6,11 +6,11 @@ import xyz.aerii.athen.handlers.Chronos
 sealed class TickEvent {
     data object Client : Event() {
         val ticks: Int
-            get() = Chronos.Ticker.tickClient
+            get() = Chronos.ticks.client
     }
 
     data object Server : Event() {
         val ticks: Int
-            get() = Chronos.Ticker.tickServer
+            get() = Chronos.ticks.server
     }
 }

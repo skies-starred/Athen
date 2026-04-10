@@ -38,8 +38,8 @@ import tech.thatgravyboat.skyblockapi.helpers.McPlayer
 import tech.thatgravyboat.skyblockapi.utils.DiscoverableValue
 import tech.thatgravyboat.skyblockapi.utils.extentions.parseRomanNumeral
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findGroup
-import xyz.aerii.athen.handlers.Smoothie.level
-import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.library.api.level
+import xyz.aerii.library.utils.stripped
 
 private val tierRegex = Regex("""(?:^|\s)(?<level>[MDCLXVI]{1,7})\s""")
 

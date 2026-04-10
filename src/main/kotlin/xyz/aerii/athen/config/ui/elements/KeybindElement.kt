@@ -5,10 +5,10 @@ package xyz.aerii.athen.config.ui.elements
 import com.mojang.blaze3d.platform.InputConstants
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.brighten
 import xyz.aerii.athen.utils.render.animations.springValue
+import xyz.aerii.library.utils.brighten
+import xyz.aerii.library.utils.hovered
 
 class KeybindElement(
     name: String,
@@ -33,7 +33,7 @@ class KeybindElement(
         val keyName = getKeyName(selectedKey)
         val buttonW = textWidth(keyName) + 12f
         val buttonX = x + width - 20f - textWidth(keyName)
-        val isHovered = isAreaHovered(buttonX, y + 8f, buttonW, 20f)
+        val isHovered = hovered(buttonX, y + 8f, buttonW, 20f)
 
         `anim$bg`.value = when {
             listening -> Mocha.Peach.argb.brighten(0.8f)
@@ -60,7 +60,7 @@ class KeybindElement(
         if (listening) {
             setKey(-100 + button)
             return false
-        } else if (button == 0 && isAreaHovered(buttonX, lastY + 8f, buttonW, 20f)) {
+        } else if (button == 0 && hovered(buttonX, lastY + 8f, buttonW, 20f)) {
             listening = true
             return true
         }

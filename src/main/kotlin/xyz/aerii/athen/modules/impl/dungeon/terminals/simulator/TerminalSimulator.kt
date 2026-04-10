@@ -11,12 +11,12 @@ import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.override
-import xyz.aerii.athen.handlers.React
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.SimulatorMenu
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.impl.*
+import xyz.aerii.library.api.client
+import xyz.aerii.library.handlers.Observable
 
 @Load
 object TerminalSimulator : Module(
@@ -29,8 +29,8 @@ object TerminalSimulator : Module(
     private val pingInput = config.textInput("Ping", "0", "0").custom("ping")
 
     var ping = 0
-    val s = React(false)
-    val s0 = React(false)
+    val s = Observable(false)
+    val s0 = Observable(false)
 
     init {
         run {
@@ -41,7 +41,7 @@ object TerminalSimulator : Module(
             ping = it.toIntOrNull() ?: return@onChange
         }
 
-        react.onChange {
+        observable.onChange {
             SimulatorMenu.a()
             if (it) {
                 "Run \"/${Athen.modId} simulate terminals ping <ping>\" to change ping!".modMessage()

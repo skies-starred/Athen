@@ -2,6 +2,7 @@
 
 package xyz.aerii.athen.modules.impl.render
 
+import com.google.gson.JsonObject
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.serialization.Codec
 import net.minecraft.network.chat.Component
@@ -14,21 +15,17 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.GameEvent
-import xyz.aerii.athen.handlers.Beacon
+import xyz.aerii.athen.handlers.Beacon.request
 import xyz.aerii.athen.handlers.Scribble
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo
-import xyz.aerii.athen.handlers.Typo.centeredText
-import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.repeatBreak
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
-import xyz.aerii.athen.utils.EMPTY_COMPONENT
 import xyz.aerii.athen.utils.data
 import xyz.aerii.athen.utils.kotlin.CopyOnWriteMap
+import xyz.aerii.library.api.*
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.literal
 
 @Load
 object VisualWords : Module(
@@ -52,7 +49,7 @@ object VisualWords : Module(
     private var words by scribble.map("words", Codec.STRING, ComponentSerialization.CODEC.xmap({ it.visualOrderText }, { seq -> seq.toComponent() }))
 
     private val remote = mutableSetOf<String>()
-    private val user = client.user.name
+    private val user = name
     private val `user$cps` = user.codePoints().toArray()
     private val `user$len` = `user$cps`.size
 
@@ -62,8 +59,8 @@ object VisualWords : Module(
         nick = nickname.value.parse(true).visualOrderText
         nickname.state.onChange { nick = it.parse(true).visualOrderText }
 
-        Beacon.get("donators.json".data) {
-            onJsonSuccess { json ->
+        "donators.json".data.request {
+            onSuccess<JsonObject> { json ->
                 val map = json.entrySet().associate { it.key to it.value.asString.parse().visualOrderText }
                 replace += map
                 remote += map.keys
@@ -246,9 +243,9 @@ object VisualWords : Module(
     }
 
     private fun help() {
-        val divider = ("§8§m" + "-".repeatBreak()).literal()
+        val divider = ("§8§m" + "-".repeat()).literal()
         divider.lie()
-        "§bVisual Words §7[Athen]".centeredText().lie()
+        "§bVisual Words §7[Athen]".center().lie()
         divider.lie()
         " <dark_gray>• <${Catppuccin.Mocha.Green.argb}>/${Athen.modId} visuals add [word] [word, supports space]".parse().lie()
         " <dark_gray>• <${Catppuccin.Mocha.Green.argb}>/${Athen.modId} visuals set [word] [word, supports space]".parse().lie()

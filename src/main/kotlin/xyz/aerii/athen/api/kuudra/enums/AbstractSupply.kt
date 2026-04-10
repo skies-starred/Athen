@@ -3,7 +3,7 @@ package xyz.aerii.athen.api.kuudra.enums
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.monster.Giant
 import net.minecraft.world.phys.AABB
-import xyz.aerii.athen.utils.ZERO_AABB
+import xyz.aerii.library.api.ZERO_AABB
 import kotlin.math.cos
 import kotlin.math.sin
 

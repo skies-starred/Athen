@@ -30,7 +30,7 @@ enum class KuudraPhase(val event: Event, val tiers: IntRange = KuudraTier.BASIC.
     val durTicks: Int
         get() {
             if (startTick == 0) return 0
-            if (endTick == 0) return Chronos.Ticker.tickServer - startTick
+            if (endTick == 0) return Chronos.ticks.server - startTick
             return (endTick - startTick).coerceAtLeast(0)
         }
 
@@ -60,7 +60,7 @@ enum class KuudraPhase(val event: Event, val tiers: IntRange = KuudraTier.BASIC.
         if (started) return@apply
 
         startTime = System.currentTimeMillis()
-        startTick = Chronos.Ticker.tickServer
+        startTick = Chronos.ticks.server
         entries.filter { it.ordinal < ordinal }.forEach { it.end() }
     }
 
@@ -68,7 +68,7 @@ enum class KuudraPhase(val event: Event, val tiers: IntRange = KuudraTier.BASIC.
         if (ended) return@apply
 
         endTime = System.currentTimeMillis()
-        endTick = Chronos.Ticker.tickServer
+        endTick = Chronos.ticks.server
     }
 
     companion object {

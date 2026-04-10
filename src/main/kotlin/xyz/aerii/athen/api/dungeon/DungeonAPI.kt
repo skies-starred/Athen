@@ -47,10 +47,11 @@ import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.events.*
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.React
-import xyz.aerii.athen.handlers.Smoothie
 import xyz.aerii.athen.handlers.Typo.devMessage
-import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.library.api.name
+import xyz.aerii.library.api.player
+import xyz.aerii.library.handlers.Observable
+import xyz.aerii.library.utils.stripped
 
 @Priority
 object DungeonAPI {
@@ -79,9 +80,9 @@ object DungeonAPI {
     private val cataRegex = Regex("^ Catacombs (?<level>\\d+):")
     private val locationRegex = Regex(" *[⏣ф] *(?<location>(?:\\s?[^ൠ\\s]+)*)(?: ൠ x\\d)?")
 
-    val bloodOpened: React<Boolean> = React(false)
-    val bloodKilledAll: React<Boolean> = React(false)
-    val bloodSpawnedAll: React<Boolean> = React(false)
+    val bloodOpened: Observable<Boolean> = Observable(false)
+    val bloodKilledAll: Observable<Boolean> = Observable(false)
+    val bloodSpawnedAll: Observable<Boolean> = Observable(false)
 
     var floorStarted = false
         private set
@@ -93,10 +94,10 @@ object DungeonAPI {
     var bloodKeys = 0
         private set
 
-    val F7Phase: React<Int> = React(0)
-    val P3Phase: React<Int> = React(0)
-    val floor: React<DungeonFloor?> = React(null)
-    val inBoss: React<Boolean> = React(false)
+    val F7Phase: Observable<Int> = Observable(0)
+    val P3Phase: Observable<Int> = Observable(0)
+    val floor: Observable<DungeonFloor?> = Observable(null)
+    val inBoss: Observable<Boolean> = Observable(false)
 
     var uniqueClass = false
         private set
@@ -125,7 +126,7 @@ object DungeonAPI {
 
         on<TabListEvent.Change> {
             val firstColumn = new.firstOrNull() ?: return@on
-            val ownName = Smoothie.playerName
+            val ownName = name
             val next = arrayOfNulls<DungeonPlayer>(5)
 
             for (i in 0 until 5) {
@@ -179,7 +180,7 @@ object DungeonAPI {
         on<MessageEvent.Chat.Receive> {
             playerGhostRegex.findThenNull(stripped, "name") { (name) ->
                 var name = name
-                if (name == "You") Smoothie.player?.let { name = it.name.stripped() }
+                if (name == "You") player?.let { name = it.name.stripped() }
 
                 for (t in teammates) {
                     if (t.name != name) continue
@@ -270,7 +271,7 @@ object DungeonAPI {
             if (ticks % 5 != 0) return@on
 
             if (floor.value?.floorNumber == 7 && inBoss.value) {
-                val y = Smoothie.player?.y ?: return@on
+                val y = player?.y ?: return@on
 
                 F7Phase.value = when {
                     y > 210 -> 1

@@ -1,40 +1,11 @@
 package xyz.aerii.athen.handlers
 
-import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.network.chat.Component
-import tech.thatgravyboat.skyblockapi.helpers.McClient
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.modules.impl.Dev
-import xyz.aerii.athen.utils.mainThread
-import kotlin.math.roundToInt
+import xyz.aerii.library.api.lie
+import xyz.aerii.library.utils.literal
 
 object Typo {
-    private val STRIP_COLOR_REGEX = Regex("(?i)§.")
-
-    @JvmStatic
-    val chatWidth: Int
-        get() = ChatComponent.getWidth(client.options.chatWidth().get())
-
-    @JvmStatic
-    val chatHeight: Int
-        get() = ChatComponent.getHeight(if (client.gui.chat.isChatFocused) client.options.chatHeightFocused().get() else client.options.chatHeightUnfocused().get())
-
-    @JvmStatic
-    fun String.stripped(): String {
-        return STRIP_COLOR_REGEX.replace(this, "")
-    }
-
-    @JvmStatic
-    fun Component.stripped(): String {
-        return STRIP_COLOR_REGEX.replace(this.string, "")
-    }
-
-    @JvmStatic
-    fun String.message() {
-        McClient.connection?.sendChat(this)
-    }
-
     @JvmStatic
     @JvmOverloads
     fun String.modMessage(prefixType: PrefixType = PrefixType.DEFAULT) {
@@ -56,42 +27,6 @@ object Typo {
     @JvmStatic
     fun Component.devMessage() {
         if (Dev.debug) modMessage(PrefixType.DEV)
-    }
-
-    @JvmStatic
-    fun String.command() {
-        McClient.sendCommand(this)
-    }
-
-    @JvmStatic
-    fun String.clientCommand() {
-        McClient.sendClientCommand(this)
-    }
-
-    @JvmStatic
-    fun String.lie() {
-        @Suppress("UNNECESSARY_SAFE_CALL") // gui can be null, why the fuck does it say that it can't be null
-        mainThread { gui?.chat?.addMessage(this@lie.literal()) }
-    }
-
-    @JvmStatic
-    fun Component.lie() {
-        @Suppress("UNNECESSARY_SAFE_CALL")
-        mainThread { gui?.chat?.addMessage(this@lie) }
-    }
-
-    @JvmStatic
-    fun String.repeatBreak(): String {
-        return repeat(chatWidth / client.font.width(this))
-    }
-
-    @JvmStatic
-    fun String.centeredText(): String {
-        val width = chatWidth
-        val width1 = client.font.width(this)
-        if (width1 >= width) return this
-
-        return " ".repeat(((width - width1) / 2f / client.font.width(" ")).roundToInt()) + this
     }
 
     enum class PrefixType(val component: Component) {

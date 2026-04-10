@@ -4,7 +4,7 @@ package xyz.aerii.athen.accessors
 
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
-import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.library.utils.stripped
 import java.lang.ref.WeakReference
 
 interface EntityAccessor {

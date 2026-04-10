@@ -12,15 +12,15 @@ import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.MessageEvent
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Smoothie.showTitle
-import xyz.aerii.athen.handlers.Typo.command
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.fcs
-import xyz.aerii.athen.utils.toDurationFromMillis
+import xyz.aerii.library.api.client
+import xyz.aerii.library.api.command
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.showTitle
+import xyz.aerii.library.utils.toDurationFromMillis
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])

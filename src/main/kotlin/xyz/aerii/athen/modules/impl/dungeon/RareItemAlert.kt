@@ -9,13 +9,13 @@ import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.PacketEvent
-import xyz.aerii.athen.handlers.Smoothie.alert
-import xyz.aerii.athen.handlers.Smoothie.level
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.stripped
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
-import xyz.aerii.athen.utils.mainThread
+import xyz.aerii.library.api.level
+import xyz.aerii.library.api.mainThread
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.alert
+import xyz.aerii.library.utils.stripped
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.THE_CATACOMBS])

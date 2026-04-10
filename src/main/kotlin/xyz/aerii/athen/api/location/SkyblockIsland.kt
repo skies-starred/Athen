@@ -31,7 +31,7 @@
 package xyz.aerii.athen.api.location
 
 import tech.thatgravyboat.skyblockapi.utils.extentions.toFormattedName
-import xyz.aerii.athen.handlers.React
+import xyz.aerii.library.handlers.Observable
 
 enum class SkyBlockIsland(val id: String, displayName: String? = null) {
     PRIVATE_ISLAND("dynamic"),
@@ -58,7 +58,7 @@ enum class SkyBlockIsland(val id: String, displayName: String? = null) {
     JERRYS_WORKSHOP("winter", "Jerry's Workshop"),
     ;
 
-    val inIsland: React<Boolean>
+    val inIsland: Observable<Boolean>
         get() = LocationAPI.island.map { it == this }
 
     val displayName = displayName ?: toFormattedName()
@@ -67,7 +67,5 @@ enum class SkyBlockIsland(val id: String, displayName: String? = null) {
 
     companion object {
         fun getByKey(key: String) = entries.firstOrNull { it.id == key }
-
-        fun inAnyIsland(vararg islands: SkyBlockIsland) = LocationAPI.island.map { it in islands }
     }
 }

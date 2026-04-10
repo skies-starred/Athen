@@ -8,7 +8,7 @@ import net.minecraft.world.item.Items
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.ITerminalSim
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.SimulatorMenu
-import xyz.aerii.athen.utils.EMPTY_COMPONENT
+import xyz.aerii.library.api.EMPTY_COMPONENT
 
 class RubixSimulator : ITerminalSim(TerminalType.RUBIX) {
     private val items = listOf(Items.ORANGE_STAINED_GLASS_PANE, Items.YELLOW_STAINED_GLASS_PANE, Items.GREEN_STAINED_GLASS_PANE, Items.BLUE_STAINED_GLASS_PANE, Items.RED_STAINED_GLASS_PANE)

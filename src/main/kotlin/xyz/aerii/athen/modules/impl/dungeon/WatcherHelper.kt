@@ -14,18 +14,18 @@ import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Chronos
-import xyz.aerii.athen.handlers.Smoothie.alert
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.stripped
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.fcs
-import xyz.aerii.athen.utils.toDuration
-import xyz.aerii.athen.utils.toDurationFromMillis
+import xyz.aerii.library.api.level
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.alert
+import xyz.aerii.library.utils.stripped
+import xyz.aerii.library.utils.toDuration
+import xyz.aerii.library.utils.toDurationFromMillis
 import kotlin.math.abs
 
 @Load
@@ -62,8 +62,7 @@ object WatcherHelper : Module(
 
     private val hud: ConfigBuilder.HUDElementBuilder = config.hud("Blood timers") {
         if (it) return@hud if (showTicks) sizedText(ex0) else sizedText(ex1)
-        val display = display() ?: return@hud null
-        sizedText(display)
+        sizedText(display.value ?: return@hud null)
     }
 
     private val showTicks by config.switch("Show ticks", true).dependsOn { hud.enabled }
@@ -118,7 +117,7 @@ object WatcherHelper : Module(
             if (!it) return@onChange
 
             `blood$start` = System.currentTimeMillis()
-            `blood$start$t` = Chronos.Ticker.tickServer
+            `blood$start$t` = Chronos.ticks.server
         }
 
         DungeonAPI.bloodSpawnedAll.onChange {
@@ -127,7 +126,7 @@ object WatcherHelper : Module(
             if (!spawnedAll) return@onChange
 
             val t = System.currentTimeMillis() - `blood$start`
-            val t0 = Chronos.Ticker.tickServer - `blood$start$t`
+            val t0 = Chronos.ticks.server - `blood$start$t`
 
             val d = t.toDurationFromMillis(secondsDecimals = 1, secondsOnly = true)
             val d0 = (t0 / 20.0).toDuration(secondsDecimals = 1, secondsOnly = true)
@@ -157,7 +156,7 @@ object WatcherHelper : Module(
             if (DungeonAPI.bloodKilledAll.value) return@on
 
             `display$total` = (System.currentTimeMillis() - `blood$start`).toDurationFromMillis(secondsDecimals = 1, secondsOnly = true)
-            `display$total$t` = ((Chronos.Ticker.tickServer - `blood$start$t`) / 20.0).toDuration(secondsDecimals = 1, secondsOnly = true)
+            `display$total$t` = ((Chronos.ticks.server - `blood$start$t`) / 20.0).toDuration(secondsDecimals = 1, secondsOnly = true)
         }.runWhen(DungeonAPI.bloodOpened)
 
         on<MessageEvent.Chat.Receive> {
@@ -165,7 +164,7 @@ object WatcherHelper : Module(
             if (`blood$start` == 0L) return@on
 
             `blood$speak` = System.currentTimeMillis()
-            `blood$speak$t` = Chronos.Ticker.tickServer
+            `blood$speak$t` = Chronos.ticks.server
 
             val t = `blood$speak` - `blood$start`
             val t0 = `blood$speak$t` - `blood$start$t`
@@ -193,7 +192,7 @@ object WatcherHelper : Module(
             if (`blood$speak` == 0L) return@on
             if (System.currentTimeMillis() - `blood$speak` < 2500) return@on
 
-            val l = client.level ?: return@on
+            val l = level ?: return@on
             val e = getEntity(l)?.takeIf { it.displayName?.stripped()?.contains("The Watcher") == true } ?: return@on
             val x = `blood$watcher$x` ?: e.x.also { `blood$watcher$x` = it }
             val z = `blood$watcher$z` ?: e.z.also { `blood$watcher$z` = it }
@@ -201,7 +200,7 @@ object WatcherHelper : Module(
             if (abs(e.x - x) <= 0.05 && abs(e.z - z) <= 0.05) return@on
 
             `blood$move` = System.currentTimeMillis()
-            `blood$move$t` = Chronos.Ticker.tickServer
+            `blood$move$t` = Chronos.ticks.server
             `blood$watcher$moved` = true
 
             val t = `blood$move` - `blood$start`

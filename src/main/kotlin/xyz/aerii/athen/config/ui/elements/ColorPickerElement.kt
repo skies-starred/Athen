@@ -6,16 +6,16 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
-import xyz.aerii.athen.handlers.KeyEater
 import xyz.aerii.athen.handlers.Scribble
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.Gradient
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.easeOutQuad
 import xyz.aerii.athen.utils.render.animations.springValue
 import xyz.aerii.athen.utils.render.animations.timedValue
+import xyz.aerii.library.api.client
+import xyz.aerii.library.api.ctrl
+import xyz.aerii.library.utils.hovered
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import java.awt.Color as JavaColor
@@ -60,7 +60,6 @@ class ColorPickerElement(
             var history by historyStorage.list("history", ColorData.CODEC, emptyList())
             @Suppress("AssignedValueIsNeverRead")
             history = globalColorHistory.map { ColorData.fromColor(it) }
-            historyStorage.save()
         }
     }
 
@@ -109,7 +108,7 @@ class ColorPickerElement(
 
         val previewX = x + width - 36f
         val previewY = y + 6f
-        val isPreviewHovered = isAreaHovered(previewX, previewY, 30f, 20f)
+        val isPreviewHovered = hovered(previewX, previewY, 30f, 20f)
 
         `anim$previewColor`.value = selectedColor.rgb
         `anim$previewScale`.value = if (isPreviewHovered) 1.05f else 1f
@@ -186,7 +185,7 @@ class ColorPickerElement(
             val histX = historyStartX + i * (historySize + historySpacing)
             val color = globalColorHistory[globalColorHistory.size - 1 - i]
 
-            val isHovered = isAreaHovered(histX, y, historySize, historySize)
+            val isHovered = hovered(histX, y, historySize, historySize)
             `anim$history`[i].value = if (isHovered) 1.1f else 1f
 
             drawScaledBox(histX + historySize / 2f, y + historySize / 2f, historySize, historySize, `anim$history`[i].value, color.rgb, Mocha.Mantle.argb, 3f, 1f)
@@ -196,7 +195,7 @@ class ColorPickerElement(
     private fun `draw$hex`(x: Float, y: Float, w: Float) {
         val h = 28f
         val focused = hexFocused
-        val hovered = isAreaHovered(x, y, w, h)
+        val hovered = hovered(x, y, w, h)
 
         `anim$hexBg`.value = when {
             focused -> Mocha.Surface2.argb
@@ -235,7 +234,7 @@ class ColorPickerElement(
 
         val previewX = lastX + width - 36f
         val previewY = lastY + 6f
-        if (isAreaHovered(previewX, previewY, 30f, 20f)) {
+        if (hovered(previewX, previewY, 30f, 20f)) {
             expanded = !expanded
             return true
         }
@@ -252,7 +251,7 @@ class ColorPickerElement(
         val totalWidth = hexWidth + 6f + totalHistoryWidth
         val startX = lastX + (width - totalWidth) / 2f
 
-        if (isAreaHovered(startX + 1f, hexY, hexWidth, 28f)) {
+        if (hovered(startX + 1f, hexY, hexWidth, 28f)) {
             if (!hexFocused) {
                 hexFocused = true
                 hexCaretBlink = System.currentTimeMillis()
@@ -268,7 +267,7 @@ class ColorPickerElement(
 
         for (i in 0 until MAX_HISTORY.coerceAtMost(globalColorHistory.size)) {
             val histX = historyStartX + i * (historySize + historySpacing)
-            if (!isAreaHovered(histX, hexY, historySize, historySize)) continue
+            if (!hovered(histX, hexY, historySize, historySize)) continue
 
             globalColorHistory[globalColorHistory.size - 1 - i].set()
             return true
@@ -279,19 +278,19 @@ class ColorPickerElement(
         val pickerH = 140f
 
         return when {
-            isAreaHovered(pickerX, pickerY, pickerW, pickerH) -> {
+            hovered(pickerX, pickerY, pickerW, pickerH) -> {
                 draggingPicker = true
                 `update$picker`(mouseX, mouseY, pickerX, pickerY, pickerW, pickerH)
                 true
             }
 
-            isAreaHovered(pickerX, pickerY + pickerH + 5f, pickerW, 15f) -> {
+            hovered(pickerX, pickerY + pickerH + 5f, pickerW, 15f) -> {
                 draggingHue = true
                 `update$hue`(mouseX, pickerX, pickerW)
                 true
             }
 
-            isAreaHovered(pickerX, pickerY + pickerH + 25f, pickerW, 15f) -> {
+            hovered(pickerX, pickerY + pickerH + 25f, pickerW, 15f) -> {
                 draggingAlpha = true
                 `update$alpha`(mouseX, pickerX, pickerW)
                 true
@@ -344,7 +343,7 @@ class ColorPickerElement(
             }
 
             GLFW.GLFW_KEY_V -> {
-                if (!KeyEater.ctrl) return false
+                if (!ctrl) return false
 
                 val clean = client.keyboardHandler.clipboard.trim().removePrefix("#").take(8).uppercase()
                 val len = clean.length

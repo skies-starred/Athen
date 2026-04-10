@@ -5,7 +5,8 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.utils.formatted
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.formatted
 import kotlin.math.pow
 
 /**

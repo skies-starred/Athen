@@ -4,11 +4,11 @@ package xyz.aerii.athen.modules.impl.render
 
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.hud.Resolute
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.fcs
+import xyz.aerii.library.api.client
 
 @Load
 object ItemNamePosition : Module(

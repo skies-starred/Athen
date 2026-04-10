@@ -13,12 +13,12 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.Typo.lie
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.athen.utils.render.Render3D
-import xyz.aerii.athen.utils.toDurationFromMillis
+import xyz.aerii.library.api.lie
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.toDurationFromMillis
 import java.awt.Color
 
 @Load

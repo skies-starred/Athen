@@ -4,14 +4,14 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.Athen
-import xyz.aerii.athen.handlers.React
-import xyz.aerii.athen.handlers.Smoothie.play
 import xyz.aerii.athen.hud.HUDElement
 import xyz.aerii.athen.hud.HUDElementContext
 import xyz.aerii.athen.hud.HUDManager
 import xyz.aerii.athen.modules.Module
-import xyz.aerii.athen.utils.mainThread
-import xyz.aerii.athen.utils.sound
+import xyz.aerii.library.api.mainThread
+import xyz.aerii.library.handlers.Observable
+import xyz.aerii.library.utils.play
+import xyz.aerii.library.utils.sound
 import java.awt.Color
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -28,12 +28,12 @@ class ConfigBuilder(
     private val default: Boolean = false
 ) {
     val feature = ConfigManager.addFeature(name, description, category, configKey, default)
-    val state = React(default)
+    val state = Observable(default)
     val value get() = state.value
     var module: Module? = null
         internal set
 
-    private val expandableStates = mutableMapOf<String, React<Boolean>>()
+    private val expandableStates = mutableMapOf<String, Observable<Boolean>>()
 
     init {
         Athen.LOGGER.debug("Feature added for {}: {}", configKey, feature)
@@ -111,7 +111,7 @@ class ConfigBuilder(
 
         operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): ReadOnlyProperty<Any?, ExpandableHandle> {
             val fullKey = "$configKey.expandable_${property.name}"
-            val state = React(false)
+            val state = Observable(false)
             expandableStates[fullKey] = state
 
             val finalData = ConfigManager.ElementData.Expandable(name, fullKey, dependency, parentKey)
@@ -183,7 +183,7 @@ class ConfigBuilder(
         key: String,
         private val default: T
     ) : ReadOnlyProperty<Any?, T> {
-        val state = React(default)
+        val state = Observable(default)
         val value get() = state.value
 
         init {

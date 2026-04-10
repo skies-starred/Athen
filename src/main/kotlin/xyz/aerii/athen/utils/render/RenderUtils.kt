@@ -4,8 +4,8 @@ import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Texter.literal
+import xyz.aerii.library.api.client
+import xyz.aerii.library.utils.literal
 
 operator fun Vec3.unaryMinus(): Vec3 = Vec3(-x, -y, -z)
 

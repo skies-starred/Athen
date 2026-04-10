@@ -4,7 +4,7 @@ import com.google.gson.JsonObject
 import com.mojang.serialization.Codec
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.repeatBreak
+import xyz.aerii.library.api.repeat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -71,7 +71,7 @@ abstract class ICarryStateTracker<T : ITrackedCarry>(storagePath: String, histor
         val rangeStart = (currentPage - 1) * 10
         val rangeEnd = minOf(rangeStart + 10, sorted.size)
         
-        val divider = "§7" + "-".repeatBreak()
+        val divider = "§7" + "-".repeat()
         val dateFormat = SimpleDateFormat("MM/dd HH:mm")
         
         divider.modMessage()

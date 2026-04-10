@@ -11,14 +11,14 @@ import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.WorldRenderEvent
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
-import xyz.aerii.athen.utils.abbreviate
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.Render3D
 import xyz.aerii.athen.utils.render.renderBoundingBox
 import xyz.aerii.athen.utils.render.renderPos
+import xyz.aerii.library.api.client
+import xyz.aerii.library.utils.abbreviate
 import java.awt.Color
 import kotlin.math.abs
 

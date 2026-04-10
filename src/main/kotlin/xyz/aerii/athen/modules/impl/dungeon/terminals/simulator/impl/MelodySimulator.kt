@@ -8,7 +8,7 @@ import net.minecraft.world.item.Items
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.ITerminalSim
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.SimulatorMenu
-import xyz.aerii.athen.utils.EMPTY_COMPONENT
+import xyz.aerii.library.api.EMPTY_COMPONENT
 
 class MelodySimulator : ITerminalSim(TerminalType.MELODY) {
     private val magentaPane = Items.MAGENTA_STAINED_GLASS_PANE.pane()

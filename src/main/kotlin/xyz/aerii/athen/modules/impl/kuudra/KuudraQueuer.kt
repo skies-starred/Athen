@@ -9,9 +9,10 @@ import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Chronos
-import xyz.aerii.athen.handlers.Smoothie
-import xyz.aerii.athen.handlers.Typo.command
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.library.api.command
+import xyz.aerii.library.api.name
+import xyz.aerii.library.handlers.time.client
 
 @Load
 object KuudraQueuer : Module(
@@ -22,25 +23,22 @@ object KuudraQueuer : Module(
     private val delay by config.slider("Delay", 20, 0, 100, "ticks")
 
     private val partyRegex = Regex("^Party > (?:\\[[^]]*?] )?\\w{1,16}(?: [ቾ⚒])?: ?(?<message>.+)$")
-    private var disableRequeue: Boolean = false
+    private var bool: Boolean = false
 
     init {
         on<MessageEvent.Chat.Receive> {
-            if (PartyAPI.leader?.name != Smoothie.playerName) return@on
+            if (PartyAPI.leader?.name?.equals(name) ?: false) return@on
 
             partyRegex.findOrNull(stripped, "message") { (message) ->
-                if (message == "!dt") disableRequeue = true
+                if (message == "!dt") bool = true
             }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
 
         on<KuudraEvent.End.Success> {
-            if (PartyAPI.leader?.name != Smoothie.playerName) return@on
-            if (disableRequeue) {
-                disableRequeue = false
-                return@on
-            }
+            if (PartyAPI.leader?.name?.equals(name) ?: false) return@on
+            if (bool) return@on ::bool.set(false)
 
-            Chronos.Tick after delay then {
+            Chronos.schedule(delay.client) {
                 "instancerequeue".command()
             }
         }

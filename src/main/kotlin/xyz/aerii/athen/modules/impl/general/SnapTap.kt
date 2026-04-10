@@ -6,9 +6,9 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.InputEvent
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.override
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.mixin.accessors.KeyMappingAccessor
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.library.api.client
 
 @Load
 object SnapTap : Module(

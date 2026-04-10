@@ -5,8 +5,8 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import xyz.aerii.athen.annotations.Priority
-import xyz.aerii.athen.handlers.React
 import xyz.aerii.athen.handlers.Scribble
+import xyz.aerii.library.handlers.Observable
 import java.awt.Color
 
 @Priority(-4)
@@ -14,7 +14,7 @@ object ConfigManager {
     private val configFile = Scribble("config/Config")
     val configValues = mutableMapOf<String, Any>()
     val features = mutableMapOf<Category, MutableList<Feature>>()
-    val states = mutableMapOf<String, React<Any>>()
+    val states = mutableMapOf<String, Observable<Any>>()
 
     init {
         val data by configFile.jsonObject("data")
@@ -109,7 +109,7 @@ object ConfigManager {
     }
 
     fun observe(key: String, listener: (Any) -> Unit) {
-        states.getOrPut(key) { React(getValue(key) ?: return) }.onChange(listener).also { listener(it.value) }
+        states.getOrPut(key) { Observable(getValue(key) ?: return) }.onChange(listener).also { listener(it.value) }
     }
 
     fun getValue(key: String): Any? = configValues[key]

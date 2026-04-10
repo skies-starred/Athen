@@ -7,10 +7,10 @@ import tech.thatgravyboat.skyblockapi.platform.scale
 import tech.thatgravyboat.skyblockapi.platform.translate
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.handlers.Scram
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.Dev
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.Render2D.text
+import xyz.aerii.library.api.client
 import kotlin.math.roundToInt
 
 @Priority(-1)
@@ -30,7 +30,7 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
     private val active: HUDElement?
         get() = dragging ?: _act.filter { it.render }.asReversed().firstOrNull { it.isHovered(mx, my) }
 
-    override fun onScramRender(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun onScramRender(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         mx = Resolute.mx
         my = Resolute.my
 
@@ -46,8 +46,8 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
             y = (((y - pad) / 8f).roundToInt() * 8f) + pad
         }
 
-        Resolute.push(guiGraphics)
-        guiGraphics.fill(0, 0, Resolute.width.toInt(), Resolute.height.toInt(), Mocha.Mauve.withAlpha(0.1f))
+        Resolute.push(graphics)
+        graphics.fill(0, 0, Resolute.width.toInt(), Resolute.height.toInt(), Mocha.Mauve.withAlpha(0.1f))
 
         if (grid) {
             val color = Mocha.Surface0.withAlpha(0.35f)
@@ -56,30 +56,30 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
 
             var gx = 0
             while (gx <= rw) {
-                guiGraphics.fill(gx, 0, gx + 1, rh, color)
+                graphics.fill(gx, 0, gx + 1, rh, color)
                 gx += 8
             }
 
             var gy = 0
             while (gy <= rh) {
-                guiGraphics.fill(0, gy, rw, gy + 1, color)
+                graphics.fill(0, gy, rw, gy + 1, color)
                 gy += 8
             }
         }
 
         for (e in _act.filter { it.render }) {
-            guiGraphics.pose().pushMatrix()
-            guiGraphics.translate(e.x, e.y)
-            guiGraphics.scale(e.scale, e.scale)
+            graphics.pose().pushMatrix()
+            graphics.translate(e.x, e.y)
+            graphics.scale(e.scale, e.scale)
 
-            guiGraphics.fill(-4, -4, e.width + 4, e.height + 4, Mocha.Base.withAlpha(0.5f))
-            guiGraphics.drawOutline(-4, -4, e.width + 8, e.height + 8, Mocha.Text.argb)
+            graphics.fill(-4, -4, e.width + 4, e.height + 4, Mocha.Base.withAlpha(0.5f))
+            graphics.drawOutline(-4, -4, e.width + 8, e.height + 8, Mocha.Text.argb)
 
-            guiGraphics.pose().pushMatrix()
-            e.render(guiGraphics, true)
-            guiGraphics.pose().popMatrix()
+            graphics.pose().pushMatrix()
+            e.render(graphics, true)
+            graphics.pose().popMatrix()
 
-            guiGraphics.pose().popMatrix()
+            graphics.pose().popMatrix()
         }
 
         active?.let { e ->
@@ -87,17 +87,17 @@ object HUDEditor : Scram("HUD Editor [Athen]") {
             val textWidth = client.font.width(text)
             val textHeight = client.font.lineHeight
 
-            guiGraphics.pose().pushMatrix()
-            guiGraphics.translate(mx + 12, my - textHeight / 2)
+            graphics.pose().pushMatrix()
+            graphics.translate(mx + 12, my - textHeight / 2)
 
-            guiGraphics.fill(-6, -6, textWidth + 6, textHeight + 6, Mocha.Base.withAlpha(0.8f))
-            guiGraphics.drawOutline(-6, -6, textWidth + 12, textHeight + 12, Mocha.Text.argb)
-            guiGraphics.text(text, 0, 0, false, Mocha.Text.argb)
-            guiGraphics.pose().popMatrix()
+            graphics.fill(-6, -6, textWidth + 6, textHeight + 6, Mocha.Base.withAlpha(0.8f))
+            graphics.drawOutline(-6, -6, textWidth + 12, textHeight + 12, Mocha.Text.argb)
+            graphics.text(text, 0, 0, false, Mocha.Text.argb)
+            graphics.pose().popMatrix()
         }
 
-        Help.render(guiGraphics)
-        Resolute.pop(guiGraphics)
+        Help.render(graphics)
+        Resolute.pop(graphics)
     }
 
     override fun onScramMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {

@@ -7,7 +7,7 @@ import net.minecraft.world.item.Items
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.ITerminalSim
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.SimulatorMenu
-import xyz.aerii.athen.utils.EMPTY_COMPONENT
+import xyz.aerii.library.api.EMPTY_COMPONENT
 import kotlin.random.Random
 
 class PanesSimulator : ITerminalSim(TerminalType.PANES) {

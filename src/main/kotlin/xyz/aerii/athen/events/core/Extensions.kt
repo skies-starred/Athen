@@ -3,8 +3,10 @@
 package xyz.aerii.athen.events.core
 
 import net.minecraft.network.protocol.Packet
-import xyz.aerii.athen.events.*
-import xyz.aerii.athen.handlers.React
+import xyz.aerii.athen.events.CommandRegistration
+import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.PacketEvent
+import xyz.aerii.library.handlers.Observable
 
 inline fun <reified T : Event> on(
     priority: Int = 0,
@@ -20,14 +22,14 @@ inline fun <reified E : PacketEvent, reified P : Packet<*>> on(
     }
 }
 
-fun Node<*>.runWhen(state: React<Boolean>) = apply {
+fun Node<*>.runWhen(state: Observable<Boolean>) = apply {
     if (overridden) return@apply
     if (eventClass == CommandRegistration::class.java) return@apply
     if (LocationEvent.Server::class.java.isAssignableFrom(eventClass)) return@apply
     add(state)
 }
 
-fun Node<*>.override(state: React<Boolean>) = apply {
+fun Node<*>.override(state: Observable<Boolean>) = apply {
     overridden = true
     conditions.clear()
     add(state)
@@ -39,7 +41,7 @@ fun Node<*>.override() = apply {
     register()
 }
 
-private fun Node<*>.add(state: React<Boolean>) = apply {
+private fun Node<*>.add(state: Observable<Boolean>) = apply {
     conditions.add(state)
     state.onChange { evaluate() }
     evaluate()

@@ -7,7 +7,7 @@ import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 import xyz.aerii.athen.annotations.Load
-import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.library.api.client
 import java.awt.Color
 
 @Load

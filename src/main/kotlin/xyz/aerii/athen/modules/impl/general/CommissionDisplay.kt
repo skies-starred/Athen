@@ -11,12 +11,12 @@ import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.handlers.Ticking
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.formatted
 import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.fcs
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.formatted
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.DWARVEN_MINES, SkyBlockIsland.MINESHAFT, SkyBlockIsland.CRYSTAL_HOLLOWS])
@@ -52,7 +52,7 @@ object CommissionDisplay : Module(
 
         config.hud("Commission display") {
             if (it) return@hud sizedText(ex0)
-            sizedText(display() ?: return@hud null)
+            sizedText(display.value ?: return@hud null)
         }
     }
 

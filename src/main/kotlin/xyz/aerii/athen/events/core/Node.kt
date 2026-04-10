@@ -1,6 +1,6 @@
 package xyz.aerii.athen.events.core
 
-import xyz.aerii.athen.handlers.React
+import xyz.aerii.library.handlers.Observable
 import java.util.concurrent.atomic.AtomicBoolean
 
 class Node<T : Event>(
@@ -10,7 +10,7 @@ class Node<T : Event>(
 ) {
     private val state = AtomicBoolean(false)
     internal var overridden = false
-    internal val conditions = mutableListOf<React<Boolean>>()
+    internal val conditions = mutableListOf<Observable<Boolean>>()
 
     fun once() = apply {
         val original = handler

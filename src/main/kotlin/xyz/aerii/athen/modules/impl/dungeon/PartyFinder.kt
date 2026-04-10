@@ -28,23 +28,20 @@ import xyz.aerii.athen.events.PacketEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Notifier.notify
-import xyz.aerii.athen.handlers.Smoothie
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Texter.onHover
-import xyz.aerii.athen.handlers.Typo.command
-import xyz.aerii.athen.handlers.Typo.lie
-import xyz.aerii.athen.handlers.Typo.repeatBreak
-import xyz.aerii.athen.handlers.Typo.stripped
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
-import xyz.aerii.athen.utils.*
-import xyz.aerii.athen.utils.mainThread
+import xyz.aerii.athen.utils.PlayerStats
+import xyz.aerii.athen.utils.calculateMP
+import xyz.aerii.athen.utils.fetchPlayerStats
+import xyz.aerii.athen.utils.parseItem
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
+import xyz.aerii.library.api.*
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.handlers.time.server
+import xyz.aerii.library.utils.*
 import java.awt.Color
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.milliseconds
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.DUNGEON_HUB])
@@ -106,7 +103,7 @@ object PartyFinder : Module(
     private val sendKickToParty by config.switch("Send to party", false).childOf { _autoKick }.dependsOn { sendKickMessage }
 
     private val canKick: Boolean
-        get() = autoKick && (PartyAPI.leader?.name ?: Smoothie.playerName) == Smoothie.playerName
+        get() = autoKick && (PartyAPI.leader?.name ?: name) == name
 
     private data class CachedStats(
         val stats: PlayerStats,
@@ -140,7 +137,7 @@ object PartyFinder : Module(
     }
 
     init {
-        Chronos.Time every 1.hours repeat {
+        Chronos.repeat(1.hours) {
             val now = System.currentTimeMillis()
             pfCache.entries.removeIf { (_, cached) -> now - cached.storedAt > 1.hours.inWholeMicroseconds }
             statsCache.entries.removeIf { (_, cached) -> now - cached.storedAt > 1.hours.inWholeMicroseconds }
@@ -168,7 +165,7 @@ object PartyFinder : Module(
             if (!joinStats && !canKick) return@on
 
             val username = pfJoinRegex.findGroup(stripped, "name") ?: return@on
-            if (username == client.player?.name?.string) return@on
+            if (username == name) return@on
 
             val cached = statsCache[username]
             if (cached != null && !cached.stats.loading) {
@@ -379,7 +376,7 @@ object PartyFinder : Module(
         "Kicked <aqua>$username<r>: $reason".notify()
 
         if (!sendKickToParty) return
-        Chronos.Time after 100.milliseconds then {
+        Chronos.schedule(2.server) {
             "pc [Athen] Kicked $username: $reason".command()
         }
     }
@@ -404,7 +401,7 @@ object PartyFinder : Module(
         val avgStr = secretAvg?.let { "§b%.1f".format(it) } ?: "§7?"
         val mpStr = bagData?.calculateMP(abiphoneContacts, consumedPrism)?.let { "§d$it" } ?: "§7?"
 
-        "§8§m${"-".repeatBreak()}".lie()
+        "§8§m${"-".repeat()}".lie()
         "§6Stats for §b$username §8[$cat§8] §8[§5MP: $mpStr§8]".lie()
         "  §7Secrets: $secretsStr §8| §7Avg: $avgStr".lie()
 
@@ -438,7 +435,7 @@ object PartyFinder : Module(
                 }
             }
 
-        "§8§m${"-".repeatBreak()}".lie()
+        "§8§m${"-".repeat()}".lie()
     }
 
     private fun PlayerStats.buildLine(floor: Int, master: Boolean, username: String, usernameColor: Int?, className: String, classLevel: Int): Component {

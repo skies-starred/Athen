@@ -2,8 +2,8 @@
 
 package xyz.aerii.athen.ui.themes
 
-import xyz.aerii.athen.utils.rgba
-import xyz.aerii.athen.utils.withAlpha
+import xyz.aerii.library.utils.rgba
+import xyz.aerii.library.utils.withAlpha
 
 // Everything is from https://catppuccin.com/palette/, love them.
 object Catppuccin {

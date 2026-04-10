@@ -4,8 +4,8 @@ import com.google.gson.JsonObject
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtIo
 import xyz.aerii.athen.Athen
-import xyz.aerii.athen.handlers.Beacon
-import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.athen.handlers.Beacon.request
+import xyz.aerii.library.utils.stripped
 import kotlin.io.encoding.Base64
 import kotlin.jvm.optionals.getOrNull
 
@@ -71,8 +71,8 @@ fun fetchPlayerStats(
 ) {
     val joined = names.joinToString(",")
     val str = if (include.isNotEmpty()) "&include=${include.joinToString(",")}" else ""
-    Beacon.get("stats?names=$joined$str&gzip=true".api, true) {
-        onJsonSuccess { json ->
+    "stats?names=$joined$str&gzip=true".api.request {
+        onSuccess<JsonObject> { json ->
             val result = buildMap {
                 for ((name, element) in json.entrySet()) {
                     val obj = element.asJsonObject

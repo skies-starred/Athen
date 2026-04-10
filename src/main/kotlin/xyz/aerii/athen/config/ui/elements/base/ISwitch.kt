@@ -2,11 +2,11 @@
 
 package xyz.aerii.athen.config.ui.elements.base
 
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.brighten
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.athen.utils.render.animations.springValue
+import xyz.aerii.library.utils.brighten
+import xyz.aerii.library.utils.hovered
 
 class ISwitch(initialValue: Boolean, private val enabledColor: Int = Mocha.Green.argb.brighten(0.8f)) {
     private val `anim$thumb` = springValue(if (initialValue) 26f else 2f, 0.25f)
@@ -14,7 +14,7 @@ class ISwitch(initialValue: Boolean, private val enabledColor: Int = Mocha.Green
     private val `anim$scale` = springValue(1f, 0.3f)
 
     fun draw(x: Float, y: Float, enabled: Boolean): Boolean {
-        val hovered = isAreaHovered(x, y, 40f, 16f)
+        val hovered = hovered(x, y, 40f, 16f)
 
         `anim$thumb`.value = if (enabled) 26f else 2f
         `anim$track`.value = if (enabled) enabledColor else Mocha.Base.argb
@@ -39,6 +39,4 @@ class ISwitch(initialValue: Boolean, private val enabledColor: Int = Mocha.Green
 
         return hovered
     }
-
-    fun isHovered(x: Float, y: Float) = isAreaHovered(x, y, 40f, 16f)
 }

@@ -10,10 +10,10 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.abbreviate
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.abbreviate
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.CRIMSON_ISLE])

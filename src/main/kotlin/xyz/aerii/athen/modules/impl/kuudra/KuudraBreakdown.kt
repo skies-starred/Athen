@@ -9,12 +9,12 @@ import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.MessageEvent
-import xyz.aerii.athen.handlers.Smoothie
 import xyz.aerii.athen.handlers.Texter.onHover
-import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.library.api.lie
+import xyz.aerii.library.api.name
+import xyz.aerii.library.handlers.parser.parse
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])
@@ -71,12 +71,12 @@ object KuudraBreakdown : Module(
             }
 
             if (stripped == "Your Fresh Tools Perk bonus doubles your building speed for the next 10 seconds!") {
-                set.find { it.name == Smoothie.playerName }?.fresh++
+                set.find { it.name == name }?.fresh++
                 return@on
             }
 
             partyRegex.findThenNull(stripped, "username", "message") { (username, message) ->
-                if (username == Smoothie.playerName) return@findThenNull
+                if (username == name) return@findThenNull
                 if (freshRegex?.matches(message) != true) return@findThenNull
                 set.find { it.name == username }?.fresh++
             } ?: return@on

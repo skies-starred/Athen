@@ -22,14 +22,8 @@ import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.KuudraEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Ticking
-import xyz.aerii.athen.handlers.Typo.centeredText
-import xyz.aerii.athen.handlers.Typo.command
-import xyz.aerii.athen.handlers.Typo.lie
 import xyz.aerii.athen.handlers.Typo.modMessage
-import xyz.aerii.athen.handlers.Typo.repeatBreak
-import xyz.aerii.athen.handlers.parse
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.kuudra.carry.KuudraCarryStateTracker.tracked
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
@@ -37,7 +31,13 @@ import xyz.aerii.athen.utils.render.Render2D.sizedText
 import xyz.aerii.athen.utils.render.Render3D
 import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.render.renderBoundingBox
-import xyz.aerii.athen.utils.toDuration
+import xyz.aerii.library.api.center
+import xyz.aerii.library.api.command
+import xyz.aerii.library.api.lie
+import xyz.aerii.library.api.repeat
+import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.literal
+import xyz.aerii.library.utils.toDuration
 import java.awt.Color
 import java.util.concurrent.CompletableFuture
 
@@ -58,7 +58,7 @@ object KuudraCarryTracker : Module(
     private val ex0 = listOf("§f§lKuudra Carries:", "§7> §bExample §8[§7Infernal§8]§f: §b3§f/§b10 §7(5m 30s | 12/hr)").fcs
     private val hud: ConfigBuilder.HUDElementBuilder = config.hud("Kuudra carry display") {
         if (it) return@hud sizedText(ex0)
-        sizedText(display() ?: return@hud null)
+        sizedText(display.value ?: return@hud null)
     }
 
     private val `hud$kuudra` by config.switch("Only in Kuudra", true).dependsOn { hud.enabled }
@@ -216,10 +216,10 @@ object KuudraCarryTracker : Module(
             "/${Athen.modId} kcarry history [page=1]" to "Show tracked history"
         )
 
-        val divider = ("§8§m" + ("-".repeatBreak())).literal()
+        val divider = ("§8§m" + ("-".repeat())).literal()
 
         divider.lie()
-        "§bAthen Kuudra Carry Commands".centeredText().lie()
+        "§bAthen Kuudra Carry Commands".center().lie()
         divider.lie()
 
         for ((c, d) in commands) "  <${Mocha.Green.argb}>$c <dark_gray>- <gray>$d".parse().lie()

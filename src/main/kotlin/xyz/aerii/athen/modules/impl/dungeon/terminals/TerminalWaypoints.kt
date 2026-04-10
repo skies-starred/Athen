@@ -9,10 +9,10 @@ import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.runWhen
-import xyz.aerii.athen.handlers.React
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.markerAABB
 import xyz.aerii.athen.utils.render.Render3D
+import xyz.aerii.library.handlers.Observable
 import java.awt.Color
 
 @Load
@@ -111,7 +111,7 @@ object TerminalWaypoints : Module(
     // </editor-fold>
 
     private var c: List<Node> = emptyList()
-    private var r: React<Boolean> = React(false)
+    private var r: Observable<Boolean> = Observable(false)
 
     init {
         DungeonAPI.P3Phase.onChange {

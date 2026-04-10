@@ -3,8 +3,9 @@
 package xyz.aerii.athen.hud
 
 import net.minecraft.client.gui.GuiGraphics
-import xyz.aerii.athen.handlers.Scurry
-import xyz.aerii.athen.handlers.Smoothie.client
+import xyz.aerii.library.api.client
+import xyz.aerii.library.utils.mouseSX
+import xyz.aerii.library.utils.mouseSY
 
 // Defaults to 1080 / 2, intended :eyes:
 object Resolute {
@@ -17,10 +18,10 @@ object Resolute {
         private set
 
     val mx: Float
-        get() = s(Scurry.x)
+        get() = s(mouseSX)
 
     val my: Float
-        get() = s(Scurry.y)
+        get() = s(mouseSY)
 
     fun s(f: Float): Float {
         return f / scale

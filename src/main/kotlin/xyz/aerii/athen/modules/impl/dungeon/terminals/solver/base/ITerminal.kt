@@ -4,12 +4,12 @@ import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.item.ItemStack
 import xyz.aerii.athen.api.dungeon.terminals.TerminalAPI
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.TerminalSimulator
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.ITerminalSim
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.TerminalSolver
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.nvg.NVGRenderer
+import xyz.aerii.library.api.client
 import java.util.concurrent.CopyOnWriteArrayList
 
 abstract class ITerminal(val terminalType: TerminalType) {

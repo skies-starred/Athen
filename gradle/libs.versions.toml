@@ -1,5 +1,5 @@
 [versions]
-loom = "1.14-SNAPSHOT"
+loom = "1.15-SNAPSHOT"
 fletchingTable = "0.1.0-alpha.22"
 ksp = "2.3.0"
 kotlin = "2.3.0"
@@ -28,6 +28,7 @@ skyblock-api = "4.0.13"
 classgraph = "4.8.184"
 lwjgl-nanovg = "3.3.3"
 autoupdate = "1.3.1"
+library = "2c8afba485"
 
 hypixel-modapi = "1.0.1"
 hypixel-modapi-fabric = "1.0.1+build.1+mc1.21"
@@ -40,6 +41,9 @@ devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth"
 
 fabric-api-1-21-10 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-1-21-10" }
 fabric-api-1-21-11 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-1-21-11" }
+
+library-1-21-10 = { module = "com.github.skies-starred.library:library-1.21.10", version.ref = "library" }
+library-1-21-11 = { module = "com.github.skies-starred.library:library-1.21.11", version.ref = "library" }
 
 modmenu-1-21-10 = { module = "com.terraformersmc:modmenu", version.ref = "modmenu-1-21-10" }
 modmenu-1-21-11 = { module = "com.terraformersmc:modmenu", version.ref = "modmenu-1-21-11" }

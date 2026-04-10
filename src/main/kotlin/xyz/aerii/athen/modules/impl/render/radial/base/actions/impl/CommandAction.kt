@@ -3,9 +3,9 @@
 package xyz.aerii.athen.modules.impl.render.radial.base.actions.impl
 
 import xyz.aerii.athen.annotations.Load
-import xyz.aerii.athen.handlers.Typo.clientCommand
 import xyz.aerii.athen.modules.impl.render.radial.base.actions.ActionType
 import xyz.aerii.athen.modules.impl.render.radial.base.actions.IAction
+import xyz.aerii.library.api.command
 
 @Load
 class CommandAction(val command: String) : IAction {
@@ -15,7 +15,7 @@ class CommandAction(val command: String) : IAction {
 
     override fun run() {
         if (command.isEmpty()) return
-        command.clientCommand()
+        command.command()
     }
 
     companion object {

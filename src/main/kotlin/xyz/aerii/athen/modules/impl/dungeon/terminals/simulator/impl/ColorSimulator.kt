@@ -7,11 +7,11 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import xyz.aerii.athen.api.dungeon.terminals.TerminalType
-import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.ITerminalSim
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.SimulatorMenu
 import xyz.aerii.athen.utils.glint
+import xyz.aerii.library.utils.literal
 import kotlin.random.Random
 
 class ColorSimulator(

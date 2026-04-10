@@ -3,9 +3,9 @@
 package xyz.aerii.athen.config.ui.elements
 
 import xyz.aerii.athen.config.ui.elements.base.IBaseUI
-import xyz.aerii.athen.handlers.Scurry.isAreaHovered
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.utils.render.animations.springValue
+import xyz.aerii.library.utils.hovered
 
 class ButtonElement(
     text: String,
@@ -25,7 +25,7 @@ class ButtonElement(
         val buttonW = width - 12f
         val buttonH = 26f
 
-        val isHovered = isAreaHovered(buttonX, buttonY, buttonW, buttonH)
+        val isHovered = hovered(buttonX, buttonY, buttonW, buttonH)
 
         `anim$bg`.value = if (isHovered) Mocha.Surface2.argb else Mocha.Base.argb
         `anim$hover`.value = if (isHovered) 1.025f else 1f
@@ -42,7 +42,7 @@ class ButtonElement(
         if (button != 0) return false
         val buttonX = lastX + 6f
         val buttonY = lastY + 6f
-        if (!isAreaHovered(buttonX, buttonY, width - 12f, 26f)) return false
+        if (!hovered(buttonX, buttonY, width - 12f, 26f)) return false
 
         `anim$click`.value = 0.92f
         onClick()

@@ -11,7 +11,7 @@ import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 import xyz.aerii.athen.events.core.CancellableEvent
 import xyz.aerii.athen.events.core.Event
-import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.library.utils.stripped
 
 sealed class GuiEvent {
     sealed class Render {

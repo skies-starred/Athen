@@ -10,8 +10,8 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.SoundPlayEvent
-import xyz.aerii.athen.handlers.Smoothie.heldItem
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.library.api.held
 
 @Load
 @OnlyIn(skyblock = true)
@@ -31,7 +31,7 @@ object TerminatorSounds : Module(
             if (sound == SoundEvents.ARROW_HIT && !wall) return@on cancel()
             if (sound != SoundEvents.ARROW_HIT && sound != SoundEvents.ARROW_HIT_PLAYER) return@on
 
-            val i = heldItem ?: return@on
+            val i = held ?: return@on
             if (i.item !is BowItem) return@on
             if (i.getData(DataTypes.SKYBLOCK_ID)?.skyblockId != "TERMINATOR") return@on
 

@@ -1,6 +1,6 @@
 package xyz.aerii.athen.modules.common.carry
 
-import xyz.aerii.athen.utils.toDuration
+import xyz.aerii.library.utils.toDuration
 
 interface ITrackedCarry {
     val player: String

@@ -12,7 +12,7 @@ import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
-import xyz.aerii.athen.utils.withAlpha
+import xyz.aerii.library.utils.withAlpha
 import java.awt.Color
 
 @Load

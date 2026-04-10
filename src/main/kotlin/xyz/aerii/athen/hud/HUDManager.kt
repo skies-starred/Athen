@@ -10,8 +10,9 @@ import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
-import xyz.aerii.athen.handlers.Smoothie.client
 import xyz.aerii.athen.modules.impl.ModSettings
+import xyz.aerii.library.api.client
+import xyz.aerii.library.handlers.time.client
 
 @Priority(-2)
 object HUDManager {
@@ -41,7 +42,7 @@ object HUDManager {
 
     fun register(element: HUDElement) {
         elements[element.id] = element
-        Chronos.Tick run { get(element.id) }
+        Chronos.schedule(1.client){ get(element.id) }
     }
 
     fun set() {

@@ -47,8 +47,9 @@ import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Chronos
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Typo.stripped
+import xyz.aerii.library.api.level
+import xyz.aerii.library.handlers.time.client
+import xyz.aerii.library.utils.stripped
 import java.lang.ref.WeakReference
 import kotlin.math.abs
 
@@ -67,7 +68,7 @@ object EntityAPI {
     @JvmStatic
     fun attach(ent: Entity) {
         val lit = ent.customName ?: return
-        val level = client.level ?: return
+        val level = level ?: return
         if (lit.stripped().damage()) return
 
         var a: Entity? = null
@@ -136,9 +137,9 @@ object EntityAPI {
 
         fun tick() {
             if (ent.customName != null) return attach(ent)
-            if (tries++ < 3) Chronos.Tick after 1 then ::tick
+            if (tries++ < 3) Chronos.schedule(1.client) { tick() }
         }
 
-        Chronos.Tick after 2 then ::tick
+        Chronos.schedule(2.client) { tick() }
     }
 }

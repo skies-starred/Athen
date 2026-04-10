@@ -58,10 +58,10 @@ import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.on
-import xyz.aerii.athen.handlers.Smoothie.client
-import xyz.aerii.athen.handlers.Texter.literal
 import xyz.aerii.athen.utils.markerAABB
 import xyz.aerii.athen.utils.render.pipelines.StarredRenderTypes
+import xyz.aerii.library.api.client
+import xyz.aerii.library.utils.literal
 import java.awt.Color
 import kotlin.math.abs
 import kotlin.math.cos
