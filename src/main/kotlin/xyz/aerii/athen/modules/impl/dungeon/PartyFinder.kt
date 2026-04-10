@@ -70,14 +70,23 @@ object PartyFinder : Module(
     private val showStats = config.switch("Show stats").custom("showStats")
     private val statsToShow by config.multiCheckbox("Stats to show", listOf("Class level", "Cata level", "Secrets", "Secret average", "Personal best", "Missing classes"), listOf(0, 1, 2, 3, 4, 5)).dependsOn { showStats.value }
 
-    private val highlight = config.switch("Highlight parties").custom("highlight")
-    private val joinableColor by config.colorPicker("Joinable", Color(0,255, 0)).dependsOn { highlight.value }
-    private val dupeColor by config.colorPicker("Dupe", Color(255, 255, 0)).dependsOn { highlight.value }
-    private val blockedColor by config.colorPicker("Blocked", Color(255, 0, 0)).dependsOn { highlight.value }
-    private val highlightSpecial by config.switch("Highlight special", true).dependsOn { highlight.value }
-    private val vcColor by config.colorPicker("VC", Color(115, 0, 255)).dependsOn { highlight.value && highlightSpecial }
-    private val permColor by config.colorPicker("Perm", Color(0, 255, 255)).dependsOn { highlight.value && highlightSpecial }
-    private val carryColor by config.colorPicker("Carry", Color(100, 0, 0)).dependsOn { highlight.value && highlightSpecial }
+    private val _highlight by config.expandable("Highlights")
+    private val highlight = config.switch("Highlight parties").childOf { _highlight }.custom("highlight")
+
+    private val joinable by config.switch("Joinable", true).dependsOn { highlight.value }.childOf { _highlight }
+    private val joinableColor by config.colorPicker("Joinable color", Color(0,255, 0)).dependsOn { highlight.value && joinable }.childOf { _highlight }
+    private val dupe by config.switch("Dupe", true).dependsOn { highlight.value }.childOf { _highlight }
+    private val dupeColor by config.colorPicker("Dupe color", Color(255, 255, 0)).dependsOn { highlight.value && dupe }.childOf { _highlight }
+    private val blocked by config.switch("Blocked", true).dependsOn { highlight.value }.childOf { _highlight }
+    private val blockedColor by config.colorPicker("Blocked color", Color(255, 0, 0)).dependsOn { highlight.value && blocked }.childOf { _highlight }
+
+    private val highlightSpecial by config.switch("Highlight special", true).dependsOn { highlight.value }.childOf { _highlight }
+    private val vc by config.switch("VC").dependsOn { highlight.value && highlightSpecial }.childOf { _highlight }
+    private val vcColor by config.colorPicker("VC color", Color(115, 0, 255)).dependsOn { highlight.value && highlightSpecial && vc }.childOf { _highlight }
+    private val perm by config.switch("Perm").dependsOn { highlight.value && highlightSpecial }.childOf { _highlight }
+    private val permColor by config.colorPicker("Perm color", Color(0, 255, 255)).dependsOn { highlight.value && highlightSpecial && perm }.childOf { _highlight }
+    private val carry by config.switch("Carry").dependsOn { highlight.value && highlightSpecial }.childOf { _highlight }
+    private val carryColor by config.colorPicker("Carry color", Color(100, 0, 0)).dependsOn { highlight.value && highlightSpecial && carry }.childOf { _highlight }
 
     private val _joinStats by config.expandable("Stats on join")
     private val joinStats by config.switch("Stats on join").childOf { _joinStats }
@@ -120,7 +129,7 @@ object PartyFinder : Module(
     private enum class SlotStatus {
         BLOCKED,
         DUPE,
-        ALLOWED
+        JOINABLE
     }
 
     private enum class Special {
@@ -184,18 +193,18 @@ object PartyFinder : Module(
 
             if (special != Special.NONE) {
                 when (special) {
-                    Special.VC -> graphics.drawRectangle(slot.x, slot.y, 16, 16, vcColor)
-                    Special.PERM -> graphics.drawRectangle(slot.x, slot.y, 16, 16, permColor)
-                    Special.CARRY -> graphics.drawRectangle(slot.x, slot.y, 16, 16, carryColor)
+                    Special.VC -> if (vc) graphics.drawRectangle(slot.x, slot.y, 16, 16, vcColor)
+                    Special.PERM -> if (perm) graphics.drawRectangle(slot.x, slot.y, 16, 16, permColor)
+                    Special.CARRY -> if (carry) graphics.drawRectangle(slot.x, slot.y, 16, 16, carryColor)
                 }
 
                 return@on
             }
 
             when (status) {
-                SlotStatus.BLOCKED -> graphics.drawRectangle(slot.x, slot.y, 16, 16, blockedColor)
-                SlotStatus.DUPE -> graphics.drawRectangle(slot.x, slot.y, 16, 16, dupeColor)
-                SlotStatus.ALLOWED -> graphics.drawRectangle(slot.x, slot.y, 16, 16, joinableColor)
+                SlotStatus.BLOCKED -> if (blocked) graphics.drawRectangle(slot.x, slot.y, 16, 16, blockedColor)
+                SlotStatus.DUPE -> if (dupe) graphics.drawRectangle(slot.x, slot.y, 16, 16, dupeColor)
+                SlotStatus.JOINABLE -> if (joinable) graphics.drawRectangle(slot.x, slot.y, 16, 16, joinableColor)
             }
         }.runWhen(highlight.state)
 
@@ -279,7 +288,7 @@ object PartyFinder : Module(
                 val status = when {
                     blocked -> SlotStatus.BLOCKED
                     dupe -> SlotStatus.DUPE
-                    else -> SlotStatus.ALLOWED
+                    else -> SlotStatus.JOINABLE
                 }
 
                 val special = when {
