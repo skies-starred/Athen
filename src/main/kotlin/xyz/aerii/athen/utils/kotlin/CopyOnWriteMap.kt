@@ -1,6 +1,6 @@
 package xyz.aerii.athen.utils.kotlin
 
-import java.util.Collections
+import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 class CopyOnWriteMap<K, V>(
