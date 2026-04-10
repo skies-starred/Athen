@@ -97,7 +97,7 @@ object PartyFinder : Module(
     private val sendKickToParty by config.switch("Send to party", false).childOf { _autoKick }.dependsOn { sendKickMessage }
 
     private val canKick: Boolean
-        get() = autoKick && PartyAPI.leader?.name == Smoothie.playerName
+        get() = autoKick && (PartyAPI.leader?.name ?: Smoothie.playerName) == Smoothie.playerName
 
     private data class CachedStats(
         val stats: PlayerStats,
