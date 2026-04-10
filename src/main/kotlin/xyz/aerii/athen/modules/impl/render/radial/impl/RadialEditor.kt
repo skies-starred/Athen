@@ -53,6 +53,8 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
     private val fields = listOf(nameField, itemField, valField, texField)
     private var type = 0
 
+    private var last = -1
+
     private var scroll = 0
     private var maxScroll = 0
     private val zones = mutableListOf<UIZone>()
@@ -79,9 +81,18 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
         working.addAll(RadialMenu.slots)
         collapsed.clear()
         reload(0, -1)
+
+        if (last != -1) return
+        last = client.options.guiScale().get()
+        client.options.guiScale().set(2)
     }
 
     override fun onScramClose() {
+        if (last != -1) {
+            client.options.guiScale().set(last)
+            last = -1
+        }
+
         commit()
         RadialMenu.slots.clear()
         RadialMenu.slots.addAll(working)
