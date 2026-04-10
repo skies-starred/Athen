@@ -43,6 +43,7 @@ dependencies {
 
     modRuntimeOnly(libs.devauth)
     modCompileOnly("entityculling".mc(mc))
+    modCompileOnly("exordium".mc(mc))
 
     modImplementation("modmenu".mc(mc))
     modImplementation("fabric-api".mc(mc))

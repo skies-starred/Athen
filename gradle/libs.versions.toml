@@ -21,6 +21,9 @@ parchment-1-21-11 = "2025.12.20"
 entityculling-1-21-10 = "zwBaFdjH"
 entityculling-1-21-11 = "Dx3xsUER"
 
+exordium-1-21-10 = "NH3FiE1F"
+exordium-1-21-11 = "nFGhHBIh"
+
 skyblock-api = "4.0.13"
 classgraph = "4.8.184"
 lwjgl-nanovg = "3.3.3"
@@ -46,6 +49,9 @@ parchment-1-21-11 = { module = "org.parchmentmc.data:parchment-1.21.11", version
 
 entityculling-1-21-10 = { module = "maven.modrinth:entityculling", version.ref = "entityculling-1-21-10" }
 entityculling-1-21-11 = { module = "maven.modrinth:entityculling", version.ref = "entityculling-1-21-11" }
+
+exordium-1-21-10 = { module = "maven.modrinth:exordium", version.ref = "exordium-1-21-10" }
+exordium-1-21-11 = { module = "maven.modrinth:exordium", version.ref = "exordium-1-21-11" }
 
 skyblock-api = { module = "tech.thatgravyboat:skyblock-api", version.ref = "skyblock-api" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }

@@ -64,14 +64,6 @@ object RadialMenu : Module(
     private val _unused1 by config.textParagraph("The configs can be exported/imported using the command <red>\"/athen radial [export|import]\"<r>. View all commands using <red>\"/athen radial help\"<r>!")
 
     private val stack = ArrayDeque<List<ISlot>>()
-    private val open = React(false).onChange {
-        if (it) return@onChange
-
-        stack.clear()
-        idx = -1
-        idx0 = -1
-        idx1 = -1
-    }
 
     private val current: List<ISlot>
         get() = stack.lastOrNull() ?: slots
@@ -82,14 +74,23 @@ object RadialMenu : Module(
 
     private val scribble = Scribble("features/radialMenu")
 
+    val slots = mutableListOf<ISlot>()
+    val configs = mutableMapOf<String, List<SlotData>>()
+
+    val open = React(false).onChange {
+        if (it) return@onChange
+
+        stack.clear()
+        idx = -1
+        idx0 = -1
+        idx1 = -1
+    }
+
     var active: String by scribble.string("active", "Default")
         private set
 
     var saved: String by scribble.string("configs")
         private set
-
-    val slots = mutableListOf<ISlot>()
-    val configs = mutableMapOf<String, List<SlotData>>()
 
     init {
         on<GameEvent.Start> {
