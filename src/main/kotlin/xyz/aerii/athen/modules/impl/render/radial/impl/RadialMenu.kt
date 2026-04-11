@@ -179,6 +179,28 @@ object RadialMenu : Module(
         }
 
         on<InputEvent.Mouse.Press> {
+            if (client.screen != null) return@on
+            if (buttonInfo.button() - 100 != keybind) return@on
+            if (open.value) return@on
+
+            react(if (releaseClose) true else !open.value, true)
+        }
+
+        on<InputEvent.Mouse.Release> {
+            if (client.screen != null) return@on
+            if (buttonInfo.button() - 100 != keybind) return@on
+            if (!open.value) return@on
+            if (!releaseClose) return@on
+
+            when {
+                idx0 != -1 && idx1 in current.indices -> current[idx1].sub.getOrNull(idx0)?.action?.run()
+                idx in current.indices -> current[idx].action.run()
+            }
+
+            react(false, bool = true)
+        }
+
+        on<InputEvent.Mouse.Press> {
             val cx = client.window.guiScaledWidth / 2
             val cy = client.window.guiScaledHeight / 2
             val dx = mouseSX - cx
