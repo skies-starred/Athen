@@ -16,6 +16,7 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.*
+import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Ticking
@@ -30,6 +31,7 @@ import xyz.aerii.athen.utils.render.fcs
 import xyz.aerii.athen.utils.render.renderBoundingBox
 import xyz.aerii.library.api.*
 import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.handlers.time.client
 import xyz.aerii.library.utils.literal
 import xyz.aerii.library.utils.toDuration
 import java.awt.Color
@@ -68,7 +70,7 @@ object SlayerCarryTracker : Module(
     private val playerLineWidth by config.slider("Player line width", 2f, 0f, 10f).dependsOn { highlightPlayer }
 
     private val tradeCompleteRegex = Regex("^Trade completed with (?:\\[.*?] )?(?<player>\\w+)!$")
-    private val coinsReceivedRegex = Regex("^\\+ (?<amount>\\d+\\.?\\d*)M coins$")
+    private val coinsReceivedRegex = Regex("^ \\+ (?<amount>\\d+\\.?\\d*)M coins$")
     private val deathRegex = Regex("^ ☠ (?<player>\\w+) was killed by (?<killer>.+)\\.$")
     private var recentTradeWith: String? = null
 
@@ -140,28 +142,30 @@ object SlayerCarryTracker : Module(
                     }
                 }.takeIf { it.isNotEmpty() } ?: return@findThenNull
 
-                when {
-                    matches.size == 1 -> {
-                        val match = matches.first()
-                        "Received payment for <aqua>${match.count}x <gray>${match.type.shortName} T${match.tier}<r> carries from <aqua>$recent<r>. "
-                            .parse()
-                            .append("Click to add".literal().onClick { add(recent, match.count, match.type.shortName.lowercase(), match.tier.toString()) })
-                            .modMessage()
-                    }
-
-                    else -> {
-                        val msg = "Found multiple matches, add for: ".literal()
-                        for ((i, m) in matches.withIndex()) {
-                            if (i > 0) msg.append(" ".literal())
-                            msg.append(
-                                "[${m.count}x ${m.type.shortName} T${m.tier}]"
-                                    .literal()
-                                    .withColor(TextColor.AQUA)
-                                    .onClick { add(recent, m.count, m.type.shortName.lowercase(), m.tier.toString()) }
-                            )
+                Chronos.schedule(1.client) {
+                    when {
+                        matches.size == 1 -> {
+                            val match = matches.first()
+                            "Received payment for <aqua>${match.count}x <gray>${match.type.shortName} T${match.tier}<r> carries from <aqua>$recent<r>. "
+                                .parse()
+                                .append("Click to add".literal().onClick { add(recent, match.count, match.type.shortName.lowercase(), match.tier.toString()) })
+                                .modMessage()
                         }
 
-                        msg.modMessage()
+                        else -> {
+                            val msg = "Found multiple matches, add for: ".literal()
+                            for ((i, m) in matches.withIndex()) {
+                                if (i > 0) msg.append(" ".literal())
+                                msg.append(
+                                    "[${m.count}x ${m.type.shortName} T${m.tier}]"
+                                        .literal()
+                                        .withColor(TextColor.AQUA)
+                                        .onClick { add(recent, m.count, m.type.shortName.lowercase(), m.tier.toString()) }
+                                )
+                            }
+
+                            msg.modMessage()
+                        }
                     }
                 }
             } ?: return@on
