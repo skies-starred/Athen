@@ -7,8 +7,8 @@ import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
 
 @Load
-object MarkLobbies: Module(
-    "Mark lobbies",
+object LobbyMarker : Module(
+    "Lobby marker",
     "Marks lobbies and alerts you if you have already been inside that lobby.",
     Category.GENERAL
 ) {
@@ -17,6 +17,7 @@ object MarkLobbies: Module(
 
     init {
         on<LocationEvent.ServerChange> {
+            if (type?.name != "SkyBlock") return@on
             if (mode != "crystal_hollows" && onlyCrystalHollows) return@on
             if (!lobbies.add(name)) "You've been in this lobby!".modMessage()
         }
