@@ -220,9 +220,9 @@ object SlayerCarryTracker : Module(
             if (tracked.isEmpty()) return@on
 
             if (highlightBoss) {
-                bossToPlayer.keys.removeIf { it.isRemoved }
-                bossToPlayer.keys.forEach { entity ->
-                    Render3D.drawBox(entity.renderBoundingBox, bossColor, bossLineWidth)
+                bossToPlayer.keys.removeIf {
+                    Render3D.drawBox(it.renderBoundingBox, bossColor, bossLineWidth)
+                    it.isRemoved
                 }
             }
 
