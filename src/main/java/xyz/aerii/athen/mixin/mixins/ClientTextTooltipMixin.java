@@ -4,7 +4,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import xyz.aerii.athen.modules.impl.render.CustomTooltip;
+import xyz.aerii.athen.modules.impl.render.tooltip.custom.CustomTooltip;
 
 @Mixin(ClientTextTooltip.class)
 public class ClientTextTooltipMixin {
