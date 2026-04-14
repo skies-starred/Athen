@@ -114,7 +114,6 @@ object CustomTooltip : Module(
 
     @JvmStatic
     fun render(graphics: GuiGraphics, font: Font, components: List<ClientTooltipComponent>, x: Int, y: Int, positioner: ClientTooltipPositioner) {
-        if (components.isEmpty()) return
         if (color != `border$color`.rgb && (client.screen as? AbstractContainerScreen<*>)?.getHoveredSlot() == null) color = `border$color`.rgb
 
         last = Chronos.ticks.client

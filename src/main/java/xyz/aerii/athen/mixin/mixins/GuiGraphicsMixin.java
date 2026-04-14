@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.aerii.athen.events.GuiEvent;
+import xyz.aerii.athen.modules.impl.render.tooltip.ScrollableTooltip;
 import xyz.aerii.athen.modules.impl.render.tooltip.custom.CustomTooltip;
 
 import java.util.List;
@@ -32,11 +33,16 @@ public class GuiGraphicsMixin {
 
     @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
     private void athen$renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, ResourceLocation background, CallbackInfo ci) {
-        if (!CustomTooltip.INSTANCE.getEnabled()) return;
+        boolean a = CustomTooltip.INSTANCE.getEnabled();
+        boolean b = ScrollableTooltip.INSTANCE.getEnabled();
 
-        CustomTooltip.render(self(), font, components, x, y, positioner);
+        if (!a && !b) return;
         ci.cancel();
+
+        if (a) CustomTooltip.render(self(), font, components, x, y, positioner);
+        else ScrollableTooltip.fn(self(), font, components, x, y, positioner, background);
     }
+
 
     @Unique
     private GuiGraphics self() {
