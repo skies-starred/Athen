@@ -105,8 +105,10 @@ object CustomTooltip : Module(
                 return@on
             }
 
-            val n = (yo + amount * `scroll$vertical$speed`).coerceIn(mss, msx)
-            yo = if (yo != 0.0 && (n > 0) != (yo > 0)) 0.0 else n
+            if (`scroll$vertical`) {
+                val n = (yo + amount * `scroll$vertical$speed`).coerceIn(mss, msx)
+                yo = if (yo != 0.0 && (n > 0) != (yo > 0)) 0.0 else n
+            }
         }
     }
 
