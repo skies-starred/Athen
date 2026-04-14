@@ -58,7 +58,7 @@ object SlayerInfo : Module(
     private val _unused2 by config.textParagraph("Variable: <red>#hits<r>, <red>#health").childOf { healthStyleExpandable }
 
     init {
-        on<TickEvent.Client> {
+        on<TickEvent.Client.End> {
             if (entities.isEmpty()) return@on
 
             hideCache.removeIf { !it.isAlive }

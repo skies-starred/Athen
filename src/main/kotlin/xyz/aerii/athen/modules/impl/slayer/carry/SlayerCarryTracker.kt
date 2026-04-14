@@ -116,7 +116,7 @@ object SlayerCarryTracker : Module(
             sizedText(display.value ?: return@hud null)
         }
 
-        on<TickEvent.Client> {
+        on<TickEvent.Client.End> {
             if (ticks % 40 != 0) return@on
             for (t in tracked.values) t.clean()
         }

@@ -267,7 +267,7 @@ object DungeonAPI {
             }
         }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
 
-        on<TickEvent.Client> {
+        on<TickEvent.Client.End> {
             if (ticks % 5 != 0) return@on
 
             if (floor.value?.floorNumber == 7 && inBoss.value) {

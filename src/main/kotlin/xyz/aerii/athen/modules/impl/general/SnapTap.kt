@@ -45,7 +45,7 @@ object SnapTap : Module(
             if (active.remove(key)) key.pair(true)
         }
 
-        on<TickEvent.Client> {
+        on<TickEvent.Client.End> {
             val options = client.options ?: return@on
             with (pairs) {
                 add(Pair(options.keyLeft, options.keyRight))

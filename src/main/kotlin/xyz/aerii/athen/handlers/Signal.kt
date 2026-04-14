@@ -2,6 +2,7 @@ package xyz.aerii.athen.handlers
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
@@ -98,6 +99,15 @@ object Signal {
             EntityEvent.Unload(entity).post()
         }
 
+        ClientTickEvents.START_CLIENT_TICK.register { _ ->
+            TickEvent.Client.Start.post()
+        }
+
+        ClientTickEvents.END_CLIENT_TICK.register { _ ->
+            TickEvent.Client.End.post()
+            if (client.isSingleplayer) TickEvent.Server.post()
+        }
+
         WorldRenderEvents.END_EXTRACTION.register { _ ->
             WorldRenderEvent.Extract.post()
         }
@@ -131,12 +141,6 @@ object Signal {
                 !GuiEvent.Input.Key.Release(event).post()
             }
         }
-    }
-
-    @Subscription(tech.thatgravyboat.skyblockapi.api.events.time.TickEvent::class)
-    fun onTick() {
-        TickEvent.Client.post()
-        if (client.isSingleplayer) TickEvent.Server.post()
     }
 
     @Subscription

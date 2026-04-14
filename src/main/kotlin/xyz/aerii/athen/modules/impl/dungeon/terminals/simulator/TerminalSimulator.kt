@@ -49,7 +49,7 @@ object TerminalSimulator : Module(
             }
         }
 
-        on<TickEvent.Client> {
+        on<TickEvent.Client.End> {
             TickEvent.Server.post()
         }.override(s0)
 

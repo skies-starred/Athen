@@ -155,7 +155,7 @@ object WatcherHelper : Module(
             resetStr()
         }
 
-        on<TickEvent.Client> {
+        on<TickEvent.Client.End> {
             if (DungeonAPI.bloodKilledAll.value) return@on
 
             `display$total` = (System.currentTimeMillis() - `blood$start`).toDurationFromMillis(secondsDecimals = 1, secondsOnly = true)

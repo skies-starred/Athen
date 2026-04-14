@@ -60,7 +60,7 @@ object KuudraInfo : Module(
             health = new
         }
 
-        on<TickEvent.Client> {
+        on<TickEvent.Client.End> {
             if (ticks % 10 != 0) return@on
             if (!hud.enabled && !hpOnKuudra) return@on
             if (!KuudraAPI.inRun) return@on

@@ -88,7 +88,7 @@ object KuudraAPI {
             for (p in McClient.players) teammates += KuudraPlayer(p.profile.name)
         }
 
-        on<TickEvent.Client> {
+        on<TickEvent.Client.End> {
             if (!inRun) return@on
             if (ticks % 2 != 0) return@on
 

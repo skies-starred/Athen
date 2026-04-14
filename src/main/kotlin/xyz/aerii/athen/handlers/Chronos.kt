@@ -8,8 +8,12 @@ import xyz.aerii.library.handlers.time.AbstractChronos
 @Priority
 object Chronos : AbstractChronos() {
     init {
-        on<TickEvent.Client> {
-            client()
+        on<TickEvent.Client.Start> {
+            client0()
+        }
+
+        on<TickEvent.Client.End> {
+            client1()
         }
 
         on<TickEvent.Server> {
