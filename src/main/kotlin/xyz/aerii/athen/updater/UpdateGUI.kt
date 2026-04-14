@@ -76,7 +76,11 @@ class UpdateGUI(
             }
 
             fn(1) -> {
-                if (booling) { booling = false; return true }
+                if (booling) {
+                    booling = false
+                    return true
+                }
+
                 onRemind()
                 "Will remind to update for version $newVersion on next launch".modMessage()
                 client.setScreen(null)
