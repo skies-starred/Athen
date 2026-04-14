@@ -56,6 +56,11 @@ object SeparatedTooltip : ITooltipRenderer {
         var drawY = startY
         for (c in comps) {
             c.renderText(this, font, tx, drawY)
+            drawY += c.getHeight(font)
+        }
+
+        drawY = startY
+        for (c in comps) {
             c.renderImage(font, tx, drawY, width, totalHeight, this)
             drawY += c.getHeight(font)
         }

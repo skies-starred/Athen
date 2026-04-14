@@ -33,10 +33,16 @@ object CombinedTooltip : ITooltipRenderer {
 
     private fun GuiGraphics.component(font: Font, comps: List<ClientTooltipComponent>, tx: Int, boxX: Int, boxY: Int, boxW: Int, boxH: Int, startY: Int, width: Int, totalHeight: Int) {
         enableScissor(boxX, boxY, boxX + boxW, boxY + boxH)
+        val l = comps.withIndex()
 
         var drawY = startY
-        for ((i, c) in comps.withIndex()) {
+        for ((i, c) in l) {
             c.renderText(this, font, tx, drawY)
+            drawY += c.getHeight(font) + if (i == 0) 2 else 0
+        }
+
+        drawY = startY
+        for ((i, c) in l) {
             c.renderImage(font, tx, drawY, width, totalHeight, this)
             drawY += c.getHeight(font) + if (i == 0) 2 else 0
         }

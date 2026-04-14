@@ -4,21 +4,24 @@ package xyz.aerii.athen.modules.impl.render.tooltip.custom
 
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner
-import net.minecraft.world.inventory.Slot
 import org.lwjgl.glfw.GLFW
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
+import tech.thatgravyboat.skyblockapi.utils.extentions.getHoveredSlot
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
+import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.render.tooltip.custom.renderers.base.TooltipContext
 import xyz.aerii.athen.modules.impl.render.tooltip.custom.renderers.impl.CombinedTooltip
 import xyz.aerii.athen.modules.impl.render.tooltip.custom.renderers.impl.SeparatedTooltip
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.library.api.bound
+import xyz.aerii.library.api.client
 import xyz.aerii.library.api.pressed
 import java.awt.Color
 
@@ -58,23 +61,21 @@ object CustomTooltip : Module(
     val `text$shadow` by config.switch("Text shadows", true).childOf { renderExpandable }
 
     var color: Int = `border$color`.rgb
-    var hover: Slot? = null
+    var last: Int = 0
     var xo: Double = 0.0
     var yo: Double = 0.0
     var scale: Double = 1.0
     var name: Boolean = false
-    var mss = 0.0
-    var msx = 0.0
+    var mss: Double = 0.0
+    var msx: Double = 0.0
 
     init {
         on<GuiEvent.Slots.Hover> {
-            hover = slot
             color = slot.item?.getData(DataTypes.RARITY)?.color?.or(0xFF000000.toInt()) ?: `border$color`.rgb
             if (`scroll$reset`) reset()
         }
 
         on<GuiEvent.Close.Any> {
-            hover = null
             color = `border$color`.rgb
             name = false
             reset()
@@ -83,15 +84,14 @@ object CustomTooltip : Module(
         on<GuiEvent.Input.Key.Press> {
             if (!onlyName.bound) return@on
             if (keyEvent.key != onlyName) return@on
-            if (hover == null) return@on
+            if (last != Chronos.ticks.client) return@on
 
             name = !name
             if (name) yo = 0.0
         }
 
         on<GuiEvent.Input.Mouse.Scroll> {
-            if (hover == null) return@on
-            if (hover?.item?.isEmpty != false) return@on
+            if (last != Chronos.ticks.client) return@on
             if (name) return@on
 
             if (`scroll$scale` && `scroll$scale$key`.bound && `scroll$scale$key`.pressed) {
@@ -113,6 +113,9 @@ object CustomTooltip : Module(
     @JvmStatic
     fun render(graphics: GuiGraphics, font: Font, components: List<ClientTooltipComponent>, x: Int, y: Int, positioner: ClientTooltipPositioner) {
         if (components.isEmpty()) return
+        if (color != `border$color`.rgb && (client.screen as? AbstractContainerScreen<*>)?.getHoveredSlot() == null) color = `border$color`.rgb
+
+        last = Chronos.ticks.client
         val components = if (name) components.take(1) else components
         val cs = components.size == 1
 
