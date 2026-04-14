@@ -86,7 +86,7 @@ object TerminalSolver : Module(
             clickSound.play()
         }.runWhen(TerminalAPI.terminalOpen)
 
-        on<GuiEvent.Container.Render.Pre> {
+        on<GuiEvent.Render.Screen.Pre> {
             val term = TerminalAPI.currentTerminal ?: return@on
             val solver = solvers[term] ?: return@on
 

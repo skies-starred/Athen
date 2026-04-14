@@ -5,7 +5,9 @@ package xyz.aerii.athen.modules.impl.dungeon
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
 import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.annotations.Load
+import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.dungeon.DungeonAPI
+import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.config.ConfigBuilder
 import xyz.aerii.athen.events.LocationEvent
@@ -29,6 +31,7 @@ import xyz.aerii.library.utils.toDurationFromMillis
 import kotlin.math.abs
 
 @Load
+@OnlyIn(islands = [SkyBlockIsland.THE_CATACOMBS])
 object WatcherHelper : Module(
     "Watcher helper",
     "Shows information about the watcher's speed and movements.",

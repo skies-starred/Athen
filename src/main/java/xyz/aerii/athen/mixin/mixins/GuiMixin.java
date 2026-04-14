@@ -19,6 +19,11 @@ public abstract class GuiMixin {
         new GuiEvent.Render.Pre(guiGraphics).post();
     }
 
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderSleepOverlay(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
+    private void athen$render$main(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+        new GuiEvent.Render.Main(guiGraphics).post();
+    }
+
     @Inject(method = "render", at = @At("TAIL"))
     private void athen$render$post(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         new GuiEvent.Render.Post(guiGraphics).post();

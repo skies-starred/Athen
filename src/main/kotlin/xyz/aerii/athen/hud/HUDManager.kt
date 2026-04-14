@@ -20,7 +20,7 @@ object HUDManager {
     val elements = mutableMapOf<String, HUDElement>()
 
     init {
-        on<GuiEvent.Render.Pre> {
+        on<GuiEvent.Render.Main> {
             if (client.screen is HUDEditor) return@on
             if (client.options.hideGui && ModSettings.hideGuis) return@on
 

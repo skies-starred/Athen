@@ -13,10 +13,15 @@ import xyz.aerii.athen.events.GuiEvent;
 @Mixin(Screen.class)
 public class ScreenMixin {
     @Inject(method = "renderWithTooltipAndSubtitles", at = @At("HEAD"), cancellable = true)
-    private void athen$renderWithTooltipAndSubtitles(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    private void athen$renderWithTooltipAndSubtitles$pre(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         Screen self = self();
-        if (!(self instanceof AbstractContainerScreen<?>)) return;
-        if (new GuiEvent.Container.Render.Pre(guiGraphics).post()) ci.cancel();
+        if ((self instanceof AbstractContainerScreen<?>)) if (new GuiEvent.Render.Container.Pre(guiGraphics).post()) ci.cancel();
+        if (new GuiEvent.Render.Screen.Pre(guiGraphics).post()) ci.cancel();
+    }
+
+    @Inject(method = "renderWithTooltipAndSubtitles", at = @At("TAIL"))
+    private void athen$renderWithTooltipAndSubtitles$post(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+        new GuiEvent.Render.Screen.Post(guiGraphics).post();
     }
 
     @Unique
