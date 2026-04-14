@@ -88,6 +88,22 @@ sealed class GuiEvent {
                 val slot: Slot,
                 val renders: MutableList<(GuiGraphics, Slot) -> Unit>
             ) : CancellableEvent()
+
+            sealed class Hotbar {
+                data class Pre(
+                    val graphics: GuiGraphics,
+                    val item: ItemStack,
+                    val x: Int,
+                    val y: Int
+                ) : CancellableEvent()
+
+                data class Post(
+                    val graphics: GuiGraphics,
+                    val item: ItemStack,
+                    val x: Int,
+                    val y: Int
+                ) : Event()
+            }
         }
 
         data class Click(

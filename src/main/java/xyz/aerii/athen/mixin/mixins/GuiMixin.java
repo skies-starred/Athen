@@ -3,6 +3,8 @@ package xyz.aerii.athen.mixin.mixins;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,6 +29,16 @@ public abstract class GuiMixin {
     @Inject(method = "render", at = @At("TAIL"))
     private void athen$render$post(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         new GuiEvent.Render.Post(guiGraphics).post();
+    }
+
+    @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
+    private void athen$renderSlot$pre(GuiGraphics guiGraphics, int x, int y, DeltaTracker deltaTracker, Player player, ItemStack stack, int seed, CallbackInfo ci) {
+        if (new GuiEvent.Slots.Render.Hotbar.Pre(guiGraphics, stack, x, y).post()) ci.cancel();
+    }
+
+    @Inject(method = "renderSlot", at = @At("TAIL"), cancellable = true)
+    private void athen$renderSlot$post(GuiGraphics guiGraphics, int x, int y, DeltaTracker deltaTracker, Player player, ItemStack stack, int seed, CallbackInfo ci) {
+        if (new GuiEvent.Slots.Render.Hotbar.Post(guiGraphics, stack, x, y).post()) ci.cancel();
     }
 
     @ModifyArgs(
