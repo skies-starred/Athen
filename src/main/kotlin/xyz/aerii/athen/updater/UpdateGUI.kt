@@ -4,14 +4,10 @@ import net.minecraft.client.gui.GuiGraphics
 import xyz.aerii.athen.handlers.Scram
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.athen.utils.nvg.NVGRenderer
-import xyz.aerii.athen.utils.nvg.NVGSpecialRenderer
-import xyz.aerii.athen.utils.render.animations.easeOutQuad
-import xyz.aerii.athen.utils.render.animations.springValue
-import xyz.aerii.athen.utils.render.animations.timedValue
+import xyz.aerii.athen.utils.render.Render2D.drawOutline
+import xyz.aerii.athen.utils.render.Render2D.drawRectangle
+import xyz.aerii.athen.utils.render.Render2D.text
 import xyz.aerii.library.api.client
-import xyz.aerii.library.utils.brighten
-import xyz.aerii.library.utils.hovered
 
 class UpdateGUI(
     private val currentVersion: String,
@@ -20,139 +16,86 @@ class UpdateGUI(
     private val onSkip: () -> Unit,
     private val onRemind: () -> Unit
 ) : Scram("Update GUI [Athen]") {
+    private var booling = false
 
-    private val openProgress = timedValue(0f, 300L, ::easeOutQuad)
-    private var updateScale = springValue(1f, 0.25f)
-    private var skipScale = springValue(1f, 0.25f)
-    private var remindScale = springValue(1f, 0.25f)
-    private val panelWidth = 500f
-    private val panelHeight = 200f
-    private var confirmingSkip = false
-
-    override fun onScramInit() {
-        openProgress.value = 1f
+    override fun isPauseScreen(): Boolean {
+        return false
     }
-
-    override fun isPauseScreen() = false
 
     override fun onScramRender(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
-        NVGSpecialRenderer.draw(graphics, 0, 0, graphics.guiWidth(), graphics.guiHeight()) {
-            val width = client.window.width
-            val height = client.window.height
-            val anim = openProgress.value
-            val scale = 0.8f + 0.2f * anim
-
-            NVGRenderer.push()
-            NVGRenderer.translate(width / 2f, height / 2f)
-            NVGRenderer.scale(scale, scale)
-            NVGRenderer.translate(-width / 2f, -height / 2f)
-            NVGRenderer.globalAlpha(anim)
-
-            drawPanel(width, height)
-
-            NVGRenderer.pop()
-        }
+        graphics.drawRectangle(0, 0, width, height, Mocha.Crust.withAlpha(0.6f))
+        graphics.drawPanel(mouseX, mouseY, (width - 360) / 2, (height - 175) / 2)
     }
 
-    private fun drawPanel(width: Int, height: Int) {
-        val panelX = (width - panelWidth) / 2f
-        val panelY = (height - panelHeight) / 2f
+    private fun GuiGraphics.drawPanel(mouseX: Int, mouseY: Int, px: Int, py: Int) {
+        drawRectangle(px, py, 360, 28, Mocha.Base.argb)
+        drawRectangle(px, py + 28, 360, 175 - 28, Mocha.Mantle.argb)
+        drawOutline(px, py, 360, 175, 1, Mocha.Surface0.argb)
+        drawRectangle(px, py + 28, 360, 1, Mocha.Surface0.argb)
 
-        NVGRenderer.drawDropShadow(panelX, panelY, panelWidth, panelHeight, 15f, 4f, 10f)
-        NVGRenderer.drawRectangle(panelX, panelY, panelWidth, 60f, Mocha.Base.argb, 10f, 10f, 0f, 0f)
-        NVGRenderer.drawRectangle(panelX, panelY + 60f, panelWidth, panelHeight - 60f, Mocha.Surface0.withAlpha(0.04f), 0f, 0f, 10f, 10f)
+        text("Update available for Athen", px + 16, py + 10, false, Mocha.Mauve.argb)
 
-        NVGRenderer.drawText("Update Available", panelX + 20f, panelY + 18f, 24f, Mocha.Text.argb, NVGRenderer.defaultFont)
+        val a = client.font.lineHeight + 6
+        val b = py + 40
 
-        val contentY = panelY + 80f
-        NVGRenderer.drawText("Current Version:", panelX + 20f, contentY, 16f, Mocha.Subtext0.argb, NVGRenderer.defaultFont)
-        NVGRenderer.drawText(currentVersion, panelX + 180f, contentY, 16f, Mocha.Text.argb, NVGRenderer.defaultFont)
+        text("Current version:", px + 16, b, false, Mocha.Subtext0.argb)
+        text(currentVersion, px + 344 - client.font.width(currentVersion), b, false, Mocha.Text.argb)
 
-        NVGRenderer.drawText("New Version:", panelX + 20f, contentY + 30f, 16f, Mocha.Subtext0.argb, NVGRenderer.defaultFont)
-        NVGRenderer.drawText(newVersion, panelX + 180f, contentY + 30f, 16f, Mocha.Green.argb, NVGRenderer.defaultFont)
+        text("New version:", px + 16, b + a, false, Mocha.Subtext0.argb)
+        text(newVersion, px + 344 - client.font.width(newVersion), b + a, false, Mocha.Green.argb)
 
-        val buttonY = panelY + panelHeight - 60f
-        val buttonWidth = 140f
-        val buttonHeight = 40f
-        val buttonSpacing = 15f
+        drawRectangle(px + 16, b + a + 30, 330, 1, Mocha.Surface0.argb)
 
-        val updateX = panelX + 20f
-        val remindX = panelX + 20f + buttonWidth + buttonSpacing + 5f
-        val skipX = panelX + panelWidth - buttonWidth - 20f
-
-        drawButton(updateX, buttonY, buttonWidth, buttonHeight, "Update Now", { updateScale.value }, { updateScale.value = it }, Mocha.Green.argb)
-        drawButton(remindX, buttonY, buttonWidth, buttonHeight, "Remind Later", { remindScale.value }, { remindScale.value = it }, Mocha.Peach.argb.brighten(0.9f))
-        drawButton(skipX, buttonY, buttonWidth, buttonHeight, if (confirmingSkip) "Confirm?" else "Skip Version", { skipScale.value }, { skipScale.value = it }, Mocha.Red.argb)
+        drawButton(mouseX, mouseY, px + 16, py + 175 - 34, "Update Now",   Mocha.Green.argb)
+        drawButton(mouseX, mouseY, px + 128, py + 175 - 34, "Remind Later", Mocha.Peach.argb)
+        drawButton(mouseX, mouseY, px + 240, py + 175 - 34, if (booling) "Confirm?" else "Skip Version", Mocha.Red.argb)
     }
 
-    private fun drawButton(x: Float, y: Float, w: Float, h: Float, text: String, getScale: () -> Float, setScale: (Float) -> Unit, color: Int) {
-        val isHovered = hovered(x, y, w, h)
-
-        setScale(if (isHovered) 1.05f else 1f)
-        val scale = getScale()
-
-        val centerX = x + w / 2f
-        val centerY = y + h / 2f
-        val scaledW = w * scale
-        val scaledH = h * scale
-        val scaledX = centerX - scaledW / 2f
-        val scaledY = centerY - scaledH / 2f
-
-        NVGRenderer.drawRectangle(scaledX, scaledY, scaledW, scaledH, color, 8f)
-
-        val textWidth = NVGRenderer.getTextWidth(text, 16f, NVGRenderer.defaultFont)
-        NVGRenderer.drawText(text, centerX - textWidth / 2f, centerY - 8f, 16f, Mocha.Base.argb, NVGRenderer.defaultFont)
+    private fun GuiGraphics.drawButton( mouseX: Int, mouseY: Int, x: Int, y: Int, label: String, color: Int) {
+        val b = mouseX in x until x + 104 && mouseY in y until y + 22
+        drawRectangle(x, y, 104, 22, if (b) color else Mocha.Surface1.argb)
+        drawOutline(x, y, 104, 22, 1, color)
+        text(label, x + (104 - client.font.width(label)) / 2, y + (22 - client.font.lineHeight) / 2 + 1, false, if (b) Mocha.Base.argb else color)
     }
 
     override fun onScramMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {
         if (button != 0) return super.onScramMouseClick(mouseX, mouseY, button)
 
-        val width = client.window.width
-        val height = client.window.height
-        val panelX = (width - panelWidth) / 2f
-        val panelY = (height - panelHeight) / 2f
+        val x = (width - 360) / 2 + 16
+        val y = (height - 175) / 2 + 141
 
-        val buttonY = panelY + panelHeight - 60f
-        val buttonWidth = 140f
-        val buttonHeight = 40f
-        val buttonSpacing = 15f
-
-        val updateX = panelX + 20f
-        val remindX = panelX + 20f + buttonWidth + buttonSpacing + 5f
-        val skipX = panelX + panelWidth - buttonWidth - 20f
+        fun fn(i: Int): Boolean {
+            val xo = x + i * (104 + 8)
+            return mouseX in xo until xo + 104 && mouseY in y until y + 22
+        }
 
         when {
-            hovered(updateX, buttonY, buttonWidth, buttonHeight) -> {
+            fn(0) -> {
                 onUpdate()
                 client.setScreen(null)
-                return true
             }
 
-            hovered(remindX, buttonY, buttonWidth, buttonHeight) -> {
-                if (confirmingSkip) {
-                    confirmingSkip = false
-                    return true
-                }
-
+            fn(1) -> {
+                if (booling) { booling = false; return true }
                 onRemind()
-                "Will remain to update for version $newVersion on next launch".modMessage()
+                "Will remind to update for version $newVersion on next launch".modMessage()
                 client.setScreen(null)
-                return true
             }
 
-            hovered(skipX, buttonY, buttonWidth, buttonHeight) -> {
-                if (confirmingSkip) {
+            fn(2) -> {
+                if (booling) {
                     onSkip()
                     "Skipped update for version $newVersion".modMessage()
                     client.setScreen(null)
-                } else {
-                    confirmingSkip = true
+                    return true
                 }
 
-                return true
+                booling = true
             }
+
+            else -> return super.onScramMouseClick(mouseX, mouseY, button)
         }
 
-        return super.onScramMouseClick(mouseX, mouseY, button)
+        return true
     }
 }
