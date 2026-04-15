@@ -15,8 +15,8 @@ object NumbersSolver : ITerminal(TerminalType.NUMBERS) {
         for ((i, c) in list.withIndex()) {
             if (i > 2) break
 
-            val sx = (c.slot % 9 * 18f + ox + 1f) * uiScale
-            val sy = ((c.slot / 9) * 18f + oy + headerH + 1f) * uiScale
+            val sx = (c.slot % 9 * float + ox + 1f) * uiScale
+            val sy = ((c.slot / 9) * float + oy + headerH + 1f) * uiScale
             val color = i.get() ?: continue
 
             drawSlot(sx, sy, 16f * uiScale, 16f * uiScale, color, uiScale)

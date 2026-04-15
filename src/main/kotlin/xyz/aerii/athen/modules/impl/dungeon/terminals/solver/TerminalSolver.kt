@@ -48,6 +48,8 @@ object TerminalSolver : Module(
     val `ui$header` by config.colorPicker("Header", Color(20, 20, 20, 200)).childOf { guiExpandable }
     val `ui$slots$fill` by config.switch("Slots: Fill").childOf { guiExpandable }
     val `ui$slots$roundness` by config.slider("Slots: Roundness", 0f, 0f, 10f, showDouble = true).childOf { guiExpandable }
+    val `ui$gap` by config.slider("Gap", 2f, 0f, 10f, showDouble = true).childOf { guiExpandable }
+    val `ui$padding` by config.slider("Padding", 5f, 0f, 20f, showDouble = true).childOf { guiExpandable }
     val `ui$numbers$showText` by config.switch("Numbers: Text", true).childOf { guiExpandable }
 
     private val soundExpandable by config.expandable("Sounds")

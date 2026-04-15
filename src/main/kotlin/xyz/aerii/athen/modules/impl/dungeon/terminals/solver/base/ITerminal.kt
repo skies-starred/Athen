@@ -14,6 +14,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 abstract class ITerminal(val terminalType: TerminalType) {
     protected val list = CopyOnWriteArrayList<Click>()
+    protected val float: Float
+        get() = 16f + TerminalSolver.`ui$gap`
 
     open fun onOpen() {}
 
@@ -28,12 +30,14 @@ abstract class ITerminal(val terminalType: TerminalType) {
     protected abstract fun forSlot(slot: Int): Click?
 
     fun main() {
+        val sp = float
+        val pad = TerminalSolver.`ui$padding`
         val uiScale = 3f * TerminalSolver.`ui$scale`
         val w = client.window.width / uiScale
         val h = client.window.height / uiScale
 
-        val gridW = 9 * 18f
-        val gridH = (terminalType.slots / 9) * 18f
+        val gridW = 7 * sp + 2 * pad
+        val gridH = (terminalType.slots / 9 - 2) * sp + 2 * pad
         val headerH = if (TerminalSolver.`ui$hideHeader`) 0f else 20f
         val padding = if (TerminalSolver.`ui$hideHeader`) 0f else 6f
         val totalH = gridH + headerH + padding
@@ -41,24 +45,27 @@ abstract class ITerminal(val terminalType: TerminalType) {
         val ox = w / 2 - gridW / 2
         val oy = h / 2 - totalH / 2
 
+        val inset = (sp - 16f) / 2f
         NVGRenderer.drawOutlinedRectangle(ox * uiScale, (oy + headerH + padding) * uiScale, gridW * uiScale, gridH * uiScale, TerminalSolver.`ui$bg`.rgb, TerminalSolver.`ui$border`.rgb, uiScale / 2f, TerminalSolver.`ui$roundness` * uiScale)
         main(ox, oy, gridW, headerH, uiScale)
-        render(ox, oy + headerH + padding, 0f, uiScale)
+        render(ox - sp + pad + inset - 1f, oy + headerH + padding - sp + pad + inset - 1f, 0f, uiScale)
     }
 
     fun click(mx: Float, my: Float, width: Float, height: Float, mouseButton: Int) {
+        val sp = float
+        val pad = TerminalSolver.`ui$padding`
         val slots = terminalType.slots
-        val gridW = 9 * 18f
-        val gridH = (slots / 9) * 18f
+        val gridW = 7 * sp + 2 * pad
+        val gridH = (terminalType.slots / 9 - 2) * sp + 2 * pad
         val headerH = if (TerminalSolver.`ui$hideHeader`) 0f else 20f
         val padding = if (TerminalSolver.`ui$hideHeader`) 0f else 6f
 
         val ox = width / 2 - gridW / 2
         val oy = height / 2 - (gridH + headerH + padding) / 2
 
-        val x = ((mx - ox) / 18).toInt()
-        val y = ((my - (oy + headerH + padding)) / 18).toInt()
-        if (x !in 0..8 || y < 0) return
+        val x = ((mx - ox - pad) / sp).toInt() + 1
+        val y = ((my - (oy + headerH + padding) - pad) / sp).toInt() + 1
+        if (x !in 1..7 || y < 1) return
 
         val slot = x + y * 9
         if (slot >= slots) return
@@ -100,7 +107,7 @@ abstract class ITerminal(val terminalType: TerminalType) {
         val titleText = terminalType.name.lowercase().replaceFirstChar { it.uppercase() }
 
         if (TerminalSolver.`ui$hideHeader`) {
-            if (!TerminalSolver.`ui$hideTitle`) NVGRenderer.drawText(titleText, (ox + 1f) * uiScale, (oy + (terminalType.slots / 9) * 18f - 8f) * uiScale, 8f * uiScale, TerminalSolver.`ui$titleColor`.rgb)
+            if (!TerminalSolver.`ui$hideTitle`) NVGRenderer.drawText(titleText, (ox + 1f) * uiScale, (oy + (terminalType.slots / 9 - 2) * float - 8f) * uiScale, 8f * uiScale, TerminalSolver.`ui$titleColor`.rgb)
             return
         }
 

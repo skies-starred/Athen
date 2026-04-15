@@ -24,8 +24,8 @@ object RubixSolver : ITerminal(TerminalType.RUBIX) {
 
     override fun render(ox: Float, oy: Float, headerH: Float, uiScale: Float) {
         for (c in list) {
-            val sx = (c.slot % 9 * 18f + ox + 1f) * uiScale
-            val sy = ((c.slot / 9) * 18f + oy + headerH + 1f) * uiScale
+            val sx = (c.slot % 9 * float + ox + 1f) * uiScale
+            val sy = ((c.slot / 9) * float + oy + headerH + 1f) * uiScale
 
             val color = if (c.button > 0) TerminalSolver.`rubix$positive`.rgb else TerminalSolver.`rubix$negative`.rgb
             drawSlot(sx, sy, 16f * uiScale, 16f * uiScale, color, uiScale)
