@@ -188,7 +188,14 @@ class ConfigBuilder(
 
         init {
             ConfigManager.observe(key) {
-                state.value = it as? T ?: default
+                @Suppress("UNCHECKED_CAST")
+                state.value = when (default) {
+                    is Int -> (it as? Number)?.toInt()
+                    is Double -> (it as? Number)?.toDouble()
+                    is Float -> (it as? Number)?.toFloat()
+                    is Long -> (it as? Number)?.toLong()
+                    else -> it
+                } as? T ?: default
             }
         }
 
