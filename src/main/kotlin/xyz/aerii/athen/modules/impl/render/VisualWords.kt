@@ -2,28 +2,24 @@
 
 package xyz.aerii.athen.modules.impl.render
 
-import com.google.gson.JsonObject
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.serialization.Codec
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.MutableComponent
-import net.minecraft.network.chat.Style
 import net.minecraft.util.FormattedCharSequence
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.GameEvent
-import xyz.aerii.athen.handlers.Beacon.request
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
-import xyz.aerii.athen.utils.data
-import xyz.aerii.athen.utils.kotlin.CopyOnWriteMap
 import xyz.aerii.library.api.*
+import xyz.aerii.library.handlers.minecraft.AbstractWords
 import xyz.aerii.library.handlers.parser.parse
 import xyz.aerii.library.utils.literal
 
@@ -34,38 +30,31 @@ object VisualWords : Module(
     Category.RENDER,
     true
 ) {
-    private class Entry(val cps: IntArray, val len: Int, val seq: FormattedCharSequence)
-
-    private val unused by config.textParagraph("Use the command \"/athen visuals help\" to learn more about the available commands!")
-    private val nameChanger by config.switch("Name changer")
-    private val nickname = config.textInput("Nickname", "cooluser4").dependsOn { nameChanger }.custom("nickname")
-
     private const val SKIP = "\u0000vw_bypass"
 
-    private val replace = CopyOnWriteMap<String, FormattedCharSequence>()
-    private val prefix = HashMap<Int, MutableList<Entry>>()
+    private val unused by config.textParagraph("Use the command \"/athen visuals help\" to learn more about the available commands!")
+    private val nameChanger = config.switch("Name changer").custom("nameChanger")
+    private val nickname = config.textInput("Nickname", "cooluser4").dependsOn { nameChanger.value }.custom("nickname")
 
     private val scribble = Scribble("features/visualWords")
-    private var words by scribble.map("words", Codec.STRING, ComponentSerialization.CODEC.xmap({ it.visualOrderText }, { seq -> seq.toComponent() }))
+    private var stored by scribble.map("words", Codec.STRING, ComponentSerialization.CODEC.xmap({ it.visualOrderText }, { seq -> seq.toComponent() }))
 
-    private val remote = mutableSetOf<String>()
-    private val user = name
-    private val `user$cps` = user.codePoints().toArray()
-    private val `user$len` = `user$cps`.size
-
-    private var nick: FormattedCharSequence? = null
+    @JvmField
+    val words = object : AbstractWords() {}.also { it.skips = SKIP }
 
     init {
-        nick = nickname.value.parse(true).visualOrderText
-        nickname.state.onChange { nick = it.parse(true).visualOrderText }
+        if (nameChanger.value) {
+            nickname.value.fn()
+        }
 
-        "donators.json".data.request {
-            onSuccess<JsonObject> { json ->
-                val map = json.entrySet().associate { it.key to it.value.asString.parse().visualOrderText }
-                replace += map
-                remote += map.keys
-                c()
-            }
+        nickname.state.onChange {
+            it.fn()
+        }
+
+        nameChanger.state.onChange {
+            if (it) return@onChange nickname.value.fn()
+            words.remove(name)
+            words.build()
         }
 
         on<GameEvent.Start> {
@@ -91,9 +80,11 @@ object VisualWords : Module(
                         then("word", StringArgumentType.string()) {
                             thenCallback("replacement", StringArgumentType.greedyString()) {
                                 val word = StringArgumentType.getString(this, "word")
-                                val seq = StringArgumentType.getString(this, "replacement").parse().visualOrderText
+                                val cmp = StringArgumentType.getString(this, "replacement").parse()
+                                val seq = cmp.visualOrderText
 
-                                replace[word] = seq
+                                words.put(word, cmp.string, cmp, seq)
+                                words.build()
                                 save()
 
                                 "Added the word <red>\"$word\" <gray>-> ".parse().skip().append(seq.toComponent()).modMessage()
@@ -106,10 +97,11 @@ object VisualWords : Module(
                         then("word", StringArgumentType.string()) {
                             thenCallback("replacement", StringArgumentType.greedyString()) {
                                 val word = StringArgumentType.getString(this, "word")
-                                if (word in remote) return@thenCallback "Cannot override word '$word'".modMessage(Typo.PrefixType.ERROR)
+                                val cmp = StringArgumentType.getString(this, "replacement").parse()
+                                val seq = cmp.visualOrderText
 
-                                val seq = StringArgumentType.getString(this, "replacement").parse().visualOrderText
-                                replace[word] = seq
+                                words.put(word, cmp.string, cmp, seq)
+                                words.build()
                                 save()
 
                                 "Set the word <red>\"$word\" <gray>-> ".parse().skip().append(seq.toComponent()).modMessage()
@@ -121,9 +113,11 @@ object VisualWords : Module(
                     then("remove") {
                         thenCallback("word", StringArgumentType.string()) {
                             val word = StringArgumentType.getString(this, "word")
-                            if (word in remote) return@thenCallback "Cannot remove word '$word'".modMessage(Typo.PrefixType.ERROR)
-                            replace.remove(word)
+
+                            words.remove(word)
+                            words.build()
                             save()
+
                             "Removed the word <red>\"$word\"".parse().skip().modMessage()
                             if (!enabled) "Feature not enabled!".modMessage(Typo.PrefixType.ERROR)
                         }
@@ -131,115 +125,23 @@ object VisualWords : Module(
 
                     thenCallback("list") {
                         "Replacement words list:".modMessage()
-                        for ((a, b) in replace) " <dark_gray>• <r>$a <gray>-> ".parse().skip().append(b.toComponent()).lie()
+                        for ((a, b) in words.map2) " <dark_gray>• <r>$a <gray>-> ".parse().skip().append(b.toComponent()).lie()
                     }
                 }
             }
         }
     }
 
-    @JvmStatic
-    fun fn(seq: FormattedCharSequence): FormattedCharSequence {
-        if (replace.isEmpty() && !nameChanger) return seq
-
-        val a = nameChanger
-        val chars = IntArray(256)
-        val styles = ArrayList<Style>(256)
-        var size = 0
-
-        seq.accept { _, style, cp ->
-            if (size >= chars.size) return@accept false
-            chars[size] = cp
-            styles.add(style)
-            size++
-            true
+    private fun String.fn() {
+        if (nameChanger.value && isNotEmpty()) {
+            val cmp = parse(true)
+            words.put(name, this, cmp, cmp.visualOrderText)
+            words.build()
+            return
         }
 
-        return FormattedCharSequence { sink ->
-            var i = 0
-
-            while (i < size) {
-                val cp = chars[i]
-                val style = styles[i]
-
-                if (a && i + `user$len` <= size) {
-                    var j = 0
-                    while (j < `user$len`) {
-                        if (chars[i + j] != `user$cps`[j]) break
-                        j++
-                    }
-
-                    if (j == `user$len`) {
-                        val seq2 = nick ?: run {
-                            sink.accept(0, style, cp)
-                            i++
-                            continue
-                        }
-
-                        seq2.accept { _, repStyle, repCp ->
-                            sink.accept(0, repStyle.applyTo(style), repCp)
-                            true
-                        }
-
-                        i += `user$len`
-                        continue
-                    }
-                }
-
-                if (style.insertion == SKIP) {
-                    sink.accept(0, style, cp)
-                    i++
-                    continue
-                }
-
-                val bucket = prefix[cp]
-                if (bucket == null) {
-                    sink.accept(0, style, cp)
-                    i++
-                    continue
-                }
-
-                var matched: Entry? = null
-                for (entry in bucket) {
-                    val len = entry.len
-                    if (i + len > size) continue
-
-                    val cps = entry.cps
-                    var j = 0
-                    while (j < len && chars[i + j] == cps[j]) j++
-                    if (j == len) {
-                        matched = entry
-                        break
-                    }
-                }
-
-                if (matched == null) {
-                    sink.accept(0, style, cp)
-                    i++
-                    continue
-                }
-
-                val seq2 = matched.seq
-                seq2.accept { _, repStyle, repCp ->
-                    sink.accept(0, repStyle.applyTo(style), repCp)
-                    true
-                }
-
-                i += matched.len
-            }
-
-            true
-        }
-    }
-
-    private fun c() {
-        prefix.clear()
-
-        for ((k, v) in replace) {
-            val cps = k.codePoints().toArray()
-            val entry = Entry(cps, cps.size, v)
-            prefix.computeIfAbsent(cps[0]) { mutableListOf() }.add(entry)
-        }
+        words.remove(name)
+        words.build()
     }
 
     private fun help() {
@@ -258,13 +160,17 @@ object VisualWords : Module(
     }
 
     private fun load() {
-        words.forEach { (k, comp) -> replace[k] = comp }
-        c()
+        for ((k, v) in stored) {
+            val c = v.toComponent()
+            words.put(k, c.string, c, v)
+        }
+
+        words.build()
     }
 
     private fun save() {
-        words = replace.filterKeys { it !in remote }
-        c()
+        stored = words.map2
+        words.build()
     }
 
     private fun Component.skip(): MutableComponent =
