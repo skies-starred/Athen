@@ -14,7 +14,9 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 abstract class ITerminal(val terminalType: TerminalType) {
     protected val list = CopyOnWriteArrayList<Click>()
-    protected val float: Float
+    protected open val int0: Int = 7
+    protected open val int1: Int = 1
+    protected open val float: Float
         get() = 16f + TerminalSolver.`ui$gap`
 
     open fun onOpen() {}
@@ -36,7 +38,7 @@ abstract class ITerminal(val terminalType: TerminalType) {
         val w = client.window.width / uiScale
         val h = client.window.height / uiScale
 
-        val gridW = 7 * sp + 2 * pad
+        val gridW = int0 * sp + 2 * pad
         val gridH = (terminalType.slots / 9 - 2) * sp + 2 * pad
         val headerH = if (TerminalSolver.`ui$hideHeader`) 0f else 20f
         val padding = if (TerminalSolver.`ui$hideHeader`) 0f else 6f
@@ -48,14 +50,14 @@ abstract class ITerminal(val terminalType: TerminalType) {
         val inset = (sp - 16f) / 2f
         NVGRenderer.drawOutlinedRectangle(ox * uiScale, (oy + headerH + padding) * uiScale, gridW * uiScale, gridH * uiScale, TerminalSolver.`ui$bg`.rgb, TerminalSolver.`ui$border`.rgb, uiScale / 2f, TerminalSolver.`ui$roundness` * uiScale)
         main(ox, oy, gridW, headerH, uiScale)
-        render(ox - sp + pad + inset - 1f, oy + headerH + padding - sp + pad + inset - 1f, 0f, uiScale)
+        render(ox - int1 * sp + pad + inset - 1f, oy + headerH + padding - sp + pad + inset - 1f, 0f, uiScale)
     }
 
     fun click(mx: Float, my: Float, width: Float, height: Float, mouseButton: Int) {
         val sp = float
         val pad = TerminalSolver.`ui$padding`
         val slots = terminalType.slots
-        val gridW = 7 * sp + 2 * pad
+        val gridW = int0 * sp + 2 * pad
         val gridH = (terminalType.slots / 9 - 2) * sp + 2 * pad
         val headerH = if (TerminalSolver.`ui$hideHeader`) 0f else 20f
         val padding = if (TerminalSolver.`ui$hideHeader`) 0f else 6f
@@ -63,9 +65,9 @@ abstract class ITerminal(val terminalType: TerminalType) {
         val ox = width / 2 - gridW / 2
         val oy = height / 2 - (gridH + headerH + padding) / 2
 
-        val x = ((mx - ox - pad) / sp).toInt() + 1
+        val x = ((mx - ox - pad) / sp).toInt() + int1
         val y = ((my - (oy + headerH + padding) - pad) / sp).toInt() + 1
-        if (x !in 1..7 || y < 1) return
+        if (x !in int1 until int1 + int0 || y < 1) return
 
         val slot = x + y * 9
         if (slot >= slots) return

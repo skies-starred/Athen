@@ -14,6 +14,9 @@ import xyz.aerii.athen.utils.nvg.NVGRenderer
 import kotlin.math.abs
 
 object RubixSolver : ITerminal(TerminalType.RUBIX) {
+    override val int0 = 3
+    override val int1 = 3
+
     private val colorOrder = listOf(
         Items.RED_STAINED_GLASS_PANE,
         Items.ORANGE_STAINED_GLASS_PANE,

@@ -10,6 +10,9 @@ import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.base.ITerminal
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 
 object MelodySolver : ITerminal(TerminalType.MELODY) {
+    override val float: Float
+        get() = 16f + TerminalSolver.`ui$melodyGap`
+
     override fun render(ox: Float, oy: Float, headerH: Float, uiScale: Float) {
         val correct = TerminalAPI.`melody$correct` ?: return
         val button = TerminalAPI.`melody$button` ?: return

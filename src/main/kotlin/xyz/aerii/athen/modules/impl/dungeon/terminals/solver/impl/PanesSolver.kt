@@ -9,6 +9,9 @@ import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.base.Click
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.base.ITerminal
 
 object PanesSolver : ITerminal(TerminalType.PANES) {
+    override val int0 = 5
+    override val int1 = 2
+
     override fun render(ox: Float, oy: Float, headerH: Float, uiScale: Float) {
         for (c in list) {
             val sx = (c.slot % 9 * float + ox + 1f) * uiScale
