@@ -49,7 +49,7 @@ object TerminalSolver : Module(
     val `ui$slots$fill` by config.switch("Slots: Fill").childOf { guiExpandable }
     val `ui$slots$roundness` by config.slider("Slots: Roundness", 0f, 0f, 10f, showDouble = true).childOf { guiExpandable }
     val `ui$gap` by config.slider("Gap", 2f, 0f, 10f, showDouble = true).childOf { guiExpandable }
-    val `ui$melodyGap` by config.slider("Melody gap", 4f, 0f, 10f, showDouble = true).childOf { guiExpandable }
+    val `ui$melodyGap` by config.slider("Melody gap", 2f, 0f, 10f, showDouble = true).childOf { guiExpandable }
     val `ui$padding` by config.slider("Padding", 5f, 0f, 20f, showDouble = true).childOf { guiExpandable }
     val `ui$numbers$showText` by config.switch("Numbers: Text", true).childOf { guiExpandable }
 
