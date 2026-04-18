@@ -22,7 +22,7 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
 * Kat reminder
 * Keybinds
 * Lag detector
-* Mark lobbies
+* Lobby marker
 * Missing enchants
 * Snap tap
 * Sound replacer
@@ -34,6 +34,7 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
 * Arrow hitboxes
 * Custom scale
 * Custom tooltip
+* Game tint
 * Ichor pool area
 * Item name position
 * Item rarity background
@@ -43,6 +44,7 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
 
 ### Slayers
 
+* Attunement display
 * Carry tracker
 * Cocoon alert and timer
 * Miniboss alerts
@@ -63,6 +65,7 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
 * Auto re-queuer
 * Block useless perks
 * Build info
+* Build timers
 * Carry tracker
 * Custom titles
 * Fresh tool helpers
@@ -71,6 +74,7 @@ A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.c
 * Run breakdown
 * Run splits
 * Stun helper
+* Supply timers
 * Supply waypoints
 * Teammate highlights
 * Timers for build start, and supply spawn
