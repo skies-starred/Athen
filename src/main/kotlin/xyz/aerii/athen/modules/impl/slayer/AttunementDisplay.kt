@@ -51,7 +51,7 @@ object AttunementDisplay : Module(
             last = null
         }
 
-        on<SlayerEvent.Cleanup> {
+        on<SlayerEvent.Reset.Any> {
             last = null
         }
     }

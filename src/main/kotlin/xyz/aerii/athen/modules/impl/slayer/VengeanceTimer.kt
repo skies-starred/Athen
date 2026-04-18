@@ -9,7 +9,7 @@ import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.api.skyblock.SlayerAPI
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.EntityEvent
-import xyz.aerii.athen.events.LocationEvent
+import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.modules.Module
@@ -61,7 +61,11 @@ object VengeanceTimer : Module(
             count.value = true
         }
 
-        on<LocationEvent.Server.Connect> {
+        on<SlayerEvent.Boss.Death> {
+            reset()
+        }
+
+        on<SlayerEvent.Reset.Any> {
             reset()
         }
     }

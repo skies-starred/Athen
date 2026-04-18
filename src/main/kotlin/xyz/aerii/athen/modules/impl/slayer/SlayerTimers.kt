@@ -7,7 +7,6 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.CommandRegistration
-import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Scribble
@@ -41,11 +40,7 @@ object SlayerTimers : Module(
             questStartTime = 0
         }
 
-        on<SlayerEvent.Cleanup> {
-            reset()
-        }
-
-        on<LocationEvent.Server.Connect> {
+        on<SlayerEvent.Reset.Any> {
             reset()
         }
 

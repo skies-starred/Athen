@@ -123,7 +123,7 @@ object SlayerStats : Module(
             }
         }
 
-        on<SlayerEvent.Cleanup> {
+        on<SlayerEvent.Reset.QuestFail> {
             `start$quest` = 0
         }
 

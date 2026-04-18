@@ -37,7 +37,7 @@ object VengeanceDamageTracker : Module(
             slayerEntity = null
         }
 
-        on<SlayerEvent.Cleanup> {
+        on<SlayerEvent.Reset.Any> {
             slayerEntity = null
         }
 

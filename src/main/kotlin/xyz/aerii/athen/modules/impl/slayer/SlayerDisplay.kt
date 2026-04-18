@@ -7,7 +7,6 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.skyblock.SlayerAPI.slayerNames
 import xyz.aerii.athen.config.Category
-import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.modules.Module
@@ -61,11 +60,7 @@ object SlayerDisplay : Module(
             if (slayerInfo.isOwnedByPlayer) reset()
         }
 
-        on<SlayerEvent.Cleanup> {
-            reset()
-        }
-
-        on<LocationEvent.Server.Connect> {
+        on<SlayerEvent.Reset.Any> {
             reset()
         }
     }

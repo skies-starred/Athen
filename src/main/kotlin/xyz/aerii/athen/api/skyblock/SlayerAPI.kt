@@ -42,7 +42,10 @@ object SlayerAPI {
 
                 questFailedRegex.matches(stripped) -> {
                     "SlayerAPI: Quest failed!".devMessage()
-                    SlayerEvent.Cleanup(SlayerEvent.CleanupType.QuestFail).post()
+
+                    SlayerEvent.Reset.QuestFail.post()
+                    SlayerEvent.Reset.Any.post()
+
                     slayer = null
                 }
             }
@@ -106,7 +109,10 @@ object SlayerAPI {
 
         on<LocationEvent.Server.Connect> {
             "SlayerAPI: Cleaning up.".devMessage()
-            SlayerEvent.Cleanup(SlayerEvent.CleanupType.ServerChange).post()
+
+            SlayerEvent.Reset.ServerChange.post()
+            SlayerEvent.Reset.Any.post()
+
             reset()
         }
     }

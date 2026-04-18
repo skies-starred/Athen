@@ -5,10 +5,6 @@ import xyz.aerii.athen.api.skyblock.SlayerInfo
 import xyz.aerii.athen.events.core.Event
 
 sealed class SlayerEvent {
-    data class Cleanup(
-        val type: CleanupType
-    ) : Event()
-
     sealed class Boss {
         data class Spawn(
             val entity: Entity,
@@ -51,9 +47,11 @@ sealed class SlayerEvent {
         data object End : Event()
     }
 
-    enum class CleanupType {
-        QuestFail,
-        ServerChange
-        ;
+    sealed class Reset : Event() {
+        data object QuestFail : Reset()
+
+        data object ServerChange : Reset()
+
+        data object Any : Reset()
     }
 }

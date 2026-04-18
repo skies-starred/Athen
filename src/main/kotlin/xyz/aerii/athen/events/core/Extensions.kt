@@ -3,9 +3,7 @@
 package xyz.aerii.athen.events.core
 
 import net.minecraft.network.protocol.Packet
-import xyz.aerii.athen.events.CommandRegistration
-import xyz.aerii.athen.events.LocationEvent
-import xyz.aerii.athen.events.PacketEvent
+import xyz.aerii.athen.events.*
 import xyz.aerii.library.handlers.Observable
 
 inline fun <reified T : Event> on(
@@ -26,6 +24,7 @@ fun Node<*>.runWhen(state: Observable<Boolean>) = apply {
     if (overridden) return@apply
     if (eventClass == CommandRegistration::class.java) return@apply
     if (LocationEvent.Server::class.java.isAssignableFrom(eventClass)) return@apply
+    if (SlayerEvent.Reset::class.java.isAssignableFrom(eventClass)) return@apply
     add(state)
 }
 
