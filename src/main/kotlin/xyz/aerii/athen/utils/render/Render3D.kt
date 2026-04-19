@@ -406,15 +406,16 @@ object Render3D {
 
     private fun PoseStack.texts(consumers: MultiBufferSource.BufferSource) {
         val cam = client.gameRenderer.mainCamera
-        val pose = last().pose()
 
         for (text in RenderQueue.texts) {
             pushPose()
 
+            val pose = last().pose()
             val scale = text.scale * 0.025f
-            translate(text.pos.x, text.pos.y, text.pos.z)
-            mulPose(cam.rotation())
-            scale(scale, -scale, scale)
+
+            pose.translate(text.pos.x.toFloat(), text.pos.y.toFloat(), text.pos.z.toFloat())
+                .rotate(cam.rotation())
+                .scale(scale, -scale, scale)
 
             client.font.drawInBatch(
                 text.text,
