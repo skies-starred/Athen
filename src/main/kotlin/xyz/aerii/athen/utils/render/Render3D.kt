@@ -309,9 +309,9 @@ object Render3D {
             if (circles.isEmpty()) return@forDepth
 
             val type = if (depth) StarredRenderTypes.TRIANGLE_FAN else StarredRenderTypes.TRIANGLE_FAN_DEPTHLESS
-            val buffer = consumers.getBuffer(type)
 
             for (circle in circles) {
+                val buffer = consumers.getBuffer(type)
                 val (u, v) = circle.normal.tangents()
                 val center = circle.center
 
@@ -331,6 +331,8 @@ object Render3D {
 
                     buffer.addVertex(this, x.toFloat(), y.toFloat(), z.toFloat()).setColor(circle.color)
                 }
+
+                consumers.endBatch(type)
             }
         }
     }
