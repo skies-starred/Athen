@@ -1,6 +1,6 @@
 # **Athen**
 
-A **Hypixel SkyBlock Quality-of-Life** mod, developed by **[me](https://github.com/skies-starred)**.
+A **Hypixel SkyBlock Quality-of-Life** mod, developed by Starred.
 
 ---
 
