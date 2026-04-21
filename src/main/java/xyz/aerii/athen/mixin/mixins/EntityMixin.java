@@ -48,9 +48,11 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.aerii.athen.accessors.EntityAccessor;
 import xyz.aerii.athen.api.skyblock.EntityAPI;
 import xyz.aerii.athen.events.EntityEvent;
+import xyz.aerii.athen.modules.impl.render.RenderOptimiser;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -145,5 +147,10 @@ public abstract class EntityMixin implements EntityAccessor {
         if (!(athen$attachedTo instanceof EntityAccessor acc)) return;
 
         acc.athen$attachments().removeIf(ref -> ref.get() == entity());
+    }
+
+    @Inject(method = "isCurrentlyGlowing", at = @At("HEAD"), cancellable = true)
+    private void athen$isCurrentlyGlowing(CallbackInfoReturnable<Boolean> cir) {
+        if (RenderOptimiser.getGlow()) cir.setReturnValue(false);
     }
 }

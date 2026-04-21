@@ -13,6 +13,7 @@ object RenderOptimiser :  Module(
     Category.RENDER
 ) {
     private val _arm by config.switch("Hide player arm")
+    private val _glow by config.switch("Hide glowing effect")
     private val _fog by config.switch("Hide fog", true)
     private val lavaOverlay by config.switch("Hide lava overlay", true)
     private val fireOverlay by config.switch("Hide fire overlay", true)
@@ -33,6 +34,10 @@ object RenderOptimiser :  Module(
     @JvmStatic
     val arm: Boolean
         get() = enabled && _arm
+
+    @JvmStatic
+    val glow: Boolean
+        get() = enabled && _glow
 
     init {
         on<WorldRenderEvent.Entity.Pre> {
