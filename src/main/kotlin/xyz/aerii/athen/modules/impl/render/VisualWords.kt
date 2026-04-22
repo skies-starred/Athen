@@ -27,8 +27,7 @@ import xyz.aerii.library.utils.literal
 object VisualWords : Module(
     "Visual words",
     "Visually modify words!",
-    Category.RENDER,
-    true
+    Category.RENDER
 ) {
     private const val SKIP = "\u0000vw_bypass"
 
