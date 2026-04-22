@@ -2,6 +2,7 @@ package xyz.aerii.athen.modules.impl.kuudra
 
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import net.minecraft.util.Mth
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
@@ -54,9 +55,11 @@ object StunHelper : Module(
             reset()
         }
 
-        on<PlayerEvent.Interact> {
+        on<PlayerEvent.Interact.Any> {
             if (!blockAbility) return@on
             if (!KuudraAPI.inRun) return@on
+
+            val item = client.player?.getItemInHand(InteractionHand.MAIN_HAND) ?: return@on
             if (item.getData(DataTypes.COOLDOWN_ABILITY)?.first != "Pickobulus") return@on
             if (blockOverride.bound && blockOverride.pressed) return@on
 

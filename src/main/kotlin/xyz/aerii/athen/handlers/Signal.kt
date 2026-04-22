@@ -10,6 +10,11 @@ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback
+import net.fabricmc.fabric.api.event.player.UseBlockCallback
+import net.fabricmc.fabric.api.event.player.UseEntityCallback
+import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.fabric.event.HypixelModAPICallback
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
@@ -17,6 +22,7 @@ import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
+import net.minecraft.world.InteractionResult
 import tech.thatgravyboat.skyblockapi.api.SkyBlockAPI
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.entity.EntityAttributesUpdateEvent
@@ -140,6 +146,46 @@ object Signal {
             ScreenKeyboardEvents.allowKeyRelease(screen).register { _, event ->
                 !GuiEvent.Input.Key.Release(event).post()
             }
+        }
+
+        UseItemCallback.EVENT.register { _, _, _ ->
+            val a = PlayerEvent.Interact.None.post()
+            val b = PlayerEvent.Interact.Any.post()
+
+            if (!a && !b) return@register InteractionResult.PASS
+            InteractionResult.FAIL
+        }
+
+        UseBlockCallback.EVENT.register { _, _, _, a ->
+            val a = PlayerEvent.Interact.Block(a.blockPos).post()
+            val b = PlayerEvent.Interact.Any.post()
+
+            if (!a && !b) return@register InteractionResult.PASS
+            InteractionResult.FAIL
+        }
+
+        UseEntityCallback.EVENT.register { _, _, _, entity, _ ->
+            val a = PlayerEvent.Interact.Entity(entity).post()
+            val b = PlayerEvent.Interact.Any.post()
+
+            if (!a && !b) return@register InteractionResult.PASS
+            InteractionResult.FAIL
+        }
+
+        AttackBlockCallback.EVENT.register { _, _, _, pos, _ ->
+            val a = PlayerEvent.Attack.Block(pos).post()
+            val b = PlayerEvent.Attack.Any.post()
+
+            if (!a && !b) return@register InteractionResult.PASS
+            InteractionResult.FAIL
+        }
+
+        AttackEntityCallback.EVENT.register { _, _, _, entity, _ ->
+            val a = PlayerEvent.Attack.Entity(entity).post()
+            val b = PlayerEvent.Attack.Any.post()
+
+            if (!a && !b) return@register InteractionResult.PASS
+            InteractionResult.FAIL
         }
     }
 
