@@ -15,7 +15,7 @@ import xyz.aerii.library.api.client
 import java.util.*
 
 @Load
-object Itemizer {
+object Itemizer { // TODO: make this check the parent config of added keys if the watch list gets too big
     private val pressed = mutableSetOf<Int>()
 
     private val `watched$tooltip` = mutableListOf<() -> Int>()
