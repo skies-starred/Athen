@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
-import tech.thatgravyboat.skyblockapi.utils.extentions.getHoveredSlot
+import xyz.aerii.athen.accessors.hovered
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.ConfigBuilder
 import xyz.aerii.athen.events.GuiEvent
@@ -46,7 +46,7 @@ object Itemizer { // TODO: make this check the parent config of added keys if th
             if (!pressed.add(keyEvent.key)) return@on
             val screen = client.screen as? AbstractContainerScreen<*> ?: return@on
 
-            if (`watched$tooltip`.any { it() == keyEvent.key }) screen.getHoveredSlot()?.item?.`invalidate$tooltip`()
+            if (`watched$tooltip`.any { it() == keyEvent.key }) screen.hovered?.item?.`invalidate$tooltip`()
             if (`watched$slot`.any { it() == keyEvent.key }) screen.menu?.slots?.forEach { it.`invalidate$render`() }
         }
 
@@ -54,7 +54,7 @@ object Itemizer { // TODO: make this check the parent config of added keys if th
             if (!pressed.remove(keyEvent.key)) return@on
             val screen = client.screen as? AbstractContainerScreen<*> ?: return@on
 
-            if (`watched$tooltip`.any { it() == keyEvent.key }) screen.getHoveredSlot()?.item?.`invalidate$tooltip`()
+            if (`watched$tooltip`.any { it() == keyEvent.key }) screen.hovered?.item?.`invalidate$tooltip`()
             if (`watched$slot`.any { it() == keyEvent.key }) screen.menu?.slots?.forEach { it.`invalidate$render`() }
         }
 

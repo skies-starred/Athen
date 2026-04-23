@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import org.lwjgl.glfw.GLFW
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
-import tech.thatgravyboat.skyblockapi.utils.extentions.getHoveredSlot
+import xyz.aerii.athen.accessors.hovered
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
@@ -114,7 +114,7 @@ object CustomTooltip : Module(
 
     @JvmStatic
     fun render(graphics: GuiGraphics, font: Font, components: List<ClientTooltipComponent>, x: Int, y: Int, positioner: ClientTooltipPositioner) {
-        if (color != `border$color`.rgb && (client.screen as? AbstractContainerScreen<*>)?.getHoveredSlot() == null) color = `border$color`.rgb
+        if (color != `border$color`.rgb && (client.screen as? AbstractContainerScreen<*>)?.hovered == null) color = `border$color`.rgb
 
         last = Chronos.ticks.client
         val components = if (name) components.take(1) else components

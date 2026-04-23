@@ -5,10 +5,10 @@ import net.minecraft.locale.Language
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
-import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.library.api.client
 import java.awt.Color
+import kotlin.math.*
 
 @Load
 object Render2D {
@@ -120,13 +120,39 @@ object Render2D {
     @JvmStatic
     @JvmOverloads
     @JvmName("drawRectangle_int")
-    fun GuiGraphics.drawRectangle(x: Int, y: Int, width: Int, height: Int, color: Int = TextColor.WHITE) {
+    fun GuiGraphics.drawRectangle(x: Int, y: Int, width: Int, height: Int, color: Int = -1) {
         fill(x, y, x + width, y + height, color)
     }
 
     @JvmStatic
     @JvmOverloads
-    fun GuiGraphics.drawOutline(x: Int, y: Int, width: Int, height: Int, border: Int, color: Int = TextColor.WHITE, inset: Boolean = false) {
+    fun GuiGraphics.drawLine(x1: Int, y1: Int, x2: Int, y2: Int, color: Int, thickness: Int = 1) {
+        val dx = x2 - x1
+        val dy = y2 - y1
+        val length = sqrt((dx * dx + dy * dy).toDouble())
+        if (length <= 0f) return
+
+        val pose = pose()
+        pose.pushMatrix()
+
+        pose.translate(x1.toFloat(), y1.toFloat())
+        pose.rotate(atan2(dy.toFloat(), dx.toFloat()))
+
+        if (thickness == 1) {
+            fill(0, 0, length.toInt(), 1, color)
+            pose.popMatrix()
+            return
+        }
+
+        val half = thickness / 2f
+        fill(0, floor(-half).toInt(), length.toInt(), ceil(half).toInt(), color)
+
+        pose.popMatrix()
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun GuiGraphics.drawOutline(x: Int, y: Int, width: Int, height: Int, border: Int, color: Int = -1, inset: Boolean = false) {
         val border = if (inset) -border else border
         fill(x - border, y - border, x + width + border, y, color)
         fill(x - border, y + height, x + width + border, y + height + border, color)
