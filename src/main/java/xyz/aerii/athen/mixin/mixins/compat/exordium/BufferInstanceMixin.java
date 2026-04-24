@@ -28,6 +28,7 @@ public class BufferInstanceMixin {
 
     @Unique
     private void athen$bool() {
+        i = 0;
         RadialMenu.INSTANCE.getOpen().onChange(b -> {
             i = b ? 1 : 0;
             return Unit.INSTANCE;
