@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
+import xyz.aerii.athen.config.ConfigManager
 import xyz.aerii.athen.config.ui.ClickGUI
 import xyz.aerii.athen.events.CommandRegistration
 import xyz.aerii.athen.events.MessageEvent
@@ -31,6 +32,8 @@ import xyz.aerii.library.utils.literal
 
 @Load
 object Commander {
+    private val r = Regex("(?<!^)([A-Z])")
+
     object StateTracker {
         var `warning$updater$sentOnce` = false
         var `warning$clickUiHelper$sentOnce` = false
@@ -52,7 +55,8 @@ object Commander {
         "/${Athen.modId} times slayers" to "Shows the slayer kill times",
         "/${Athen.modId} times kuudra <tier>" to "Shows the kuudra pbs",
         "/${Athen.modId} update [stream]" to "Install updates (release/beta/alpha)",
-        "/${Athen.modId} checkupdate [stream]" to "Check for available updates"
+        "/${Athen.modId} checkupdate [stream]" to "Check for available updates",
+        "/${Athen.modId} toggle feature <featureKey>" to "Toggles the specified feature!"
     )
 
     init {
@@ -109,6 +113,18 @@ object Commander {
                         clickUiHelperCollapsed = !clickUiHelperCollapsed
                         if (clickUiHelperCollapsed) "Click UI helper has been <yellow>collapsed<r> and moved to the <aqua>top right corner<r>. Left-click it to expand. Use <yellow>/${Athen.modId} hide help<r> to permanently hide (not recommended).".parse().modMessage()
                         else "Click UI helper has been <green>expanded<r>.".parse().modMessage()
+                    }
+
+                    then("feature") {
+                        thenCallback("key", StringArgumentType.string()) {
+                            val key = StringArgumentType.getString(this, "key")
+
+                            val b = ConfigManager.getValue(key) as? Boolean ?: return@thenCallback "Not a valid feature!".modMessage()
+                            ConfigManager.updateConfig(key, !b)
+
+                            val s = key.replace(r, " $1").lowercase().replaceFirstChar { it.uppercase() }
+                            "<${Mocha.Mauve.argb}>$s <gray>➤ ${if (b) "<red>Disabled" else "<green>Enabled"}".parse().modMessage()
+                        }
                     }
                 }
 
