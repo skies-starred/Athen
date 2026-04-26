@@ -3,6 +3,8 @@
 package xyz.aerii.athen.modules.impl.render
 
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
@@ -12,6 +14,7 @@ import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.GuiEvent
 import xyz.aerii.athen.events.core.runWhen
+import xyz.aerii.athen.handlers.Resourceful
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
@@ -26,7 +29,7 @@ object ItemRarityBackground : Module(
     "Displays a background for the item that's rendering!",
     Category.RENDER
 ) {
-    private val renderStyle by config.dropdown("Render style", listOf("Filled", "Outline",  "Filled outline"), 2)
+    private val renderStyle by config.dropdown("Render style", listOf("Filled", "Outline",  "Filled outline", "Circle"), 2)
     private val mode = config.dropdown("Render mode", listOf("Everywhere", "Slots"), 1).custom("mode")
     private val hotbar = config.switch("Hotbar", true).dependsOn { mode.value == 1 }.custom("hotbar")
     private val fill by config.slider("Fill alpha", 0.5f, 0f, 1f, showDouble = true).dependsOn { renderStyle == 0 || renderStyle == 2 }
@@ -40,6 +43,15 @@ object ItemRarityBackground : Module(
     private val `color$mythic` by config.colorPicker("Mythic color", Color(SkyBlockRarity.MYTHIC.color)).childOf { colorExpandable }
     private val `color$divine` by config.colorPicker("Divine color", Color(SkyBlockRarity.DIVINE.color)).childOf { colorExpandable }
     private val `color$special` by config.colorPicker("Special color", Color(SkyBlockRarity.SPECIAL.color)).childOf { colorExpandable }
+
+    private val common = Resourceful.identify("common")
+    private val uncommon = Resourceful.identify("uncommon")
+    private val rare = Resourceful.identify("rare")
+    private val epic = Resourceful.identify("epic")
+    private val leg = Resourceful.identify("legendary")
+    private val mythic = Resourceful.identify("mythic")
+    private val divine = Resourceful.identify("divine")
+    private val special = Resourceful.identify("special")
 
     init {
         on<GuiEvent.Items.Render.Pre> {
@@ -57,7 +69,8 @@ object ItemRarityBackground : Module(
 
     private fun GuiGraphics.fn(item: ItemStack, x: Int, y: Int) {
         if (item.isEmpty) return
-        val color = item.getData(DataTypes.RARITY)?.get() ?: return
+        val a = item.getData(DataTypes.RARITY) ?: return
+        val color = a.get()
 
         when (renderStyle) {
             0 -> {
@@ -72,6 +85,10 @@ object ItemRarityBackground : Module(
                 drawRectangle(x, y, 16, 16, color.withAlpha(fill))
                 drawOutline(x, y, 16, 16, 1, color, true)
             }
+
+            3 -> {
+                blitSprite(RenderPipelines.GUI_TEXTURED, a.sprite(), x, y, 16, 16)
+            }
         }
     }
 
@@ -85,4 +102,15 @@ object ItemRarityBackground : Module(
         SkyBlockRarity.DIVINE -> `color$divine`
         else -> `color$special`
     }.rgb
+
+    private fun SkyBlockRarity.sprite(): ResourceLocation = when (this) {
+        SkyBlockRarity.COMMON -> common
+        SkyBlockRarity.UNCOMMON -> uncommon
+        SkyBlockRarity.RARE -> rare
+        SkyBlockRarity.EPIC -> epic
+        SkyBlockRarity.LEGENDARY -> leg
+        SkyBlockRarity.MYTHIC -> mythic
+        SkyBlockRarity.DIVINE -> divine
+        else -> special
+    }
 }
