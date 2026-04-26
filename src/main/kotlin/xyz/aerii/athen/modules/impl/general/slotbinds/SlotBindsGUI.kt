@@ -167,12 +167,12 @@ object SlotBindsGUI : Scram("Slot Binds Editor [Athen]") {
 
             zones.add(UIZone(x, y, 18, 18, ZoneType.SLOT, data = slot))
             if (mx in x until x + 18 && my in y until y + 18) {
-                if (bound) {
-                    tt = "L: Cycle | R: Remove"
-                    tc = bc
-                } else if (selected != null && (selected!! in 36..44) != (slot in 36..44)) {
+                if (selected != null && (selected!! in 36..44) != (slot in 36..44)) {
                     tt = "Click to bind"
                     tc = Mocha.Green.argb
+                } else if (bound) {
+                    tt = "L: Cycle | R: Remove"
+                    tc = bc
                 }
 
                 tx = x + 20
@@ -198,12 +198,12 @@ object SlotBindsGUI : Scram("Slot Binds Editor [Athen]") {
 
             zones.add(UIZone(x, y, 18, 18, ZoneType.SLOT, data = slot))
             if (mx in x until x + 18 && my in y until y + 18) {
-                if (bound) {
-                    tt = "L: Cycle | R: Remove"
-                    tc = bc
-                } else if (selected != null && (selected!! in 36..44) != (slot in 36..44)) {
+                if (selected != null && (selected!! in 36..44) != (slot in 36..44)) {
                     tt = "Click to bind"
                     tc = Mocha.Green.argb
+                } else if (bound) {
+                    tt = "L: Cycle | R: Remove"
+                    tc = bc
                 }
 
                 tx = x + 20
@@ -253,12 +253,6 @@ object SlotBindsGUI : Scram("Slot Binds Editor [Athen]") {
             }
 
             if (button == 0) {
-                if (bound) {
-                    SlotBinds.cycle(slot)
-                    selected = null
-                    return true
-                }
-
                 val s = selected
                 when {
                     s == slot -> {
@@ -268,6 +262,10 @@ object SlotBindsGUI : Scram("Slot Binds Editor [Athen]") {
                     s != null && ((s in 36..44) != (slot in 36..44)) -> {
                         SlotBinds.bind(s, slot)
                         selected = null
+                    }
+
+                    bound && s == null -> {
+                        SlotBinds.cycle(slot)
                     }
 
                     else -> {

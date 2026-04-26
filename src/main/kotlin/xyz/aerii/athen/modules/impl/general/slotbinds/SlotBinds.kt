@@ -230,9 +230,14 @@ object SlotBinds : Module(
             if (!b3 && !b.fn()) return@on
 
             val c = if (b3) b else h
-            val d = (if (b3) h else b) - 36
+            val d = if (b3) h else b
+            val e = d - 36
 
-            guiClick(s.menu.containerId, c, d, ClickType.SWAP)
+            val g = s.menu.slots
+            if (g.getOrNull(c)?.item?.isEmpty != false && g.getOrNull(d)?.item?.isEmpty != false) return@on
+
+            m1.put(d, c)
+            guiClick(s.menu.containerId, c, e, ClickType.SWAP)
             cancel()
         }
 
@@ -336,21 +341,27 @@ object SlotBinds : Module(
 
     private fun rk(k: Int) {
         val v = m0.remove(k)
-        if (v != -1) m1.remove(v)
         m2.remove(k)
+        if (v == -1) return
+        if (m1.get(v) != k) return
+
+        val a = m0.int2IntEntrySet().firstOrNull { it.intValue == v }?.intKey
+        if (a != null) m1.put(v, a) else m1.remove(v)
     }
 
     private fun rv(v: Int) {
-        val k = m1.remove(v)
+        val k = m1.get(v)
         if (k == -1) return
 
         m0.remove(k)
         m2.remove(k)
+
+        val a = m0.int2IntEntrySet().firstOrNull { it.intValue == v }?.intKey
+        if (a != null) m1.put(v, a) else m1.remove(v)
     }
 
     private fun put(k: Int, v: Int) {
         rk(k)
-        rv(v)
 
         m0.put(k, v)
         m1.put(v, k)
