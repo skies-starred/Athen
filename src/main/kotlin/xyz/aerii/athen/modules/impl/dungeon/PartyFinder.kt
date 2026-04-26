@@ -36,6 +36,7 @@ import xyz.aerii.athen.utils.calculateMP
 import xyz.aerii.athen.utils.fetchPlayerStats
 import xyz.aerii.athen.utils.parseItem
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
+import xyz.aerii.athen.utils.render.Render2D.text
 import xyz.aerii.library.api.*
 import xyz.aerii.library.handlers.parser.parse
 import xyz.aerii.library.handlers.time.server
@@ -65,6 +66,7 @@ object PartyFinder : Module(
     private val statsCache = mutableMapOf<String, CachedStats>()
 
     private val showStats = config.switch("Show stats").custom("showStats")
+    private val stackSize = config.switch("Party stack size", true).custom("stackSize")
     private val statsToShow by config.multiCheckbox("Stats to show", listOf("Class level", "Cata level", "Secrets", "Secret average", "Personal best", "Missing classes"), listOf(0, 1, 2, 3, 4, 5)).dependsOn { showStats.value }
 
     private val _highlight by config.expandable("Highlights")
@@ -204,6 +206,13 @@ object PartyFinder : Module(
                 SlotStatus.JOINABLE -> if (joinable) graphics.drawRectangle(slot.x, slot.y, 16, 16, joinableColor)
             }
         }.runWhen(highlight.state)
+
+        on<GuiEvent.Slots.Render.Post> {
+            if (!inPartyFinder) return@on
+            val s = slotData[slot.index]?.members?.size?.toString() ?: return@on
+
+            graphics.text(s, slot.x + 17 - client.font.width(s), slot.y + 18 - client.font.lineHeight)
+        }.runWhen(stackSize.state)
 
         on<GuiEvent.Open.Container> {
             inPartyFinder = stripped == "Party Finder"
