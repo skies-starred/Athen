@@ -27,7 +27,7 @@ import xyz.aerii.library.utils.literal
 import kotlin.time.Duration.Companion.hours
 
 object Athen : ClientModInitializer {
-    const val modVersion: String = /*$ mod_version*/ "0.1.5"
+    const val modVersion: String = /*$ mod_version*/ "0.1.6"
     const val modId: String = /*$ mod_id*/ "athen"
     const val modName: String = /*$ mod_name*/ "Athen"
     const val discordUrl: String = "https://discord.gg/DB5S3DjQVa"
