@@ -3,6 +3,9 @@
 package xyz.aerii.athen
 
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import net.fabricmc.api.ClientModInitializer
 import net.minecraft.SharedConstants
 import org.apache.logging.log4j.LogManager
@@ -37,6 +40,9 @@ object Athen : ClientModInitializer {
 
     @JvmField
     val GSON: Gson = Gson()
+
+    @JvmField
+    val SCOPE: CoroutineScope = CoroutineScope(Dispatchers.Default + CoroutineName(modName))
 
     override fun onInitializeClient() {
         AnnotationLoader.load()
