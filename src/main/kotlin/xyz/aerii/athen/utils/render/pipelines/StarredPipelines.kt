@@ -14,7 +14,8 @@ object StarredPipelines {
 
     val LINES: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
-            .withLocation("pipeline/depth/line")
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
+            .withLocation(string("pipeline/depth/line"))
             .build()
     )
 
@@ -27,6 +28,7 @@ object StarredPipelines {
 
     val DEBUG_FILLED: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
             .withLocation(string("pipeline/depth/debug_filled"))
             .build()
     )
@@ -40,17 +42,18 @@ object StarredPipelines {
 
     val TRIANGLE_FAN: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
-            .withLocation(string("pipeline/depth/triangle_fan"))
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
+            .withLocation(string("pipeline/depth/triangle_fan"))
             .withCull(false)
             .build()
     )
 
     val TRIANGLE_FAN_DEPTHLESS: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
-            .withLocation(string("pipeline/depthless/triangle_fan"))
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withLocation(string("pipeline/depthless/triangle_fan"))
             .withCull(false)
             .build()
     )
