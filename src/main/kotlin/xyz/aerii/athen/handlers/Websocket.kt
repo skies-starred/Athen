@@ -77,8 +77,12 @@ object Websocket {
                                 }
 
                                 "err" -> {
-                                    Athen.LOGGER.error("IRC message rejected: $b")
-                                    "<red>Message rejected: <gray>$b".parse().modMessage(Typo.PrefixType.ERROR)
+                                    Athen.LOGGER.error("Websocket error: $b")
+                                    "<red>IRC error: <gray>$b".parse().modMessage(Typo.PrefixType.ERROR)
+                                }
+
+                                "warn" -> {
+                                    b?.let { "<yellow>$it".parse().modMessage(Typo.PrefixType.ERROR) }
                                 }
 
                                 "joined" -> {
