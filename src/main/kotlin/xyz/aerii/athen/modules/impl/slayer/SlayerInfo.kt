@@ -49,6 +49,7 @@ object SlayerInfo : Module(
     private val timerStyleExpandable by config.expandable("Timer styles")
     private val timerStyle by config.textInput("Normal", "<aqua>#time").childOf { timerStyleExpandable }
     private val blazeStyle by config.textInput("Blaze", "<aqua>#hits <dark_gray>[<gray>#time<dark_gray>]").childOf { timerStyleExpandable }
+    private val attunementColor by config.switch("Use attunement colors", true).childOf { timerStyleExpandable }
     private val laserStyle by config.textInput("Laser", "<aqua>#laser <dark_gray>[<gray>#time<dark_gray>]").childOf { timerStyleExpandable }
     private val _unused1 by config.textParagraph("Variable: <red>#time<r>, <red>#laser").childOf { timerStyleExpandable }
 
@@ -180,7 +181,7 @@ object SlayerInfo : Module(
 
     private fun String.str1(hits: String, time: String): Component = this
         .replace("&", "§")
-        .replace("#hits", hits)
+        .replace("#hits", hits.fn())
         .replace("#time", time)
         .parse(true)
 
@@ -195,6 +196,19 @@ object SlayerInfo : Module(
         .replace("#health", health)
         .replace("#hits", hits.toString())
         .parse(true)
+
+    private fun String.fn(): String {
+        if (!attunementColor) return this
+        val s = substringBefore(" ")
+
+        return when (s) {
+            "ASHEN" -> "<dark_gray>"
+            "AURIC" -> "<gold>"
+            "CRYSTAL" -> "<aqua>"
+            "SPIRIT" -> "<white>"
+            else -> this
+        }
+    }
 
     private data class Info(
         val slayer: xyz.aerii.athen.api.skyblock.SlayerInfo,
