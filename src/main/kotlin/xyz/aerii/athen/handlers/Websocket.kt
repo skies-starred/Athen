@@ -2,13 +2,22 @@ package xyz.aerii.athen.handlers
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.mojang.brigadier.arguments.StringArgumentType
+import kotlinx.coroutines.launch
+import net.minecraft.network.protocol.game.ServerboundChatPacket
 import xyz.aerii.athen.Athen
+import xyz.aerii.athen.Athen.SCOPE
 import xyz.aerii.athen.annotations.Load
+import xyz.aerii.athen.events.CommandRegistration
+import xyz.aerii.athen.events.PacketEvent
+import xyz.aerii.athen.events.core.on
+import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.impl.ModSettings
 import xyz.aerii.athen.utils.wsUrl
 import xyz.aerii.library.api.client
 import xyz.aerii.library.api.name
+import xyz.aerii.library.handlers.Observable
 import xyz.aerii.library.handlers.parser.parse
 import xyz.aerii.library.handlers.time.Task
 import java.net.URI
@@ -26,6 +35,7 @@ object Websocket {
     private var ws: WebSocket? = null
     private var rc: Task? = null
     private var cc: String = "general"
+    private var ob: Observable<Boolean> = Observable(false)
 
     @Volatile
     var authenticated = false
@@ -33,6 +43,25 @@ object Websocket {
 
     init {
         if (ModSettings.irc) connect()
+
+        on<CommandRegistration> {
+            event.register("airc") {
+                thenCallback("message", StringArgumentType.greedyString()) {
+                     send(StringArgumentType.getString(this@thenCallback, "message"))
+                }
+
+                thenCallback("toggle") {
+                    val b = !ob.value
+                    ob.value = b
+                    "Send all messages to IRC <gray>➤ ${if (b) "<green>Enabled" else "<red>Disabled"}".parse().modMessage()
+                }
+            }
+        }
+
+        on<PacketEvent.Send, ServerboundChatPacket> {
+            send(message)
+            it.cancel()
+        }.runWhen(ob)
     }
 
     fun connect() {
@@ -145,16 +174,6 @@ object Websocket {
             })
     }
 
-    private fun rc() {
-        rc?.cancel()
-        rc = Chronos.repeat(15.seconds) { connect() }
-    }
-
-    private fun msg(json: JsonObject) {
-        json.addProperty("n", name)
-        ws?.sendText(json.toString(), true)
-    }
-
     fun create(channel: String, pin: String? = null) {
         msg(JsonObject().apply {
             addProperty("t", "create")
@@ -202,5 +221,17 @@ object Websocket {
 
         ows?.sendClose(WebSocket.NORMAL_CLOSURE, "")
         authenticated = false
+    }
+
+    private fun rc() {
+        rc?.cancel()
+        rc = Chronos.repeat(15.seconds) { connect() }
+    }
+
+    private fun msg(json: JsonObject) {
+        SCOPE.launch {
+            json.addProperty("n", name)
+            ws?.sendText(json.toString(), true)
+        }
     }
 }
