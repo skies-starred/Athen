@@ -105,6 +105,7 @@ object IRC : IWebSocket() {
         }
 
         on<PacketEvent.Send, ServerboundChatPacket> {
+            if (message.startsWith('/')) return@on
             send(message)
             it.cancel()
         }.runWhen(ob and a.observable)
