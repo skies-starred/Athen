@@ -32,8 +32,5 @@ object ModSettings : Module(
     @JvmStatic
     val hideGuis by config.switch("Hide GUIs in F1")
 
-    @JvmStatic
-    val irc by config.switch("Connect to IRC on launch", true)
-
     private val _oldApiText by config.textParagraph("Some features may not work with the old api.")
 }

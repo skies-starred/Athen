@@ -4,9 +4,7 @@ package xyz.aerii.athen.handlers
 
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
-import kotlinx.coroutines.launch
 import xyz.aerii.athen.Athen
-import xyz.aerii.athen.Athen.SCOPE
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.ConfigManager
 import xyz.aerii.athen.config.ui.ClickGUI
@@ -225,71 +223,6 @@ object Commander {
 
                     thenCallback("stream", StringArgumentType.string()) {
                         ModUpdater.installUpdate(StringArgumentType.getString(this, "stream"))
-                    }
-                }
-
-                then("irc") {
-                    then("create") {
-                        then("channel", StringArgumentType.string()) {
-                            callback {
-                                if (!Websocket.authenticated) return@callback "Not connected to IRC! Use <yellow>/${Athen.modId} irc connect".parse().modMessage(Typo.PrefixType.ERROR)
-                                Websocket.create(StringArgumentType.getString(this, "channel"))
-                            }
-
-                            thenCallback("pin", StringArgumentType.string()) {
-                                if (!Websocket.authenticated) return@thenCallback "Not connected to IRC! Use <yellow>/${Athen.modId} irc connect".parse().modMessage(Typo.PrefixType.ERROR)
-                                Websocket.create(StringArgumentType.getString(this, "channel"), StringArgumentType.getString(this, "pin"))
-                            }
-                        }
-                    }
-
-                    then("join") {
-                        then("channel", StringArgumentType.string()) {
-                            callback {
-                                if (!Websocket.authenticated) return@callback "Not connected to IRC! Use <yellow>/${Athen.modId} irc connect".parse().modMessage(Typo.PrefixType.ERROR)
-                                Websocket.join(StringArgumentType.getString(this, "channel"))
-                            }
-
-                            thenCallback("pin", StringArgumentType.string()) {
-                                if (!Websocket.authenticated) return@thenCallback "Not connected to IRC! Use <yellow>/${Athen.modId} irc connect".parse().modMessage(Typo.PrefixType.ERROR)
-                                Websocket.join(StringArgumentType.getString(this, "channel"), StringArgumentType.getString(this, "pin"))
-                            }
-                        }
-                    }
-
-                    then("pin") {
-                        thenCallback("pin", StringArgumentType.string()) {
-                            if (!Websocket.authenticated) return@thenCallback "Not connected to IRC!".modMessage(Typo.PrefixType.ERROR)
-                            Websocket.setPin(StringArgumentType.getString(this, "pin"))
-                        }
-                    }
-
-                    thenCallback("leave") {
-                        if (!Websocket.authenticated) return@thenCallback "Not connected to IRC!".modMessage(Typo.PrefixType.ERROR)
-                        Websocket.leave()
-                    }
-
-                    then("chat") {
-                        thenCallback("message", StringArgumentType.greedyString()) {
-                            if (!Websocket.authenticated) return@thenCallback "Not connected to IRC!".modMessage(Typo.PrefixType.ERROR)
-                            Websocket.send(StringArgumentType.getString(this, "message"))
-                        }
-                    }
-
-                    thenCallback("list") {
-                        if (!Websocket.authenticated) return@thenCallback "Not connected to IRC!".modMessage(Typo.PrefixType.ERROR)
-                        Websocket.list()
-                    }
-
-                    thenCallback("connect") {
-                        "<gray>Connecting to IRC...".parse().modMessage()
-                        SCOPE.launch { Websocket.connect() }
-                    }
-
-                    thenCallback("disconnect") {
-                        if (!Websocket.authenticated) return@thenCallback "Not connected to IRC!".modMessage(Typo.PrefixType.ERROR)
-                        SCOPE.launch { Websocket.close() }
-                        "<gray>Disconnected from IRC.".parse().modMessage()
                     }
                 }
             }
