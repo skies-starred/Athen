@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import xyz.aerii.athen.events.GuiEvent;
 import xyz.aerii.athen.modules.impl.render.ItemNamePosition;
+import xyz.aerii.athen.modules.impl.render.RenderOptimiser;
 
 @Mixin(Gui.class)
 public abstract class GuiMixin {
@@ -39,6 +40,12 @@ public abstract class GuiMixin {
     @Inject(method = "renderSlot", at = @At("TAIL"), cancellable = true)
     private void athen$renderSlot$post(GuiGraphics guiGraphics, int x, int y, DeltaTracker deltaTracker, Player player, ItemStack stack, int seed, CallbackInfo ci) {
         if (new GuiEvent.Slots.Render.Hotbar.Post(guiGraphics, stack, x, y).post()) ci.cancel();
+    }
+
+    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
+    private void athen$renderEffects(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+        if (!RenderOptimiser.getEffects()) return;
+        ci.cancel();
     }
 
     @ModifyArgs(

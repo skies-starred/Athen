@@ -18,6 +18,7 @@ object RenderOptimiser :  Module(
     Category.RENDER
 ) {
     private val _arm by config.switch("Hide player arm")
+    private val _effects by config.switch("Hide effects in UI", true)
 
     private val armor0 = config.switch("Hide armor on players").custom("_armor0")
     private val armor0t by config.multiCheckbox("Players to hide for", listOf("Self", "Others"), listOf(0)).dependsOn { armor0.value }
@@ -48,6 +49,10 @@ object RenderOptimiser :  Module(
     @JvmStatic
     val glow: Boolean
         get() = enabled && _glow
+
+    @JvmStatic
+    val effects: Boolean
+        get() = enabled && _effects
 
     init {
         on<WorldRenderEvent.Entity.Pre> {
