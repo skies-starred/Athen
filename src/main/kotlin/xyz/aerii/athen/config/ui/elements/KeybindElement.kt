@@ -58,7 +58,7 @@ class KeybindElement(
         val buttonX = lastX + width - 20f - textWidth(keyName)
 
         if (listening) {
-            setKey(-100 + button)
+            setKey(button)
             return false
         } else if (button == 0 && hovered(buttonX, lastY + 8f, buttonW, 20f)) {
             listening = true
@@ -91,7 +91,7 @@ class KeybindElement(
 
     private fun getKeyName(keyCode: Int) = when (keyCode) {
         -1 -> "None"
-        in -100..-1 -> "Mouse ${keyCode + 100}"
+        in 0..7 -> "Mouse $keyCode"
         else -> InputConstants.Type.KEYSYM.getOrCreate(keyCode).displayName.string.let {
             if (it.length == 1) it.uppercase() else it
         }

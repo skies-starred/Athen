@@ -180,7 +180,7 @@ object RadialMenu : Module(
 
         on<InputEvent.Mouse.Press> {
             if (client.screen != null) return@on
-            if (buttonInfo.button() - 100 != keybind) return@on
+            if (buttonInfo.button() != keybind) return@on
             if (open.value) return@on
 
             react(if (releaseClose) true else !open.value, true)
@@ -188,7 +188,7 @@ object RadialMenu : Module(
 
         on<InputEvent.Mouse.Release> {
             if (client.screen != null) return@on
-            if (buttonInfo.button() - 100 != keybind) return@on
+            if (buttonInfo.button() != keybind) return@on
             if (!open.value) return@on
             if (!releaseClose) return@on
 
