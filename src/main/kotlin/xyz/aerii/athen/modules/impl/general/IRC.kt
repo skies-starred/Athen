@@ -6,46 +6,110 @@ import com.google.gson.JsonParser
 import com.mojang.brigadier.arguments.StringArgumentType
 import net.minecraft.network.protocol.game.ServerboundChatPacket
 import xyz.aerii.athen.Athen
-import xyz.aerii.athen.annotations.Websocket
+import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.api.websocket.SocketPacket
 import xyz.aerii.athen.api.websocket.base.IWebSocket
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.CommandRegistration
+import xyz.aerii.athen.events.InternalEvent
 import xyz.aerii.athen.events.PacketEvent
-import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Typo
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.library.api.center
+import xyz.aerii.library.api.client
 import xyz.aerii.library.api.lie
 import xyz.aerii.library.api.name
 import xyz.aerii.library.api.repeat
 import xyz.aerii.library.handlers.Observable
-import xyz.aerii.library.handlers.Observable.Companion.and
 import xyz.aerii.library.handlers.parser.parse
 
-@Websocket
-object IRC : IWebSocket() {
+@Load
+object IRC : Module(
+    "IRC",
+    "Enables the IRC by default on launch if the module is enabled.",
+    Category.GENERAL,
+    true
+), IWebSocket {
+    private val _unused by config.textParagraph("Run <red>\"/athen irc help\" <r>to view all commands!")
+    private val help by config.switch("Help message", true)
+    private val format0 by config.textInput("Message format", "<#A6E3A1>#name <dark_gray>➤ <white>#message")
+    private val discord by config.switch("Discord IRC", true)
+    private val format1 by config.textInput("Discord format", "<#A6E3A1>#name <dark_gray>➤ <white>#message").dependsOn { discord }
+
     private val ob: Observable<Boolean> = Observable(false)
     private var cc: String = "general"
 
-    @JvmStatic
-    val a = object : Module(
-        "IRC",
-        "Enables the IRC by default on launch if the module is enabled.",
-        Category.GENERAL,
-        true
-    ) {}
-
-    private val _unused by a.config.textParagraph("Run <red>\"/athen irc help\" <r>to view all commands!")
-    private val help by a.config.switch("Help message", true)
-    private val format0 by a.config.textInput("Message format", "<#A6E3A1>#name <dark_gray>➤ <white>#message")
-    private val discord by a.config.switch("Discord IRC", true)
-    private val format1 by a.config.textInput("Discord format", "<#A6E3A1>#name <dark_gray>➤ <white>#message").dependsOn { discord }
-
     init {
+        on<PacketEvent.Send, ServerboundChatPacket> {
+            if (message.startsWith('/')) return@on
+            send(message)
+            it.cancel()
+        }.runWhen(ob)
+
+        on<InternalEvent.WebSocket.Message> {
+            if (id !in SocketPacket.IRC.ClientBound.all) return@on
+
+            when (id) {
+                SocketPacket.IRC.ClientBound.Join.id -> {
+                    if (channel == null) return@on
+
+                    cc = channel
+                    "<gray>Joined channel <aqua>#$channel".parse().modMessage()
+                    if (help) "<gray>Need help? Run <red>\"/athen irc help\"<r>!".parse().modMessage()
+                }
+
+                SocketPacket.IRC.ClientBound.Left.id -> {
+                    if (channel == null) return@on
+                    if (cc == channel) cc = "general"
+
+                    "<gray>Left channel <aqua>#$channel".parse().modMessage()
+                }
+
+                SocketPacket.IRC.ClientBound.Chat.id -> {
+                    if (channel == null) return@on
+                    if (name == null) return@on
+                    if (body == null) return@on
+                    if (name == client.user.name) return@on
+                    if (name == "[Discord]") return@on
+
+                    "<dark_gray>[<aqua>#$channel<dark_gray>]".format0(name, body).parse().modMessage()
+                }
+
+                SocketPacket.IRC.ClientBound.Discord.id -> {
+                    if (!discord) return@on
+                    if (name == null) return@on
+                    if (body == null) return@on
+
+                    "<dark_gray>[<aqua>Discord<dark_gray>]".format1(name, body).parse().modMessage()
+                }
+
+                SocketPacket.IRC.ClientBound.Error.id -> {
+                    "<red>IRC error: <gray>$body".parse().modMessage(Typo.PrefixType.ERROR)
+                }
+
+                SocketPacket.IRC.ClientBound.Warn.id -> {
+                    "<yellow>IRC: <gray>$body".parse().modMessage(Typo.PrefixType.ERROR)
+                }
+
+                SocketPacket.IRC.ClientBound.List.id -> {
+                    if (body == null) return@on
+
+                    val ch = runCatching {
+                        JsonParser.parseString(body).asJsonArray.map {
+                            val arr = it.asJsonArray
+                            "${arr[0].asString} (${arr[1].asInt})"
+                        }.sortedWith(compareBy({ if (it.startsWith("general ")) 0 else 1 }, { it }))
+                    }.getOrNull() ?: return@on
+
+                    if (ch.isEmpty()) "<gray>No active channels.".parse().modMessage()
+                    else "<gray>Active channels: <aqua>${ch.joinToString("<dark_gray>, <aqua>") { ch -> "#$ch" }}".parse().modMessage()
+                }
+            }
+        }
+
         on<CommandRegistration> {
             event.register("airc") {
                 thenCallback("message", StringArgumentType.greedyString()) {
@@ -119,76 +183,6 @@ object IRC : IWebSocket() {
                 }
             }
         }
-
-        on<PacketEvent.Send, ServerboundChatPacket> {
-            if (message.startsWith('/')) return@on
-            send(message)
-            it.cancel()
-        }.runWhen(ob and a.observable)
-    }
-
-    override fun fn0(t: Int, c: String?, n: String?, b: String?) {
-        if (t !in SocketPacket.IRC.ClientBound.all) return
-
-        when (t) {
-            SocketPacket.IRC.ClientBound.Join.id -> {
-                if (c == null) return
-
-                cc = c
-                "<gray>Joined channel <aqua>#$c".parse().modMessage()
-                if (help) "<gray>Need help? Run <red>\"/athen irc help\"<r>!".parse().modMessage()
-            }
-
-            SocketPacket.IRC.ClientBound.Left.id -> {
-                if (c == null) return
-                if (cc == c) cc = "general"
-
-                "<gray>Left channel <aqua>#$c".parse().modMessage()
-            }
-
-            SocketPacket.IRC.ClientBound.Chat.id -> {
-                if (c == null) return
-                if (n == null) return
-                if (b == null) return
-                if (n == name) return
-                if (n == "[Discord]") return
-
-                "<dark_gray>[<aqua>#$c<dark_gray>]".format0(n, b).parse().modMessage()
-            }
-
-            SocketPacket.IRC.ClientBound.Discord.id -> {
-                if (!discord) return
-                if (n == null) return
-                if (b == null) return
-
-                "<dark_gray>[<aqua>Discord<dark_gray>]".format1(n, b).parse().modMessage()
-            }
-
-            SocketPacket.IRC.ClientBound.Error.id -> {
-                "<red>IRC error: <gray>$b".parse().modMessage(Typo.PrefixType.ERROR)
-            }
-
-            SocketPacket.IRC.ClientBound.Warn.id -> {
-                if (b != null) "<yellow>IRC: <gray>$b".parse().modMessage(Typo.PrefixType.ERROR)
-            }
-
-            SocketPacket.IRC.ClientBound.List.id -> {
-                if (b == null) return
-                val ch = runCatching {
-                    JsonParser.parseString(b).asJsonArray.map {
-                        val arr = it.asJsonArray
-                        "${arr[0].asString} (${arr[1].asInt})"
-                    }.sortedWith(compareBy({ if (it.startsWith("general ")) 0 else 1 }, { it }))
-                }.getOrNull() ?: return
-
-                if (ch.isEmpty()) "<gray>No active channels.".parse().modMessage()
-                else "<gray>Active channels: <aqua>${ch.joinToString("<dark_gray>, <aqua>") { ch -> "#$ch" }}".parse().modMessage()
-            }
-        }
-    }
-
-    override fun fn1(): Boolean {
-        return a.enabled
     }
 
     private fun create(channel: String, pin: String? = null) {

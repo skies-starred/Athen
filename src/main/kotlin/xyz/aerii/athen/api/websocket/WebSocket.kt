@@ -5,9 +5,9 @@ import com.google.gson.JsonParser
 import kotlinx.coroutines.launch
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.Athen.SCOPE
-import xyz.aerii.athen.annotations.Load
-import xyz.aerii.athen.api.websocket.base.IWebSocket
+import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.events.CommandRegistration
+import xyz.aerii.athen.events.InternalEvent
 import xyz.aerii.athen.events.core.on
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Typo
@@ -25,15 +25,12 @@ import java.util.UUID
 import java.util.concurrent.CompletionStage
 import kotlin.time.Duration.Companion.seconds
 
-@Load
+@Priority
 object WebSocket {
     private val http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()
     private val url = URI(wsUrl)
     private var ws: WebSocket? = null
     private var rc: Task? = null
-
-    @JvmStatic
-    val all: MutableSet<IWebSocket> = mutableSetOf()
 
     @Volatile
     var auth = false
@@ -93,7 +90,6 @@ object WebSocket {
                 val json = buffer.toString()
                 buffer.clear()
 
-                val ss = all.toList()
                 runCatching { JsonParser.parseString(json).asJsonObject }.getOrNull()?.let { j ->
                     val t = j.get("t")?.asInt ?: return@let
                     val c = j.get("c")?.asString
@@ -122,7 +118,7 @@ object WebSocket {
                         }
 
                         else -> {
-                            for (s in ss) if (s.fn1()) s.fn0(t, c, n, b)
+                            InternalEvent.WebSocket.Message(t, b, c, n).post()
                         }
                     }
                 }
