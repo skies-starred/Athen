@@ -2,6 +2,7 @@ package xyz.aerii.athen.api.websocket
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.Athen.SCOPE
@@ -31,6 +32,7 @@ object WebSocket {
     private val url = URI(wsUrl)
     private var ws: WebSocket? = null
     private var rc: Task? = null
+    private val ch: Channel<JsonObject> = Channel(Channel.UNLIMITED)
 
     @Volatile
     var auth = false
@@ -51,6 +53,13 @@ object WebSocket {
                         "<gray>Disconnected from WebSocket.".parse().modMessage()
                     }
                 }
+            }
+        }
+
+        SCOPE.launch {
+            for (c in ch) {
+                c.addProperty("n", name)
+                ws?.sendText(c.toString(), true)
             }
         }
 
@@ -153,10 +162,7 @@ object WebSocket {
     }
 
     fun send(json: JsonObject) {
-        SCOPE.launch {
-            json.addProperty("n", name)
-            ws?.sendText(json.toString(), true)
-        }
+        ch.trySend(json)
     }
 
     private fun fn0() {
