@@ -128,12 +128,12 @@ object IRC : Module(
                     then("create") {
                         then("channel", StringArgumentType.string()) {
                             callback {
-                                if (!auth) return@callback "Not connected to IRC! Use <yellow>/${Athen.modId} irc connect".parse().modMessage(Typo.PrefixType.ERROR)
+                                if (!auth) return@callback er0()
                                 create(StringArgumentType.getString(this, "channel"))
                             }
 
                             thenCallback("pin", StringArgumentType.string()) {
-                                if (!auth) return@thenCallback "Not connected to IRC! Use <yellow>/${Athen.modId} irc connect".parse().modMessage(Typo.PrefixType.ERROR)
+                                if (!auth) return@thenCallback er0()
                                 create(StringArgumentType.getString(this, "channel"), StringArgumentType.getString(this, "pin"))
                             }
                         }
@@ -142,12 +142,12 @@ object IRC : Module(
                     then("join") {
                         then("channel", StringArgumentType.string()) {
                             callback {
-                                if (!auth) return@callback "Not connected to IRC! Use <yellow>/${Athen.modId} irc connect".parse().modMessage(Typo.PrefixType.ERROR)
+                                if (!auth) return@callback er0()
                                 join(StringArgumentType.getString(this, "channel"))
                             }
 
                             thenCallback("pin", StringArgumentType.string()) {
-                                if (!auth) return@thenCallback "Not connected to IRC! Use <yellow>/${Athen.modId} irc connect".parse().modMessage(Typo.PrefixType.ERROR)
+                                if (!auth) return@thenCallback er0()
                                 join(StringArgumentType.getString(this, "channel"), StringArgumentType.getString(this, "pin"))
                             }
                         }
@@ -155,25 +155,25 @@ object IRC : Module(
 
                     then("pin") {
                         thenCallback("pin", StringArgumentType.string()) {
-                            if (!auth) return@thenCallback "Not connected to IRC!".modMessage(Typo.PrefixType.ERROR)
+                            if (!auth) return@thenCallback er0()
                             pin(StringArgumentType.getString(this, "pin"))
                         }
                     }
 
                     thenCallback("leave") {
-                        if (!auth) return@thenCallback "Not connected to IRC!".modMessage(Typo.PrefixType.ERROR)
+                        if (!auth) return@thenCallback er0()
                         leave()
                     }
 
                     then("chat") {
                         thenCallback("message", StringArgumentType.greedyString()) {
-                            if (!auth) return@thenCallback "Not connected to IRC!".modMessage(Typo.PrefixType.ERROR)
+                            if (!auth) return@thenCallback er0()
                             send(StringArgumentType.getString(this, "message"))
                         }
                     }
 
                     thenCallback("list") {
-                        if (!auth) return@thenCallback "Not connected to IRC!".modMessage(Typo.PrefixType.ERROR)
+                        if (!auth) return@thenCallback er0()
                         list()
                     }
 
@@ -243,5 +243,9 @@ object IRC : Module(
         " <dark_gray>- <$c>/airc toggle <gray>- send all messages to irc".parse().lie()
 
         a.lie()
+    }
+
+    private fun er0() {
+        "Not connected to IRC! Use <yellow>/${Athen.modId} ws connect".parse().modMessage(Typo.PrefixType.ERROR)
     }
 }
