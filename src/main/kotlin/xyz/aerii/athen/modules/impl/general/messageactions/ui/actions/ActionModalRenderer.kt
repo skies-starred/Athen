@@ -130,7 +130,7 @@ class ActionModalRenderer(
         graphics.text("Cancel", x1 + (hw - client.font.width("Cancel")) / 2, y1 + (fh - client.font.lineHeight) / 2 + 1, false, Mocha.Red.argb)
         zones.add(UIZone(x1, y1, hw, fh, UIZoneType.MODAL_CANCEL))
 
-        graphics.text("Regex: use \$0, \$1, \$2... for groups", x1, y1 - 8 - client.font.lineHeight - 2, false, Mocha.Overlay0.argb)
+        graphics.text("Regex: use $0 for full message, and $1, $2, $3... for groups", x1, y1 - 8 - client.font.lineHeight - 2, false, Mocha.Overlay0.argb)
 
         if (matchOpen) matchType(graphics, mx, my, x0 + padding + hw + 8, matchY + fh, hw)
         if (catOpen) category(graphics, mx, my, x0 + padding + hw + 8, catY + fh, hw)
