@@ -12,6 +12,7 @@ import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.athen.utils.regex
 import xyz.aerii.library.api.lie
 import xyz.aerii.library.api.name
 import xyz.aerii.library.handlers.parser.parse
@@ -107,13 +108,5 @@ object KuudraBreakdown : Module(
     ) {
         val deaths: Int?
             get() = KuudraAPI.teammates.find { it.name == name }?.deaths
-    }
-
-    private fun String.regex(): Regex? {
-        return try {
-            Regex(this)
-        } catch (_: Exception) {
-            null
-        }
     }
 }
