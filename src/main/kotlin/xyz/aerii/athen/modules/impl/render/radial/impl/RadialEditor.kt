@@ -240,17 +240,20 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
         val cNorm = java.awt.Color(Mocha.Surface0.withAlpha(0.5f), true).rgb
         val cHov = java.awt.Color(Mocha.Mauve.withAlpha(0.5f), true).rgb
 
+        //~ if >= 26.1 'submitGuiElement' -> 'addGuiElement'
         guiGraphics.guiRenderState.submitGuiElement(SlotsRenderState(guiGraphics, cx, cy, num, 50f, 80f, cNorm, cHov, hm, mini, hs, am, ex, idx2))
         guiGraphics.guiRenderState.nextStratum()
 
         for (i in current.indices) {
             val (sx, sy) = SlotsRenderState.centerSlot(cx, cy, num, 50f, 80f, i)
+            //~ if >= 26.1 'renderItem(' -> 'item('
             guiGraphics.renderItem(current[i].item, sx - 8, sy - 8)
         }
 
         if (!bool && RadialMenu.subMenu == 1 && selMain in working.indices) {
             for (j in working[selMain].sub.indices) {
                 val (sx, sy) = SlotsRenderState.centerSub(cx, cy, num, 80f, selMain, j)
+                //~ if >= 26.1 'renderItem(' -> 'item('
                 guiGraphics.renderItem(working[selMain].sub[j].item, sx - 8, sy - 8)
             }
         }
@@ -258,6 +261,7 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
         if (!bool && RadialMenu.subMenu == 2) {
             for ((i, s) in ex) {
                 val (sx, sy) = SlotsRenderState.centerSub0(cx, cy, num, 80f, i)
+                //~ if >= 26.1 'renderItem(' -> 'item('
                 guiGraphics.renderItem(s.item, sx - 8, sy - 8)
             }
         }
@@ -267,7 +271,7 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
 
         guiGraphics.drawRectangle(cx - 12, cy - 12, 24, 24, if (hCenter) Mocha.Surface2.argb else Mocha.Surface1.argb)
         guiGraphics.drawOutline(cx - 12, cy - 12, 24, 24, 1, if (hCenter) Mocha.Mauve.argb else Mocha.Overlay0.argb)
-        guiGraphics.drawString(client.font, str, cx - client.font.width(str) / 2, cy - client.font.lineHeight / 2, if (hCenter) Mocha.Mauve.argb else Mocha.Subtext0.argb, false)
+        guiGraphics.text(str, cx - client.font.width(str) / 2, cy - client.font.lineHeight / 2, false, if (hCenter) Mocha.Mauve.argb else Mocha.Subtext0.argb)
 
         val label = if (hCenter) (if (back) "Back" else "Exit") else {
             if (hs != -1) working.getOrNull(selMain)?.sub?.getOrNull(hs)?.name
@@ -349,6 +353,7 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
                     }
                 }
 
+                //~ if >= 26.1 'renderItem(' -> 'item('
                 guiGraphics.renderItem(working[i].item, sx + 6, iy + 2)
                 val ty = iy + (20 - client.font.lineHeight) / 2
                 val label = working[i].name.ifBlank { "..." }
@@ -392,6 +397,7 @@ object RadialEditor : Scram("Radial menu editor [Athen]") {
                         }
 
                         guiGraphics.drawRectangle(sx + 6 + 4, iy + 2, 1, 18 - 4, Mocha.Overlay0.argb)
+                        //~ if >= 26.1 'renderItem(' -> 'item('
                         guiGraphics.renderItem(working[i].sub[j].item, sx + 6 + 8, iy + 1)
                         val sty = iy + (18 - client.font.lineHeight) / 2
                         val subLabel = working[i].sub[j].name.ifBlank { "..." }

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.GuardianRenderer;
 import net.minecraft.client.renderer.entity.state.GuardianRenderState;
+//~ if >= 26.1 'CameraRenderState' -> 'level.CameraRenderState'
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.world.entity.monster.Guardian;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,6 +17,7 @@ import xyz.aerii.athen.modules.impl.slayer.EndermanLaserHider;
 
 @Mixin(GuardianRenderer.class)
 public class GuardianRendererMixin {
+    //~ if >= 26.1 'CameraRenderState;)V' -> 'level/CameraRenderState;)V'
     @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/GuardianRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V"), cancellable = true)
     private void athen$submit(GuardianRenderState guardianRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (!EndermanLaserHider.INSTANCE.getEnabled()) return;

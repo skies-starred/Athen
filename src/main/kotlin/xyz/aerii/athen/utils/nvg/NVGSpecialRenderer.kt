@@ -40,6 +40,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
+//~ if >= 26.1 'gui.render.state.pip.PictureInPictureRenderState' -> 'renderer.state.gui.pip.PictureInPictureRenderState'
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.MultiBufferSource
 import org.joml.Matrix3x2f
@@ -55,6 +56,7 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource)
         lastState = state
 
         val colorTex = RenderSystem.outputColorTextureOverride
+        //~ if >= 26.1 'getDevice()' -> 'getDevice().backend'
         val bufferManager = (RenderSystem.getDevice() as? GlDevice)?.directStateAccess() ?: return
         val glDepthTex = (RenderSystem.outputDepthTextureOverride?.texture() as? GlTexture) ?: return
 
@@ -126,12 +128,9 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource)
             val scissor = context.scissorStack.peek()
             val pose = Matrix3x2f(context.pose())
             val bounds = createBounds(x, y, x + width, y + height, pose, scissor)
+            val state = NVGRenderState(x, y, width, height, pose, scissor, bounds, renderContent)
 
-            val state = NVGRenderState(
-                x, y, width, height,
-                pose, scissor, bounds,
-                renderContent
-            )
+            //~ if >= 26.1 'submitPicturesInPictureState' -> 'addPicturesInPictureState'
             context.guiRenderState.submitPicturesInPictureState(state)
         }
 

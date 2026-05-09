@@ -3,7 +3,8 @@
 package xyz.aerii.athen.modules.impl.dungeon
 
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
-import net.minecraft.sounds.SoundEvents
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.SoundEvent
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.dungeon.DungeonAPI
@@ -75,6 +76,8 @@ object WatcherHelper : Module(
     private val `text$normal` by config.textInput("Normal", "<red>Watcher!").childOf { textExpandable }
     private val `text$slow` by config.textInput("Slow", "<red>Yawn...").childOf { textExpandable }
     private val `text$snail` by config.textInput("Very slow", "<red>Zzz...").childOf { textExpandable }
+
+    private val purreow = SoundEvent.createVariableRangeEvent(ResourceLocation.withDefaultNamespace("entity.cat.purreow"))
 
     private var `blood$start`: Long = 0
     private var `blood$start$t`: Int = 0
@@ -182,10 +185,10 @@ object WatcherHelper : Module(
             "Watcher took <red>$`display$speak` <gray>($`display$speak$t`)<r> to speak!".parse().onHover("<red>$t0<white> ticks.".parse()).modMessage()
 
             when (ty) {
-                Shrimp.FAST -> `text$fast`.parse().alert(subTitle = "Took <red>$`display$speak` <r>to speak!".parse(), soundType = SoundEvents.CAT_PURREOW)
-                Shrimp.NORMAL -> `text$normal`.parse().alert(subTitle = "Took <red>$`display$speak` <r>to speak!".parse(), soundType = SoundEvents.CAT_PURREOW)
-                Shrimp.SLOW -> `text$slow`.parse().alert(subTitle = "Took <red>$`display$speak` <r>to speak!".parse(), soundType = SoundEvents.CAT_PURREOW)
-                Shrimp.SNAIL -> `text$snail`.parse().alert(subTitle = "Took <red>$`display$speak` <r>to speak!".parse(), soundType = SoundEvents.CAT_PURREOW)
+                Shrimp.FAST -> `text$fast`.parse().alert(subTitle = "Took <red>$`display$speak` <r>to speak!".parse(), soundType = purreow)
+                Shrimp.NORMAL -> `text$normal`.parse().alert(subTitle = "Took <red>$`display$speak` <r>to speak!".parse(), soundType = purreow)
+                Shrimp.SLOW -> `text$slow`.parse().alert(subTitle = "Took <red>$`display$speak` <r>to speak!".parse(), soundType = purreow)
+                Shrimp.SNAIL -> `text$snail`.parse().alert(subTitle = "Took <red>$`display$speak` <r>to speak!".parse(), soundType = purreow)
             }
         }.runWhen(DungeonAPI.bloodOpened)
 

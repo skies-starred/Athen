@@ -97,8 +97,8 @@ dependencies {
     shadow("classgraph".global)
     shadow("autoupdate".global)
     shadow("library".versioned)
-    shadow("lwjgl-nanovg".global)
-    for (p in listOf("windows", "linux", "macos", "macos-arm64")) shadow("lwjgl-nanovg".global.get().toString() + ":natives-$p")
+    shadow("lwjgl-nanovg".versioned)
+    for (p in listOf("windows", "linux", "macos", "macos-arm64")) shadow("lwjgl-nanovg".versioned.get().toString() + ":natives-$p")
 
     shadow("skyblock-api".global) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$ver" + if (new) "" else "-remapped") }

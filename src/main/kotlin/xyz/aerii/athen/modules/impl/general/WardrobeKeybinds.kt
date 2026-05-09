@@ -2,8 +2,6 @@
 
 package xyz.aerii.athen.modules.impl.general
 
-import net.minecraft.client.player.LocalPlayer
-import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Items
 import org.lwjgl.glfw.GLFW
@@ -16,6 +14,7 @@ import xyz.aerii.athen.events.core.CancellableEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.mixin.accessors.KeyMappingAccessor
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.athen.utils.guiClick
 import xyz.aerii.library.api.bound
 import xyz.aerii.library.api.client
 import xyz.aerii.library.api.pressed
@@ -119,25 +118,22 @@ object WardrobeKeybinds : Module(
         val container = player.containerMenu ?: return
 
         if (key == prevPage) {
-            if (currentPage > 1) cl(container.containerId, 45, player)
+            if (currentPage > 1) guiClick(container.containerId, 45)
             return
         }
 
         if (key == nextPage) {
-            if (currentPage < maxPage) cl(container.containerId, 53, player)
+            if (currentPage < maxPage) guiClick(container.containerId, 53)
             return
         }
 
         val slot = wardrobeSlots.find { it.value == key }?.takeIf { it.slot?.item?.isEmpty == false } ?: return // slot can be empty on high ping, yay!
         if (slot.equipped && preventUnequip) return
 
-        cl(container.containerId, slot.idx, player)
+        guiClick(container.containerId, slot.idx)
         lastClick = System.currentTimeMillis()
         cancel()
     }
-
-    private fun cl(id: Int, idx: Int, player: LocalPlayer) =
-        client.gameMode?.handleInventoryMouseClick(id, idx, 0, ClickType.PICKUP, player)
 
     private fun acc(idx: Int): KeyMappingAccessor =
         client.options.keyHotbarSlots[idx] as KeyMappingAccessor

@@ -71,7 +71,7 @@ object CustomTooltip : Module(
 
     init {
         on<GuiEvent.Slots.Hover> {
-            color = slot.item?.getData(DataTypes.RARITY)?.color?.or(0xFF000000.toInt()) ?: `border$color`.rgb
+            color = slot.item.getData(DataTypes.RARITY)?.color?.or(0xFF000000.toInt()) ?: `border$color`.rgb
             if (`scroll$reset`) reset()
         }
 

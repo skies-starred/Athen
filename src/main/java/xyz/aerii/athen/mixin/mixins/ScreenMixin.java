@@ -12,6 +12,7 @@ import xyz.aerii.athen.events.GuiEvent;
 
 @Mixin(Screen.class)
 public class ScreenMixin {
+    //~ if >= 26.1 'renderWithTooltipAndSubtitles' -> 'extractRenderStateWithTooltipAndSubtitles'
     @Inject(method = "renderWithTooltipAndSubtitles", at = @At("HEAD"), cancellable = true)
     private void athen$renderWithTooltipAndSubtitles$pre(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         Screen self = self();
@@ -19,6 +20,7 @@ public class ScreenMixin {
         if (new GuiEvent.Render.Screen.Pre(guiGraphics).post()) ci.cancel();
     }
 
+    //~ if >= 26.1 'renderWithTooltipAndSubtitles' -> 'extractRenderStateWithTooltipAndSubtitles'
     @Inject(method = "renderWithTooltipAndSubtitles", at = @At("TAIL"))
     private void athen$renderWithTooltipAndSubtitles$post(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         new GuiEvent.Render.Screen.Post(guiGraphics).post();

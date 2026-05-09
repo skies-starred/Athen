@@ -20,17 +20,23 @@ import xyz.aerii.athen.modules.impl.render.tooltip.custom.CustomTooltip;
 import java.util.List;
 
 @Mixin(value = GuiGraphics.class, priority = Integer.MAX_VALUE)
+//~ !graphics
 public class GuiGraphicsMixin {
+//~ graphics
+
+    //~ if >= 26.1 'renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V' -> 'item(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V'
     @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At("HEAD"))
     private void athen$renderItem(LivingEntity entity, Level level, ItemStack stack, int x, int y, int seed, CallbackInfo ci) {
         new GuiEvent.Items.Render.Pre(self(), stack, x, y).post();
     }
 
+    //~ if >= 26.1 'renderItemDecorations(' -> 'itemDecorations('
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("TAIL"))
     private void athen$renderItemDecorations(Font font, ItemStack stack, int x, int y, String text, CallbackInfo ci) {
         new GuiEvent.Items.Render.Post(self(), stack, x, y).post();
     }
 
+    //~ if >= 26.1 'renderTooltip' -> 'tooltip'
     @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
     private void athen$renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, ResourceLocation background, CallbackInfo ci) {
         boolean a = CustomTooltip.INSTANCE.getEnabled();

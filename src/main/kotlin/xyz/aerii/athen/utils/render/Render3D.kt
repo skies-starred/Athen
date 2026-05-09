@@ -44,7 +44,6 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.math.Axis
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer./*? >= 1.21.11 {*//*rendertype.RenderTypes*//*? } else {*/RenderType/*? }*/
 import net.minecraft.client.renderer.texture.OverlayTexture
@@ -67,6 +66,12 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+
+//? if >= 26.1 {
+/*import net.minecraft.util.LightCoordsUtil
+*///? } else {
+import net.minecraft.client.renderer.LightTexture
+//? }
 
 private data class QueuedLine(val start: Vector3f, val end: Vector3f, val color: Int, val width: Float)
 private data class QueuedBox(val aabb: AABB, val color: Int, val width: Float)
@@ -118,7 +123,7 @@ object Render3D {
 
     init {
         on<WorldRenderEvent.Render> {
-            val camera = client.gameRenderer.mainCamera?.position/*? >= 1.21.11 { *//*()*//*? }*/ ?: return@on
+            val camera = client.gameRenderer.mainCamera.position/*? >= 1.21.11 { *//*()*//*? }*/
 
             pose.pushPose()
             pose.translate(-camera.x, -camera.y, -camera.z)
@@ -402,6 +407,7 @@ object Render3D {
             .setColor(color)
             .setUv(u, v)
             .setOverlay(OverlayTexture.NO_OVERLAY)
+            //~ if >= 26.1 'LightTexture' -> 'LightCoordsUtil'
             .setLight(LightTexture.FULL_BRIGHT)
             .setNormal(this, 0f, 1f, 0f)
     }
@@ -429,6 +435,7 @@ object Render3D {
                 consumers,
                 if (text.depth) Font.DisplayMode.NORMAL else Font.DisplayMode.SEE_THROUGH,
                 text.bgColor,
+                //~ if >= 26.1 'LightTexture' -> 'LightCoordsUtil'
                 LightTexture.FULL_BRIGHT
             )
 

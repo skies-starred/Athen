@@ -10,6 +10,7 @@ import xyz.aerii.athen.modules.impl.render.tooltip.custom.renderers.base.IToolti
 import xyz.aerii.athen.modules.impl.render.tooltip.custom.renderers.base.TooltipContext
 import xyz.aerii.athen.utils.render.Render2D.drawOutline
 import xyz.aerii.athen.utils.render.Render2D.drawRectangle
+import xyz.aerii.athen.utils.render.Render2D.text
 
 object SeparatedTooltip : ITooltipRenderer {
     override fun TooltipContext.render() {
@@ -30,7 +31,8 @@ object SeparatedTooltip : ITooltipRenderer {
         graphics.box(hx, hy, w, headerH, bw)
         val text = (header as ClientTextTooltip).text
         val textX = if (CustomTooltip.`header$centered`) (x + (w - 8) / 2) - font.width(text) / 2 else x
-        graphics.drawString(font, text, textX, dy, -1, CustomTooltip.`text$shadow`)
+        graphics.text(text, textX, dy, CustomTooltip.`text$shadow`)
+        //~ if >= 26.1 'renderImage' -> 'extractImage'
         header.renderImage(font, x, dy, width, height, graphics)
 
         val bx = x - 4
@@ -55,12 +57,14 @@ object SeparatedTooltip : ITooltipRenderer {
 
         var drawY = startY
         for (c in comps) {
+            //~ if >= 26.1 'renderText' -> 'extractText'
             c.renderText(this, font, tx, drawY)
             drawY += c.getHeight(font)
         }
 
         drawY = startY
         for (c in comps) {
+            //~ if >= 26.1 'renderImage' -> 'extractImage'
             c.renderImage(font, tx, drawY, width, totalHeight, this)
             drawY += c.getHeight(font)
         }

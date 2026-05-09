@@ -18,6 +18,7 @@ object Render2D {
     @JvmName("text_string")
     fun GuiGraphics.text(text: String, x: Int, y: Int, shadow: Boolean = true, color: Int = -1, center: Boolean = false) {
         val xx = if (center) x - client.font.width(text) / 2 else x
+        //~ if >= 26.1 'drawString(' -> 'text('
         drawString(client.font, text, xx, y, color, shadow)
     }
 
@@ -26,6 +27,7 @@ object Render2D {
     @JvmName("text_component")
     fun GuiGraphics.text(text: Component, x: Int, y: Int, shadow: Boolean = true, color: Int = -1, center: Boolean = false) {
         val xx = if (center) x - client.font.width(text) / 2 else x
+        //~ if >= 26.1 'drawString(' -> 'text('
         drawString(client.font, text, xx, y, color, shadow)
     }
 
@@ -34,6 +36,7 @@ object Render2D {
     @JvmName("text_fcs")
     fun GuiGraphics.text(text: FormattedCharSequence, x: Int, y: Int, shadow: Boolean = true, color: Int = -1, center: Boolean = false) {
         val xx = if (center) x - client.font.width(text) / 2 else x
+        //~ if >= 26.1 'drawString(' -> 'text('
         drawString(client.font, text, xx, y, color, shadow)
     }
 
@@ -165,6 +168,7 @@ object Render2D {
         for (i in lines.indices) {
             val xx = if (i in center) x + (max - widths[i]) / 2 else x
             val yy = y + i * (client.font.lineHeight + spacing)
+            //~ if >= 26.1 'drawString' -> 'text'
             drawString(client.font, lines[i], xx, yy, color, shadow)
         }
     }

@@ -119,12 +119,14 @@ object ScrollableTooltip : Module(
         val a = if (b) o + yo.toInt().coerceAtMost(0) else o
         var p = a
         for ((i, c) in l) {
+            //~ if >= 26.1 'renderText' -> 'extractText'
             c.renderText(this, font, n, p)
             p += c.getHeight(font) + if (i == 0) 2 else 0
         }
 
         p = a
         for ((io, c) in l) {
+            //~ if >= 26.1 'renderImage' -> 'extractImage'
             c.renderImage(font, n, p, i, j, this)
             p += c.getHeight(font) + if (io == 0) 2 else 0
         }

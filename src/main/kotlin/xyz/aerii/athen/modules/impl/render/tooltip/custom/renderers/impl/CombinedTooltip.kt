@@ -37,12 +37,14 @@ object CombinedTooltip : ITooltipRenderer {
 
         var drawY = startY
         for ((i, c) in l) {
+            //~ if >= 26.1 'renderText' -> 'extractText'
             c.renderText(this, font, tx, drawY)
             drawY += c.getHeight(font) + if (i == 0) 2 else 0
         }
 
         drawY = startY
         for ((i, c) in l) {
+            //~ if >= 26.1 'renderImage' -> 'extractImage'
             c.renderImage(font, tx, drawY, width, totalHeight, this)
             drawY += c.getHeight(font) + if (i == 0) 2 else 0
         }

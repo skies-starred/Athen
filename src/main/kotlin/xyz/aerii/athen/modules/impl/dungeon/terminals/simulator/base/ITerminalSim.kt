@@ -37,7 +37,7 @@ abstract class ITerminalSim(
     Inventory(client.player!!, PlayerEquipment(client.player!!)),
     component
 ) {
-    protected val slots: List<Slot> get() = menu?.slots?.take(num) ?: emptyList()
+    protected val slots: List<Slot> get() = menu.slots.take(num)
     protected val pane = ItemStack(Items.BLACK_STAINED_GLASS_PANE).apply { set(DataComponents.CUSTOM_NAME, EMPTY_COMPONENT) }
     var id = 0
     var c = true
@@ -81,7 +81,7 @@ abstract class ITerminalSim(
     //? }
         if (slot == null) return
         if (slot.container != inv) return
-        if (slot.item?.item == Items.BLACK_STAINED_GLASS_PANE) return
+        if (slot.item.item == Items.BLACK_STAINED_GLASS_PANE) return
         if (!c) return
 
         if (TerminalSimulator.ping > 0) {

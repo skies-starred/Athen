@@ -34,9 +34,9 @@ class ColorSimulator(
     }
 
     override fun click(slot: Slot, button: Int) {
-        val stack = slot.item?.takeIf { it.item in t.second } ?: return "Invalid item! Does not match the color!".modMessage()
+        val stack = slot.item.takeIf { it.item in t.second } ?: return "Invalid item! Does not match the color!".modMessage()
         mapOf(slot.containerSlot to stack.apply { set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true) }).a()
-        if (slots.none { it.item?.item in t.second && !it.item.glint() }) SimulatorMenu.a()
+        if (slots.none { it.item.item in t.second && !it.item.glint() }) SimulatorMenu.a()
     }
 }
 

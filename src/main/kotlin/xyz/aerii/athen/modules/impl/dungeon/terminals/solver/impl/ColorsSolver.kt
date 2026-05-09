@@ -34,7 +34,7 @@ object ColorsSolver : ITerminal(TerminalType.COLORS) {
     }
 
     private fun ItemStack.matches(str: String): Boolean {
-        val n = item.name.stripped().lowercase()
+        val n = item.getName(item.defaultInstance).stripped().lowercase()
         return n.startsWith(str) || when (str) {
             "black" -> item == Items.INK_SAC
             "blue" -> item == Items.LAPIS_LAZULI

@@ -34,7 +34,7 @@ package xyz.aerii.athen.api.dungeon
 
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonKey
-import tech.thatgravyboat.skyblockapi.api.data.Perk
+import tech.thatgravyboat.skyblockapi.api.data.MayorPerks
 import tech.thatgravyboat.skyblockapi.utils.extentions.parseRomanOrArabic
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.anyMatch
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.find
@@ -118,7 +118,7 @@ object DungeonAPI {
         get() = ownPlayer?.cataLevel ?: 0
 
     val isPaul: Boolean
-        get() = Perk.EZPZ.active
+        get() = MayorPerks.EZPZ.active
     // </editor-fold>
 
     init {

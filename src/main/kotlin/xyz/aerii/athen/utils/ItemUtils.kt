@@ -12,10 +12,15 @@ import kotlin.jvm.optionals.getOrNull
 private fun ItemStack.data(): CompoundTag =
     getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag()
 
-fun ItemStack.glint() = componentsPatch.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE)?.isPresent == true
+fun ItemStack.glint() =
+    //? if >= 26.1 {
+    /*components.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE) != null
+    *///? } else {
+    componentsPatch.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE)?.isPresent == true
+    //? }
 
 fun ItemStack.etherwarp(): Boolean =
-    data().getBoolean("ethermerge").orElse(false) || getSkyBlockId() == "ETHERWARP_CONDUIT"
+    data().getBoolean("ethermerge").orElse(false)!! || getSkyBlockId() == "ETHERWARP_CONDUIT"
 
 fun ItemStack.enchants(): List<String> {
     val tag = this.tag?.getCompound("enchantments")?.getOrNull() ?: return emptyList()

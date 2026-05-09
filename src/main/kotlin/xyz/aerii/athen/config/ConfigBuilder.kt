@@ -1,8 +1,8 @@
 package xyz.aerii.athen.config
 
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
-import net.minecraft.sounds.SoundEvents
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.hud.HUDElement
 import xyz.aerii.athen.hud.HUDElementContext
@@ -242,7 +242,7 @@ class ConfigBuilder(
             private set
 
         val sound: SoundEvent
-            get() = soundEvent ?: ds ?: SoundEvents.CAT_PURR
+            get() = soundEvent ?: ds ?: purr
 
         init {
             ConfigManager.observe(key) { soundEvent = (it as? String)?.sound() }
@@ -252,6 +252,10 @@ class ConfigBuilder(
 
         fun play() {
             mainThread { soundEvent?.play(volume, pitch) }
+        }
+
+        companion object {
+            private val purr = SoundEvent.createVariableRangeEvent(ResourceLocation.withDefaultNamespace("entity.cat.purr"))
         }
     }
 }

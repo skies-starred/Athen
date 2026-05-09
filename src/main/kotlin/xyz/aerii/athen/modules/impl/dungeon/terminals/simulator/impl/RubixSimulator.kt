@@ -18,7 +18,7 @@ class RubixSimulator : ITerminalSim(TerminalType.RUBIX) {
     }
 
     override fun click(slot: Slot, button: Int) {
-        val item = slot.item?.item ?: return
+        val item = slot.item.item
         val i = items.indexOfFirst { it == item }.takeIf { it != -1 } ?: return
         val n = if (button == 1) (i - 1 + items.size) % items.size else (i + 1) % items.size
 
@@ -30,8 +30,7 @@ class RubixSimulator : ITerminalSim(TerminalType.RUBIX) {
         var r: Item? = null
 
         for (s in slots) {
-            val it = s.item?.item ?: continue
-            if (it == Items.BLACK_STAINED_GLASS_PANE) continue
+            val it = s.item.item.takeIf { it != Items.BLACK_STAINED_GLASS_PANE } ?: continue
 
             if (r == null) r = it
             else if (it != r) return false

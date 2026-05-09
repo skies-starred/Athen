@@ -16,13 +16,13 @@ class PanesSimulator : ITerminalSim(TerminalType.PANES) {
     }
 
     override fun click(slot: Slot, button: Int) {
-        mapOf(slot.containerSlot to pane(slot.item?.item != Items.LIME_STAINED_GLASS_PANE)).a()
+        mapOf(slot.containerSlot to pane(slot.item.item != Items.LIME_STAINED_GLASS_PANE)).a()
         if (c()) SimulatorMenu.a()
     }
 
     private fun c(): Boolean {
         for (s in slots) {
-            val it = s.item?.item ?: continue
+            val it = s.item.item
             if (it != Items.BLACK_STAINED_GLASS_PANE && it == Items.RED_STAINED_GLASS_PANE) return false
         }
 

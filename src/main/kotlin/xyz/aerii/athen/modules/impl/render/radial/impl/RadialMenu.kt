@@ -303,17 +303,20 @@ object RadialMenu : Module(
             val ex = fn()
             val idx2 = if (subMenu == 2 && idx0 != -1) ex.getOrNull(idx0)?.first ?: -1 else -1
 
+            //~ if >= 26.1 'submitGuiElement' -> 'addGuiElement'
             graphics.guiRenderState.submitGuiElement(SlotsRenderState(graphics, cx, cy, num, 50f, 80f, `color$normal`.rgb, `color$hover`.rgb, idx, mini, idx0, idx1, ex, idx2))
             graphics.guiRenderState.nextStratum()
 
             for (i in current.indices) {
                 val (sx, sy) = SlotsRenderState.centerSlot(cx, cy, num, 50f, 80f, i)
+                //~ if >= 26.1 'renderItem(' -> 'item('
                 graphics.renderItem(current[i].item, sx - 8, sy - 8)
             }
 
             if (subMenu == 1 && idx1 in current.indices) {
                 for (j in current[idx1].sub.indices) {
                     val (sx, sy) = SlotsRenderState.centerSub(cx, cy, num, 80f, idx1, j)
+                    //~ if >= 26.1 'renderItem(' -> 'item('
                     graphics.renderItem(current[idx1].sub[j].item, sx - 8, sy - 8)
                 }
             }
@@ -321,6 +324,7 @@ object RadialMenu : Module(
             if (subMenu == 2) {
                 for ((i, s) in ex) {
                     val (sx, sy) = SlotsRenderState.centerSub0(cx, cy, num, 80f, i)
+                    //~ if >= 26.1 'renderItem(' -> 'item('
                     graphics.renderItem(s.item, sx - 8, sy - 8)
                 }
             }
@@ -333,7 +337,7 @@ object RadialMenu : Module(
 
             graphics.drawRectangle(cx - 12, cy - 12, 24, 24, if (h) Mocha.Surface2.argb else Mocha.Surface1.argb)
             graphics.drawOutline(cx - 12, cy - 12, 24, 24, 1, if (h) Mocha.Mauve.argb else Mocha.Overlay0.argb)
-            graphics.drawString(client.font, str, cx - client.font.width(str) / 2, cy - client.font.lineHeight / 2, if (h) Mocha.Mauve.argb else Mocha.Subtext0.argb, false)
+            graphics.text(str, cx - client.font.width(str) / 2, cy - client.font.lineHeight / 2, false, if (h) Mocha.Mauve.argb else Mocha.Subtext0.argb)
 
             val sel = when {
                 idx0 != -1 && idx1 in current.indices -> current[idx1].sub.getOrNull(idx0)

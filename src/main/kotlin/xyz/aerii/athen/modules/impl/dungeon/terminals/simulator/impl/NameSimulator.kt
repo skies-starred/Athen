@@ -22,7 +22,7 @@ class NameSimulator(
     override fun s(): Map<Int, ItemStack> {
         val result = mutableMapOf<Int, ItemStack>()
         val guaranteedSlot = (10..34).filter { it % 9 in 1..7 && it / 9 in 1..3 }.random()
-        
+
         for (row in 1..3) {
             for (col in 1..7) {
                 val index = row * 9 + col
@@ -34,34 +34,34 @@ class NameSimulator(
     }
 
     override fun click(slot: Slot, button: Int) {
-        val item = slot.item ?: return
-        val name = item.hoverName?.string ?: return
-        
+        val item = slot.item
+        val name = item.hoverName.string
+
         if (!name.startsWith(targetLetter, ignoreCase = true)) return "Invalid item! Does not start with <red>$targetLetter".parse().modMessage(Typo.PrefixType.ERROR)
         if (item.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE) == true) return
-        
+
         mapOf(slot.containerSlot to item.apply { set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true) }).a()
 
         if (c()) SimulatorMenu.a()
     }
 
-        private fun c(): Boolean {
-            for (s in slots) {
-                val it = s.item
-                val n = it?.hoverName?.string ?: continue
+    private fun c(): Boolean {
+        for (s in slots) {
+            val it = s.item
+            val n = it.hoverName.string
 
-                if (!n.startsWith(targetLetter, ignoreCase = true)) continue
-                if (!it.glint()) return false
-            }
-
-            return true
+            if (!n.startsWith(targetLetter, ignoreCase = true)) continue
+            if (!it.glint()) return false
         }
+
+        return true
+    }
 
     private fun pane(match: Boolean): ItemStack {
         val items = BuiltInRegistries.ITEM.filter { item ->
             if (item == Items.AIR) return@filter false
 
-            val name = item.name?.string ?: return@filter false
+            val name = item.getName(item.defaultInstance).string
             if (name.contains("pane", ignoreCase = true)) return@filter false
 
             name.startsWith(targetLetter, ignoreCase = true) == match

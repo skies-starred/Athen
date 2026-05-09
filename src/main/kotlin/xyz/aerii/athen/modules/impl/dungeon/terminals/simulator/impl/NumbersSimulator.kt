@@ -21,12 +21,10 @@ class NumbersSimulator : ITerminalSim(TerminalType.NUMBERS) {
     }
 
     override fun click(slot: Slot, button: Int) {
-        if (slot.item?.item != Items.RED_STAINED_GLASS_PANE) return
+        if (slot.item.item != Items.RED_STAINED_GLASS_PANE) return
         if (slot.containerSlot != min()?.containerSlot) return
 
-        val count = slot.item?.count ?: return
-        mapOf(slot.containerSlot to pane(count, true)).a()
-
+        mapOf(slot.containerSlot to pane(slot.item.count, true)).a()
         if (c()) SimulatorMenu.a()
     }
 
@@ -36,7 +34,7 @@ class NumbersSimulator : ITerminalSim(TerminalType.NUMBERS) {
 
         for (s in slots) {
             val it = s.item
-            if (it?.item != Items.RED_STAINED_GLASS_PANE) continue
+            if (it.item != Items.RED_STAINED_GLASS_PANE) continue
 
             val count = it.count
             if (count < m) {
@@ -49,7 +47,7 @@ class NumbersSimulator : ITerminalSim(TerminalType.NUMBERS) {
     }
 
     private fun c(): Boolean {
-        for (s in slots) if (s.item?.item == Items.RED_STAINED_GLASS_PANE) return false
+        for (s in slots) if (s.item.item == Items.RED_STAINED_GLASS_PANE) return false
         return true
     }
 

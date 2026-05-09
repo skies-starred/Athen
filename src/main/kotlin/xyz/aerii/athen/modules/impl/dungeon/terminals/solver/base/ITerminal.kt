@@ -8,6 +8,7 @@ import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.TerminalSimulato
 import xyz.aerii.athen.modules.impl.dungeon.terminals.simulator.base.ITerminalSim
 import xyz.aerii.athen.modules.impl.dungeon.terminals.solver.TerminalSolver
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
+import xyz.aerii.athen.utils.guiClick
 import xyz.aerii.athen.utils.nvg.NVGRenderer
 import xyz.aerii.library.api.client
 import java.util.concurrent.CopyOnWriteArrayList
@@ -91,18 +92,12 @@ abstract class ITerminal(val terminalType: TerminalType) {
     protected fun click(slot: Int, button: Int) {
         if (TerminalSimulator.s.value) {
             val screen = client.screen as? ITerminalSim ?: return
-            val slot0 = screen.menu?.slots?.getOrNull(slot) ?: return
+            val slot0 = screen.menu.slots.getOrNull(slot) ?: return
             screen.slotClicked(slot0, slot, button, if (button == 0) ClickType.CLONE else ClickType.PICKUP)
             return
         }
 
-        client.gameMode?.handleInventoryMouseClick(
-            TerminalAPI.lastId,
-            slot,
-            if (button == 0) 2 else button,
-            if (button == 0) ClickType.CLONE else ClickType.PICKUP,
-            client.player ?: return
-        )
+        guiClick(TerminalAPI.lastId, slot, if (button == 0) 2 else button, if (button == 0) ClickType.CLONE else ClickType.PICKUP)
     }
 
     private fun main(ox: Float, oy: Float, gridW: Float, headerH: Float, uiScale: Float) {

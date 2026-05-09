@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
+//~ if >= 26.1 'world.WorldRenderEvents' -> 'level.LevelRenderEvents'
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
@@ -78,6 +79,7 @@ object Signal {
         }
 
         SpecialGuiElementRegistry.register { graphics ->
+            //~ if >= 26.1 'vertexConsumers' -> 'bufferSource'
             NVGSpecialRenderer(graphics.vertexConsumers())
         }
 
@@ -114,11 +116,15 @@ object Signal {
             if (client.isSingleplayer) TickEvent.Server.post()
         }
 
+        //~ if >= 26.1 'WorldRenderEvents' -> 'LevelRenderEvents'
         WorldRenderEvents.END_EXTRACTION.register { _ ->
             WorldRenderEvent.Extract.post()
         }
 
+        //~ if >= 26.1 'WorldRenderEvents' -> 'LevelRenderEvents'
         WorldRenderEvents.END_MAIN.register { context ->
+            //~ if >= 26.1 'matrices' -> 'poseStack'
+            //~ if >= 26.1 'consumers' -> 'bufferSource'
             WorldRenderEvent.Render(context.matrices(), context.consumers() as? MultiBufferSource.BufferSource ?: return@register).post()
         }
 
@@ -197,7 +203,7 @@ object Signal {
     fun onScoreboardTitleUpdate(event: ScoreboardTitleUpdateEvent) = ScoreboardEvent.UpdateTitle(event.old, event.new).post()
 
     @Subscription
-    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) = ScoreboardEvent.Update(event.old, event.new, event.components).post()
+    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) = ScoreboardEvent.Update(event.old, event.new, event.oldComponents, event.newComponents).post()
 
     @Subscription
     fun onCommand(event: RegisterCommandsEvent) = CommandRegistration(event).post()
