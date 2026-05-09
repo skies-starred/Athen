@@ -1,4 +1,6 @@
 pluginManagement {
+    includeBuild("build-logic")
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -9,10 +11,10 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.9-alpha.6"
+    id("dev.kikugie.stonecutter") version "0.9"
 }
 
 stonecutter.create(rootProject) {
-    versions("1.21.10", "1.21.11")
+    versions("1.21.10", "1.21.11").buildscript = "build.obf.gradle.kts"
     vcsVersion = "1.21.10"
 }

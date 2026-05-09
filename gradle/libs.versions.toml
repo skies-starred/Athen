@@ -72,6 +72,7 @@ hypixel-modapi-fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-loom = { id = "fabric-loom", version.ref = "loom" }
+loom-obf = { id = "fabric-loom", version.ref = "loom" }
+loom = { id = "net.fabricmc.fabric-loom", version.ref = "loom" }
 fletchingTable = { id = "dev.kikugie.fletching-table.fabric", version.ref = "fletchingTable" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

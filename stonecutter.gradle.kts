@@ -1,6 +1,6 @@
 plugins {
     id("dev.kikugie.stonecutter")
-    alias(libs.plugins.loom) apply false
+    alias(libs.plugins.loom.obf) apply false
 }
 
 stonecutter active "1.21.10"
