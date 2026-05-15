@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.AABB
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
@@ -223,8 +224,7 @@ object MobHighlight : Module(
         on<WorldRenderEvent.Entity.Pre> {
             val e = entity ?: return@on
             val color = map.get(e.id).takeIf { it != Int.MIN_VALUE }?.or(0xFF000000.toInt()) ?: return@on
-
-            extractFrameBox(e.renderBoundingBox, color)
+            fn1(e.renderBoundingBox, color)
         }
 
         on<InputEvent.Keyboard.Press> {
@@ -252,6 +252,12 @@ object MobHighlight : Module(
         val type = a.type
 
         MobHighlightPopup.open(name, type, max.toInt())
+    }
+
+    private fun fn1(aabb: AABB, color: Int) {
+        val depth = true
+
+        extractFrameBox(aabb, color, depth = depth)
     }
 
     data class EntityNamed(
