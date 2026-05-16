@@ -28,12 +28,12 @@ object VengeanceDamageTracker : Module(
 
     init {
         on<SlayerEvent.Boss.Spawn> {
-            if (!slayerInfo.isOwnedByPlayer) return@on
+            if (!slayerInfo.owned) return@on
             slayerEntity = entity
         }
 
         on<SlayerEvent.Boss.Death> {
-            if (!slayerInfo.isOwnedByPlayer) return@on
+            if (!slayerInfo.owned) return@on
             slayerEntity = null
         }
 

@@ -7,6 +7,7 @@ import net.minecraft.world.item.component.CustomData
 import tech.thatgravyboat.skyblockapi.utils.extentions.getSkyBlockId
 import tech.thatgravyboat.skyblockapi.utils.extentions.tag
 import java.util.*
+import kotlin.jvm.optionals.getOrDefault
 import kotlin.jvm.optionals.getOrNull
 
 private fun ItemStack.data(): CompoundTag =
@@ -27,5 +28,17 @@ fun ItemStack.enchants(): List<String> {
 
     return ArrayList<String>(tag.size()).apply {
         for (k in tag.keySet()) add(k.lowercase(Locale.ROOT))
+    }
+}
+
+fun ItemStack.enchants0(): List<String> {
+    val tag = this.tag?.getCompound("enchantments")?.getOrNull() ?: return emptyList()
+
+    return ArrayList<String>(tag.size()).apply {
+        for (k in tag.keySet()) {
+            val k = k.lowercase(Locale.ROOT)
+            val i = tag.getInt(k).getOrDefault(0)
+            add("$k:$i")
+        }
     }
 }

@@ -4,13 +4,12 @@ import com.google.gson.JsonObject
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.world.entity.Entity
-import tech.thatgravyboat.skyblockapi.api.area.slayer.SlayerType
 import xyz.aerii.athen.annotations.Priority
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerBoss
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.modules.common.carry.ICarryStateTracker
 import xyz.aerii.athen.modules.common.carry.ICarryStateTracker.HistoryEntry
 import xyz.aerii.athen.modules.common.carry.ITrackedCarry
-import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryTracker.shortName
 import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryTracker.slayerTypeMap
 import java.util.*
 
@@ -37,7 +36,7 @@ object SlayerCarryStateTracker : ICarryStateTracker<SlayerCarryStateTracker.Trac
     data class TrackedCarry(
         override val player: String,
         override var total: Int,
-        val slayerType: SlayerType,
+        val slayerType: SlayerBoss,
         val tier: Int,
         override var completed: Int = 0,
         override var lastCompletionTime: Long = 0L,
@@ -56,7 +55,7 @@ object SlayerCarryStateTracker : ICarryStateTracker<SlayerCarryStateTracker.Trac
             val totalTime: Double
         )
 
-        override fun getType() = "${slayerType.shortName}${if (tier == -1) " Any" else " T$tier"}"
+        override fun getType() = "${slayerType.short}${if (tier == -1) " Any" else " T$tier"}"
         override fun getShortType() = getType()
 
         fun onSpawn(boss: Entity): Boolean {
@@ -124,14 +123,14 @@ object SlayerCarryStateTracker : ICarryStateTracker<SlayerCarryStateTracker.Trac
 
     override fun create(player: String, total: Int, vararg params: Any): TrackedCarry? {
         if (params.size < 2) return null
-        val slayerType = params[0] as? SlayerType ?: return null
+        val slayerType = params[0] as? SlayerBoss ?: return null
         val tier = params[1] as? Int ?: return null
         return TrackedCarry(player, total, slayerType, tier)
     }
 
     override fun valid(existing: TrackedCarry, vararg params: Any): Boolean {
         if (params.size < 2) return false
-        val slayerType = params[0] as? SlayerType ?: return false
+        val slayerType = params[0] as? SlayerBoss ?: return false
         val tier = params[1] as? Int ?: return false
         return existing.slayerType == slayerType && (existing.tier == -1 || tier == -1 || existing.tier == tier)
     }

@@ -2,10 +2,10 @@
 
 package xyz.aerii.athen.modules.impl.slayer
 
-import tech.thatgravyboat.skyblockapi.api.area.slayer.SlayerMiniBoss
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findGroup
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerMini
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.MessageEvent
 import xyz.aerii.athen.events.SlayerEvent
@@ -34,7 +34,7 @@ object MinibossAlert : Module(
     private val bigBoiText by config.textInput("Big boi text", "<red>Big boi spawned!")
     private val _unused0 by config.textParagraph("The same text will be used for both title and message.\n<gray>Big boi = Big miniboss")
 
-    private val bigBoys = SlayerMiniBoss.entries.filter { it.isBigBoy }.map { it.displayName }
+    private val bigBoys = SlayerMini.entries.filter { it.special }.map { it.name }
     private val regex = Regex("^SLAYER MINI-BOSS (?<name>.+?) has spawned!$")
 
     init {
@@ -49,8 +49,8 @@ object MinibossAlert : Module(
         on<SlayerEvent.Miniboss.Spawn> {
             if (entity.tickCount >= 20) return@on
             val player = client.player ?: return@on
-            val slayerMiniBoss = (slayerInfo.type as? SlayerMiniBoss).takeIf { entity.distanceTo(player) < maxDistance } ?: return@on
-            val text = (if (slayerMiniBoss.isBigBoy) bigBoiText else alertText)
+            val slayerMiniBoss = (slayerInfo.type as? SlayerMini).takeIf { entity.distanceTo(player) < maxDistance } ?: return@on
+            val text = (if (slayerMiniBoss.special) bigBoiText else alertText)
 
             if (showTitle) text.parse().alert()
             if (sendMessage) if (vanillaMessage) text.parse().modMessage() else text.notify()

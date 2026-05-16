@@ -1,11 +1,12 @@
 package xyz.aerii.athen.modules.impl.slayer
 
 import com.mojang.serialization.Codec
-import tech.thatgravyboat.skyblockapi.api.area.slayer.SlayerType
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
+import xyz.aerii.athen.api.slayers.enums.tier.SlayerTier
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerBoss
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Chronos
@@ -48,10 +49,12 @@ object SlayerTimers : Module(
         }
 
         on<SlayerEvent.Boss.Spawn> {
-            if (!slayerInfo.isOwnedByPlayer) return@on
-            if (bool && slayerInfo.type == SlayerType.TARANTULA_BROODFATHER && slayerInfo.tier == 5) return@on ::bool.set(false)
+            if (!slayerInfo.owned) return@on
 
-            if (slayerInfo.type == SlayerType.TARANTULA_BROODFATHER && slayerInfo.tier == 5) bool = true
+            val a = slayerInfo.type == SlayerBoss.Tarantula && slayerInfo.tier == SlayerTier.Five
+            if (bool && a) return@on ::bool.set(false)
+            if (a) bool = true
+
             startTick = Chronos.ticks.server
             val spawnTime = System.currentTimeMillis()
             if (questStartTime <= 0) return@on
@@ -61,13 +64,13 @@ object SlayerTimers : Module(
         }
 
         on<SlayerEvent.Boss.Death> {
-            if (!slayerInfo.isOwnedByPlayer) return@on
+            if (!slayerInfo.owned) return@on
 
             val time = entity.tickCount / 20.0
             val str0 = time.toDuration(secondsDecimals = 1)
             val time0 = Chronos.ticks.server - startTick
             val str1 = (time0 / 20.0).toDuration(secondsDecimals = 1)
-            val key = slayerInfo.str + if (entity.customName?.stripped()?.contains("Conjoined Brood") == true) "_P2" else ""
+            val key = slayerInfo.string + if (entity.customName?.stripped()?.contains("Conjoined Brood") == true) "_P2" else ""
             val pb = killPBs.value[key]
 
             val str = when {
@@ -89,7 +92,7 @@ object SlayerTimers : Module(
                 }
             }
 
-            val a = slayerInfo.type == SlayerType.TARANTULA_BROODFATHER && slayerInfo.tier == 5
+            val a = slayerInfo.type == SlayerBoss.Tarantula && slayerInfo.tier == SlayerTier.Five
             val p = if (a && bool) " <dark_gray>[P1]<r>" else if (a) " <dark_gray>[P2]<r>" else ""
             "Slayer$p killed in $str<r>.".parse().onHover("<red>$time0 ticks.".parse()).modMessage()
         }

@@ -5,7 +5,7 @@ import net.minecraft.world.entity.Entity
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.rendering.ui.text.vanilla.extensions.sizedText
-import xyz.aerii.athen.api.skyblock.SlayerAPI.slayerNames
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerBoss
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.ducks.entity.attachedNames
 import xyz.aerii.athen.events.SlayerEvent
@@ -38,7 +38,7 @@ object SlayerDisplay : Module(
             if ("Spawned by:" in s) continue
 
             colon = colon ?: l.takeIf { ":" in s }
-            name = name ?: l.takeIf { slayerNames.any { it in s } }
+            name = name ?: l.takeIf { SlayerBoss.NAMES.any { it in s } }
 
             if (colon != null && name != null) break
         }
@@ -53,11 +53,11 @@ object SlayerDisplay : Module(
         }
 
         on<SlayerEvent.Boss.Spawn> {
-            if (slayerInfo.isOwnedByPlayer) slayerEntity = entity
+            if (slayerInfo.owned) slayerEntity = entity
         }
 
         on<SlayerEvent.Boss.Death> {
-            if (slayerInfo.isOwnedByPlayer) reset()
+            if (slayerInfo.owned) reset()
         }
 
         on<SlayerEvent.Reset.Any> {

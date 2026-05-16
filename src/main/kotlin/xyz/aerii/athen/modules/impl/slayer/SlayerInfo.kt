@@ -6,12 +6,12 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
-import tech.thatgravyboat.skyblockapi.api.area.slayer.SlayerType
 import tech.thatgravyboat.skyblockapi.utils.extentions.serverHealth
 import tech.thatgravyboat.skyblockapi.utils.extentions.toRomanNumeral
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.rendering.level.impl.extensions.impl.extractText
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerBoss
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.ducks.entity.attachedStripped
 import xyz.aerii.athen.ducks.entity.parent
@@ -21,7 +21,6 @@ import xyz.aerii.athen.events.TickEvent
 import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.modules.Module
-import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryTracker.shortName
 import xyz.aerii.athen.utils.render.renderPos
 import xyz.aerii.library.api.client
 import xyz.aerii.library.handlers.parser.parse
@@ -86,7 +85,7 @@ object SlayerInfo : Module(
                 var attached: String? = null
 
                 for (l in e.attachedStripped) {
-                    val a = i.slayer.type == SlayerType.VOIDGLOOM_SERAPH
+                    val a = i.slayer.type == SlayerBoss.Voidgloom
 
                     if (hits == null && a && " Hits" in l) {
                         hits = l.substringBefore(" Hits").substringAfterLast(' ').toIntOrNull()
@@ -105,7 +104,7 @@ object SlayerInfo : Module(
         }
 
         on<SlayerEvent.Boss.Spawn> {
-            entities[entity] = Info(slayerInfo, slayerInfo.type?.displayName ?: return@on)
+            entities[entity] = Info(slayerInfo, slayerInfo.type?.display ?: return@on)
         }
 
         on<SlayerEvent.Boss.Death> {
@@ -143,8 +142,8 @@ object SlayerInfo : Module(
     }
 
     private fun Info.str(hits: Int? = null): List<Component> = buildList {
-        add(attached.str(slayer.entity.time(), slayer.type == SlayerType.INFERNO_DEMONLORD))
-        add(nameStyle.str0((slayer.type as? SlayerType)?.shortName ?: name, name, slayer.tier?.toRomanNumeral(true) ?: "???"))
+        add(attached.str(slayer.entity.time(), slayer.type == SlayerBoss.Inferno))
+        add(nameStyle.str0((slayer.type as? SlayerBoss)?.short ?: name, name, slayer.tier?.int?.toRomanNumeral(true) ?: "???"))
 
         val cH = (slayer.entity as? LivingEntity)?.serverHealth?.abbreviate() ?: "???"
         add(if (hits != null) hitStyle.str3(cH, hits) else healthStyle.str3(cH))
@@ -211,7 +210,7 @@ object SlayerInfo : Module(
     }
 
     private data class Info(
-        val slayer: xyz.aerii.athen.api.skyblock.SlayerInfo,
+        val slayer: xyz.aerii.athen.api.slayers.data.SlayerInfo,
         val name: String,
         var attached: String = "",
         var renderText: List<Component> = emptyList(),

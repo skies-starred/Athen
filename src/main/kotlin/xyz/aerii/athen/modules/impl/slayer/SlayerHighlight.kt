@@ -39,7 +39,7 @@ object SlayerHighlight : Module(
     init {
         on<SlayerEvent.Boss.Spawn> {
             if (!bossHighlight) return@on
-            if (onlyShowForMine && !slayerInfo.isOwnedByPlayer) return@on
+            if (onlyShowForMine && !slayerInfo.owned) return@on
 
             trackedSlayers.add(slayerInfo.entity)
         }

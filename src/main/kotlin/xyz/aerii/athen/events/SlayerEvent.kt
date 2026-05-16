@@ -1,7 +1,7 @@
 package xyz.aerii.athen.events
 
 import net.minecraft.world.entity.Entity
-import xyz.aerii.athen.api.skyblock.SlayerInfo
+import xyz.aerii.athen.api.slayers.data.SlayerInfo
 import xyz.aerii.athen.events.core.Event
 
 sealed class SlayerEvent {

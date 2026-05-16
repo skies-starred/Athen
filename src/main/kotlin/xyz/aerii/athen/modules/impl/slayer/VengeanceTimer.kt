@@ -6,7 +6,7 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.location.SkyBlockIsland
 import xyz.aerii.athen.api.rendering.ui.text.vanilla.extensions.sizedText
-import xyz.aerii.athen.api.skyblock.SlayerAPI
+import xyz.aerii.athen.api.slayers.SlayerAPI
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.ducks.entity.parent
 import xyz.aerii.athen.events.EntityEvent
@@ -52,9 +52,9 @@ object VengeanceTimer : Module(
         on<EntityEvent.Update.Named> {
             if (count.value) return@on
             val entity = entity.parent ?: return@on
-            val slayerInfo = SlayerAPI.slayerBosses[entity] ?: return@on
+            val slayerInfo = SlayerAPI.bosses[entity] ?: return@on
 
-            if (!slayerInfo.isOwnedByPlayer) return@on
+            if (!slayerInfo.owned) return@on
             if (!stripped.contains("ASHEN ♨7")) return@on
             if (held?.getData(DataTypes.SKYBLOCK_ID)?.skyblockId !in abilityIds) return@on
 

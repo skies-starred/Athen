@@ -3,18 +3,17 @@
 package xyz.aerii.athen.modules.impl.slayer
 
 import net.minecraft.util.FormattedCharSequence
-import tech.thatgravyboat.skyblockapi.api.area.slayer.SlayerMob
-import tech.thatgravyboat.skyblockapi.api.area.slayer.SlayerType
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.onClick
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.rendering.ui.text.vanilla.extensions.sizedText
+import xyz.aerii.athen.api.slayers.enums.tier.SlayerTier
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerBoss
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.SlayerEvent
 import xyz.aerii.athen.handlers.Notifier.notify
-import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
@@ -24,7 +23,6 @@ import xyz.aerii.library.api.client
 import xyz.aerii.library.handlers.parser.parse
 import xyz.aerii.library.kommand.ICommand
 import xyz.aerii.library.utils.formatted
-import xyz.aerii.library.utils.literal
 import xyz.aerii.library.utils.stripped
 import xyz.aerii.library.utils.toDuration
 
@@ -35,9 +33,8 @@ object SlayerStats : Module(
     "Displays slayer session statistics.",
     Category.SLAYER
 ), ICommand {
-    private val tierXp = mapOf(1 to 5, 2 to 25, 3 to 100, 4 to 500, 5 to 1500)
-    private var `last$type`: SlayerMob? = null
-    private var `last$tier`: Int? = null
+    private var `last$type`: SlayerBoss? = null
+    private var `last$tier`: SlayerTier? = null
 
     private var kills = 0
     private var xp = 0
@@ -104,21 +101,20 @@ object SlayerStats : Module(
         }
 
         on<SlayerEvent.Boss.Death> {
-            if (!slayerInfo.isOwnedByPlayer) return@on
+            if (!slayerInfo.owned) return@on
             if (slayerInfo.type == SlayerBoss.Tarantula && slayerInfo.tier == SlayerTier.Five && client.level?.getEntity(entity.id + 1)?.customName?.stripped()?.contains("Conjoined Brood") != true) return@on
 
             kills++
             total += entity.tickCount / 20.0
-            xp += tierXp[slayerInfo.tier] ?: 0
+            xp += slayerInfo.tier?.xp ?: 0
 
             val a = `last$type`
             val b = `last$tier`
-            `last$type` = slayerInfo.type
+            `last$type` = slayerInfo.type as SlayerBoss
             `last$tier` = slayerInfo.tier
 
             if ((a != null && a != `last$type`) || (b != null && b != `last$tier`)) {
-                "Detected a different slayer, click to reset stats.".literal().withColor(Mocha.Lavender.argb)
-                    .onHover("This WILL clear all your stats".literal().withColor(Mocha.Red.argb))
+                "<hover:<${Mocha.Red.argb}>This WILL clear all your stats!><${Mocha.Lavender.argb}>Detected a different slayer, click to reset stats.".parse()
                     .onClick {
                         reset()
                         "Slayer stats were reset!".notify()

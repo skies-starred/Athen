@@ -26,7 +26,7 @@ object EndermanLaserHider : Module(
     init {
         on<SlayerEvent.Boss.Spawn> {
             if (entity !is EnderMan) return@on
-            if (slayerInfo.isOwnedByPlayer) return@on
+            if (slayerInfo.owned) return@on
             if (!carry && slayerInfo.owner in SlayerCarryStateTracker.tracked.keys) return@on
 
             set.add(entity)

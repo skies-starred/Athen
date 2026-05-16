@@ -1,6 +1,5 @@
 package xyz.aerii.athen.modules.impl.slayer.carry
 
-import tech.thatgravyboat.skyblockapi.api.area.slayer.SlayerType
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findThenNull
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
@@ -10,6 +9,7 @@ import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
 import xyz.aerii.athen.api.rendering.level.impl.extensions.impl.extractFrameBox
 import xyz.aerii.athen.api.rendering.ui.text.vanilla.extensions.sizedText
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerBoss
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.*
 import xyz.aerii.athen.handlers.Chronos
@@ -40,7 +40,7 @@ object SlayerCarryTracker : Module(
     "Track slayer carries and display progress.",
     Category.SLAYER
 ), ICommand {
-    private data class CarryMatch(val type: SlayerType, val tier: Int, val count: Int, val price: Double)
+    private data class CarryMatch(val type: SlayerBoss, val tier: Int, val count: Int, val price: Double)
 
     private val announceInParty by config.switch("Announce in party", true)
     private val showSpawnMessage by config.switch("Show spawn message", true)
@@ -69,21 +69,21 @@ object SlayerCarryTracker : Module(
     private var recentTradeWith: String? = null
 
     val slayerTypeMap = mapOf(
-        SlayerType.REVENANT_HORROR to listOf("zombie", "rev", "revenant"),
-        SlayerType.TARANTULA_BROODFATHER to listOf("spider", "tara", "tarantula"),
-        SlayerType.SVEN_PACKMASTER to listOf("wolf", "sven"),
-        SlayerType.VOIDGLOOM_SERAPH to listOf("enderman", "voidgloom", "eman", "void"),
-        SlayerType.INFERNO_DEMONLORD to listOf("blaze", "inferno")
+        SlayerBoss.Revenant to listOf("zombie", "rev", "revenant"),
+        SlayerBoss.Tarantula to listOf("spider", "tara", "tarantula"),
+        SlayerBoss.Sven to listOf("wolf", "sven"),
+        SlayerBoss.Voidgloom to listOf("enderman", "voidgloom", "eman", "void"),
+        SlayerBoss.Inferno to listOf("blaze", "inferno")
     ).flatMap { (type, aliases) ->
         aliases.map { it.lowercase() to type }
     }.toMap()
 
     private val slayerMaxTier = mapOf(
-        SlayerType.REVENANT_HORROR to 5,
-        SlayerType.TARANTULA_BROODFATHER to 5,
-        SlayerType.SVEN_PACKMASTER to 4,
-        SlayerType.VOIDGLOOM_SERAPH to 4,
-        SlayerType.INFERNO_DEMONLORD to 4
+        SlayerBoss.Revenant to 5,
+        SlayerBoss.Tarantula to 5,
+        SlayerBoss.Sven to 4,
+        SlayerBoss.Voidgloom to 4,
+        SlayerBoss.Inferno to 4
     )
 
     private val ex0 = listOf("§f§lSlayer Carries:", "§7> §bExample §8[§7Void T4§8]§f: §b3§f/§b10 §7(12.5s | 28/hr)").fcs
@@ -175,9 +175,9 @@ object SlayerCarryTracker : Module(
                     when {
                         matches.size == 1 -> {
                             val match = matches.first()
-                            "Received payment for <aqua>${match.count}x <gray>${match.type.shortName} T${match.tier}<r> carries from <aqua>$recent<r>. "
+                            "Received payment for <aqua>${match.count}x <gray>${match.type.short} T${match.tier}<r> carries from <aqua>$recent<r>. "
                                 .parse()
-                                .append("Click to add".literal().onClick { add(recent, match.count, match.type.shortName.lowercase(), match.tier.toString()) })
+                                .append("Click to add".literal().onClick { add(recent, match.count, match.type.short.lowercase(), match.tier.toString()) })
                                 .modMessage()
                         }
 
@@ -186,10 +186,10 @@ object SlayerCarryTracker : Module(
                             for ((i, m) in matches.withIndex()) {
                                 if (i > 0) msg.append(" ".literal())
                                 msg.append(
-                                    "[${m.count}x ${m.type.shortName} T${m.tier}]"
+                                    "[${m.count}x ${m.type.short} T${m.tier}]"
                                         .literal()
                                         .withColor(TextColor.AQUA)
-                                        .onClick { add(recent, m.count, m.type.shortName.lowercase(), m.tier.toString()) }
+                                        .onClick { add(recent, m.count, m.type.short.lowercase(), m.tier.toString()) }
                                 )
                             }
 
@@ -209,33 +209,33 @@ object SlayerCarryTracker : Module(
             if (tracked.isEmpty()) return@on
 
             val owner = slayerInfo.owner ?: return@on
-            val slayerType = slayerInfo.type as? SlayerType ?: return@on
+            val slayerType = slayerInfo.type as? SlayerBoss ?: return@on
             val carry = tracked[owner] ?: return@on
             if (carry.slayerType != slayerType) return@on
-            if (carry.tier != -1 && carry.tier != slayerInfo.tier) return@on
+            if (carry.tier != -1 && carry.tier != slayerInfo.tier?.int) return@on
             if (!carry.onSpawn(entity)) return@on
 
             bossToPlayer[entity] = owner
             if (showSpawnMessage) {
-                "Boss spawned for <aqua>$owner <gray>[${slayerType.shortName}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]".also { if (useCustomMessages) it.notify() else it.parse().modMessage() }
+                "Boss spawned for <aqua>$owner <gray>[${slayerType.short}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]".also { if (useCustomMessages) it.notify() else it.parse().modMessage() }
             }
         }
 
         on<SlayerEvent.Boss.Death> {
             if (tracked.isEmpty()) return@on
 
-            val slayerType = slayerInfo.type as? SlayerType ?: return@on
+            val slayerType = slayerInfo.type as? SlayerBoss ?: return@on
             val player = bossToPlayer.remove(entity) ?: return@on
             val carry = tracked[player] ?: return@on
             if (carry.slayerType != slayerType) return@on
-            if (carry.tier != -1 && carry.tier != slayerInfo.tier) return@on
+            if (carry.tier != -1 && carry.tier != slayerInfo.tier?.int) return@on
 
             val result = carry.onKill() ?: return@on
 
             "Killed boss for <aqua>$player<r> in <yellow>${result.killTime.toDuration(secondsDecimals = 1)} <gray>| <yellow>${(result.killTicks / 20.0).toDuration(secondsDecimals = 1)}".parse().onHover("<red>${result.killTicks} ticks.".parse()).modMessage()
             if (announceInParty) "pc $player: ${result.current}/${result.total}".command()
             if (result.completed) {
-                "<${Mocha.Green.argb}>Completed bosses for <aqua>$player <gray>[${slayerType.shortName}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]<r> in <yellow>${result.totalTime.toDuration()}".parse().modMessage()
+                "<${Mocha.Green.argb}>Completed bosses for <aqua>$player <gray>[${slayerType.short}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]<r> in <yellow>${result.totalTime.toDuration()}".parse().modMessage()
 
                 SlayerCarryStateTracker.add(player, result.amount, carry.getType())
                 tracked.remove(player)
@@ -284,10 +284,10 @@ object SlayerCarryTracker : Module(
         SlayerCarryStateTracker.addCarry(player, amount, slayerType, tier)
     }
 
-    private fun getPrices(): Map<SlayerType, Map<Int, String>> {
+    private fun getPrices(): Map<SlayerBoss, Map<Int, String>> {
         return mapOf(
-            SlayerType.VOIDGLOOM_SERAPH to mapOf(3 to voidT3Price, 4 to voidT4Price),
-            SlayerType.INFERNO_DEMONLORD to mapOf(2 to blazeT2Price, 3 to blazeT3Price, 4 to blazeT4Price)
+            SlayerBoss.Voidgloom to mapOf(3 to voidT3Price, 4 to voidT4Price),
+            SlayerBoss.Inferno to mapOf(2 to blazeT2Price, 3 to blazeT3Price, 4 to blazeT4Price)
         )
     }
 
@@ -311,14 +311,4 @@ object SlayerCarryTracker : Module(
 
         divider.lie()
     }
-
-    val SlayerType.shortName: String
-        get() = when (this) {
-            SlayerType.REVENANT_HORROR -> "Rev"
-            SlayerType.SVEN_PACKMASTER -> "Sven"
-            SlayerType.INFERNO_DEMONLORD -> "Blaze"
-            SlayerType.TARANTULA_BROODFATHER -> "Tara"
-            SlayerType.RIFTSTALKER_BLOODFIEND -> "Vamp"
-            SlayerType.VOIDGLOOM_SERAPH -> "Void"
-        }
 }

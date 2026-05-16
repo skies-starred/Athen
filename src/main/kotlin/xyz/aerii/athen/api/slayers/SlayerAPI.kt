@@ -1,8 +1,12 @@
-package xyz.aerii.athen.api.skyblock
+package xyz.aerii.athen.api.slayers
 
 import net.minecraft.world.entity.Entity
-import tech.thatgravyboat.skyblockapi.api.area.slayer.*
 import xyz.aerii.athen.annotations.Priority
+import xyz.aerii.athen.api.slayers.data.SlayerInfo
+import xyz.aerii.athen.api.slayers.enums.type.base.ISlayerType
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerBoss
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerDemon
+import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerMini
 import xyz.aerii.athen.ducks.entity.parent
 import xyz.aerii.athen.events.EntityEvent
 import xyz.aerii.athen.events.LocationEvent
@@ -14,32 +18,31 @@ import java.util.*
 
 @Priority
 object SlayerAPI {
-    private val questFailedRegex = Regex("\\s+SLAYER QUEST FAILED!")
-    private val questStartedRegex = Regex("\\s+SLAYER QUEST STARTED!")
-    private val questCompletedRegex = Regex("\\s+SLAYER QUEST COMPLETE!")
+    private val failRegex = Regex("\\s+SLAYER QUEST FAILED!")
+    private val startRegex = Regex("\\s+SLAYER QUEST STARTED!")
+    private val completeRegex = Regex("\\s+SLAYER QUEST COMPLETE!")
 
-    private val logged: MutableSet<Entity> = mutableSetOf()
-    val slayerBosses: WeakHashMap<Entity, SlayerInfo> = WeakHashMap()
-    val slayerNames = SLAYER_MOBS.flatMap { it.inGameNames }.toSet() + "Conjoined Brood"
+    private val logged: MutableSet<Int> = mutableSetOf()
 
+    val bosses: WeakHashMap<Entity, SlayerInfo> = WeakHashMap()
     var slayer: SlayerInfo? = null
         private set
 
     init {
         on<MessageEvent.Chat.Receive> {
             when {
-                questStartedRegex.matches(stripped) -> {
+                startRegex.matches(stripped) -> {
                     "SlayerAPI: Quest started!".devMessage()
                     SlayerEvent.Quest.Start.post()
                 }
 
-                questCompletedRegex.matches(stripped) -> {
+                completeRegex.matches(stripped) -> {
                     "SlayerAPI: Quest completed!".devMessage()
                     SlayerEvent.Quest.End.post()
                     slayer = null
                 }
 
-                questFailedRegex.matches(stripped) -> {
+                failRegex.matches(stripped) -> {
                     "SlayerAPI: Quest failed!".devMessage()
 
                     SlayerEvent.Reset.QuestFail.post()
@@ -51,26 +54,25 @@ object SlayerAPI {
         }
 
         on<EntityEvent.Update.Attach> {
-            var entity = entity.parent ?: return@on
+            if (!logged.add(entity.id)) return@on
 
-            val slayerInfo = when {
-                stripped.check() -> slayerBosses.computeIfAbsent(entity, ::SlayerInfo)
-                else -> slayerBosses[entity] ?: return@on
-            }
+            val entity = entity.parent ?: return@on
+            val slayerInfo =
+                if (stripped.check()) bosses.computeIfAbsent(entity, ::SlayerInfo)
+                else bosses[entity] ?: return@on
 
             if (
-                slayerInfo.type is SlayerMob &&
-                (slayerInfo.type !is SlayerType || slayerInfo.owner != null) &&
-                logged.add(entity)
+                slayerInfo.type is ISlayerType &&
+                (slayerInfo.type !is SlayerBoss || slayerInfo.owner != null)
             ) {
                 when (slayerInfo.type) {
-                    is SlayerType -> {
-                        if (slayerInfo.isOwnedByPlayer) slayer = slayerInfo
+                    is SlayerBoss -> {
+                        if (slayerInfo.owned) slayer = slayerInfo
                         SlayerEvent.Boss.Spawn(entity, slayerInfo).post()
                         "SlayerAPI: Slayer spawned (owner=${slayerInfo.owner}, tier=${slayerInfo.tier}, tickAge=${entity.tickCount / 20.0}s)".devMessage()
                     }
 
-                    is SlayerMiniBoss -> {
+                    is SlayerMini -> {
                         SlayerEvent.Miniboss.Spawn(entity, slayerInfo).post()
                         "SlayerAPI: Miniboss spawned (owner=${slayerInfo.owner}, tickAge=${entity.tickCount / 20.0}s)".devMessage()
                     }
@@ -84,17 +86,17 @@ object SlayerAPI {
         }
 
         on<EntityEvent.Death> {
-            val slayerInfo = slayerBosses.remove(entity) ?: return@on
-            logged.remove(entity)
+            val slayerInfo = bosses.remove(entity) ?: return@on
+            logged.remove(entity.id)
 
             when (slayerInfo.type) {
-                is SlayerType -> {
-                    if (slayerInfo.isOwnedByPlayer) slayer = null
+                is SlayerBoss -> {
+                    if (slayerInfo.owned) slayer = null
                     SlayerEvent.Boss.Death(entity, slayerInfo).post()
                     "SlayerAPI: Slayer killed (owner=${slayerInfo.owner}, tier=${slayerInfo.tier}, tickAge=${entity.tickCount / 20.0}s)".devMessage()
                 }
 
-                is SlayerMiniBoss -> {
+                is SlayerMini -> {
                     SlayerEvent.Miniboss.Death(entity, slayerInfo).post()
                     "SlayerAPI: Miniboss killed (owner=${slayerInfo.owner}, tickAge=${entity.tickCount / 20.0}s)".devMessage()
                 }
@@ -117,7 +119,7 @@ object SlayerAPI {
     }
 
     private fun reset() {
-        slayerBosses.clear()
+        bosses.clear()
         logged.clear()
         slayer = null
     }
@@ -125,7 +127,7 @@ object SlayerAPI {
     private fun String.check(): Boolean {
         if (!startsWith("☠") && !endsWith("❤") && !endsWith("❤ ✯") && !endsWith(" Hits")) return false
 
-        for (name in slayerNames) if (contains(name)) return true
+        for (name in ISlayerType.Companion.Names.all) if (contains(name)) return true
         return false
     }
 }
