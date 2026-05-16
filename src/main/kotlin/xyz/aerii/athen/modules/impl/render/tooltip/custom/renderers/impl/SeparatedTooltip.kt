@@ -29,9 +29,13 @@ object SeparatedTooltip : ITooltipRenderer {
         val dy = hy + 4
 
         graphics.box(hx, hy, w, headerH, bw)
-        val text = (header as ClientTextTooltip).text
-        val textX = if (CustomTooltip.`header$centered`) (x + (w - 8) / 2) - font.width(text) / 2 else x
-        graphics.extractText(text, textX, dy, CustomTooltip.`text$shadow`)
+
+        val text = (header as? ClientTextTooltip)?.text
+        if (text != null) {
+            val textX = if (CustomTooltip.`header$centered`) (x + (w - 8) / 2) - font.width(text) / 2 else x
+            graphics.extractText(text, textX, dy, CustomTooltip.`text$shadow`)
+        }
+
         //~ if >= 26.1 'renderImage' -> 'extractImage'
         header.renderImage(font, x, dy, width, height, graphics)
 
