@@ -26,10 +26,10 @@ object BeamRenderer : ILevelRenderer {
     private val beam = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/entity/beacon_beam.png")
 
     override fun render(poseStack: PoseStack, pose: PoseStack.Pose, consumers: MultiBufferSource.BufferSource) {
-        fn(poseStack, pose, consumers)
+        fn(poseStack, consumers)
     }
 
-    private fun fn(poseStack: PoseStack, pose: PoseStack.Pose, consumers: MultiBufferSource.BufferSource) {
+    private fun fn(poseStack: PoseStack, consumers: MultiBufferSource.BufferSource) {
         if (LevelQueueImpl.beams.isEmpty()) return
 
         val partialTick = client.deltaTracker.getGameTimeDeltaPartialTick(false)
@@ -55,6 +55,7 @@ object BeamRenderer : ILevelRenderer {
 
             poseStack.pushPose()
             poseStack.translate(pos.x + 0.5, pos.y.toDouble(), pos.z + 0.5)
+            val pose = poseStack.last()
 
             poseStack.pushPose()
             poseStack.mulPose(Axis.YP.rotationDegrees(animationTime * 2.25f - 45f))
