@@ -64,6 +64,9 @@ object TerminalAPI {
     var `melody$correct`: Int? = null
 
     init {
+        val state = (DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0
+        val state0 = state and TerminalSolver.observable
+
         terminalOpen.onChange {
             (if (it) DungeonEvent.Terminal.Open else DungeonEvent.Terminal.Close).post()
         }
@@ -78,7 +81,7 @@ object TerminalAPI {
             currentTitle = title
             lastId = containerId
             currentItems.clear()
-        }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
+        }.runWhen(state)
 
         on<PacketEvent.Process.Pre, ClientboundContainerSetSlotPacket> {
             if (!terminalOpen.value) return@on
@@ -88,7 +91,7 @@ object TerminalAPI {
 
             currentItems[slot] = item
             if (currentItems.size == currentTerminal?.slots || currentTerminal == TerminalType.MELODY) DungeonEvent.Terminal.Update(slot, item).post()
-        }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
+        }.runWhen(state)
 
         on<PacketEvent.Process.Pre, ClientboundContainerSetContentPacket> {
             if (!terminalOpen.value) return@on
@@ -96,11 +99,12 @@ object TerminalAPI {
 
             currentItems.clear()
             for ((i, it) in items.withIndex()) if (i < (currentTerminal?.slots ?: 0)) currentItems[i] = it
-        }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
+            if (currentItems.size == currentTerminal?.slots) DungeonEvent.Terminal.Update(-1, ItemStack.EMPTY).post()
+        }.runWhen(state)
 
         on<PacketEvent.Process.Pre, ClientboundContainerClosePacket> {
-            if (terminalOpen.value) Chronos.schedule(1.client) { reset() }
-        }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
+            if (terminalOpen.value) Chronos.schedule(1.client, ::reset)
+        }.runWhen(state)
 
         on<PacketEvent.Send, ServerboundContainerClickPacket> {
             if (!terminalOpen.value) return@on
@@ -109,24 +113,24 @@ object TerminalAPI {
             if (System.currentTimeMillis() - openTime >= TerminalSolver.fcDelay) return@on
 
             it.cancel()
-        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.observable)
+        }.runWhen(state0)
 
         on<PacketEvent.Send, ServerboundContainerClosePacket> {
             if (!terminalOpen.value) return@on
 
             reset()
-        }.runWhen((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0)
+        }.runWhen(state)
 
         on<PacketEvent.Send, ServerboundInteractPacket> {
             val entity = level?.getEntity((this as ServerboundInteractPacketAccessor).entityId()) as? ArmorStand ?: return@on
             if (entity.displayName?.stripped() != "Inactive Terminal") return@on
 
             if (cd > 0 || lastId != -1) it.cancel() else cd = 15
-        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.observable)
+        }.runWhen(state0)
 
         on<TickEvent.Server> {
             if (cd > 0) cd--
-        }.runWhen(((DungeonAPI.F7Phase.map { it == 3 } or TerminalSimulator.s) or TerminalSimulator.s0) and TerminalSolver.observable)
+        }.runWhen(state0)
     }
 
     private fun reset() {

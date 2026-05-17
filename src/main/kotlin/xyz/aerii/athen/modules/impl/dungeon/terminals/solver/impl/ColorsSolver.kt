@@ -34,12 +34,15 @@ object ColorsSolver : ITerminal(TerminalType.COLORS) {
     }
 
     private fun ItemStack.matches(str: String): Boolean {
-        val n = item.getName(item.defaultInstance).stripped().lowercase()
+        val n = hoverName.stripped().lowercase()
         return n.startsWith(str) || when (str) {
             "black" -> item == Items.INK_SAC
             "blue" -> item == Items.LAPIS_LAZULI
             "brown" -> item == Items.COCOA_BEANS
-            "white" -> item == Items.BONE_MEAL
+            "white" -> item == Items.BONE_MEAL || item == Items.WHITE_WOOL
+            "green" -> item == Items.CACTUS
+            "red" -> item == Items.POPPY
+            "yellow" -> item == Items.DANDELION
             else -> false
         }
     }

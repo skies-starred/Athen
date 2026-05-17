@@ -28,6 +28,6 @@ object NameSolver : ITerminal(TerminalType.NAME) {
         val match = TerminalType.NAME.regex.matchEntire(TerminalAPI.currentTitle)
         val targetLetter = match?.groupValues?.get(1)?.lowercase() ?: return
 
-        for ((s, i) in TerminalAPI.currentItems) if (i.hoverName.stripped().lowercase().startsWith(targetLetter) && !i.glint()) list.add(Click(s, 0))
+        for ((s, i) in TerminalAPI.currentItems) if (i.hoverName.stripped().lowercase().startsWith(targetLetter, true) && !i.glint()) list.add(Click(s, 0))
     }
 }
