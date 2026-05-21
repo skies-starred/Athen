@@ -27,6 +27,7 @@ import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.ui.themes.Catppuccin
 import xyz.aerii.library.api.lie
 import xyz.aerii.library.handlers.parser.parse
+import xyz.aerii.library.utils.formatted
 import kotlin.math.*
 
 @Load
@@ -125,7 +126,7 @@ object SlayerDropsData : Module(
             val r2 = "%.2f".format(i1.toDouble() / i2.toDouble() * 100)
 
             cancel()
-            "   <pink>RNG Meter <r>- <pink>$i0<gray>/<pink>$i2 XP <dark_gray>[<gray>$r0<dark_gray>/<gray>$r1 <dark_gray>| <gray>$r2%<dark_gray>]".parse().lie()
+            "   <pink>RNG Meter <r>- <pink>$i0<gray>/<pink>${i2.formatted()} XP <dark_gray>[<gray>$r0<dark_gray>/<gray>$r1 <dark_gray>| <gray>$r2%<dark_gray>]".parse().lie()
 
             if (!last) return@on
             val c = fn(i1, i2, l.drop.chance)
