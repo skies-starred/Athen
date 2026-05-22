@@ -101,7 +101,7 @@ class ModalRenderer(
 
     private fun fn() {
         val a = nameField.value.trim().lowercase()
-        list = if (a.isEmpty()) emptyList() else BuiltInRegistries.ENTITY_TYPE.map { it.toString() }.filter { a in it }.sorted().take(30)
+        list = if (a.isEmpty()) emptyList() else BuiltInRegistries.ENTITY_TYPE.keySet().map { it.toString() }.filter { a in it }.sorted().take(30)
 
         val h0 = list.size * 14
         val h1 = h0.coerceAtMost(84)
