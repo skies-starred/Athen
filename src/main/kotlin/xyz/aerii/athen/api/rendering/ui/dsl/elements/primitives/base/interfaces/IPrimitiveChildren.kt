@@ -15,15 +15,19 @@ interface IPrimitiveChildren<T> : IPrimitiveSelf<T> where T : IPrimitiveElement<
         for (c in children) c.render(graphics)
     }
 
-    fun adopt(a: IPrimitiveElement<*>) = apply {
+    fun adopt(a: IPrimitiveElement<*>): T {
         a.parent?.children?.remove(a)
-        a.parent = self
 
+        a.parent = self
         children.add(a)
+
+        root.layout()
+        return self
     }
 
-    fun attach(a: IPrimitiveElement<*>) = apply {
+    fun attach(a: IPrimitiveElement<*>): T {
         a.adopt(self)
+        return self
     }
 
     fun forEach(reversed: Boolean = false, block: (IPrimitiveElement<*>) -> Unit) {

@@ -6,6 +6,7 @@ import xyz.aerii.athen.api.rendering.ui.dsl.events.impl.MouseEvent
 
 interface IPrimitiveInteractable<T> : IPrimitiveSelf<T> where T : IPrimitiveElement<T> {
     var focused: IPrimitiveElement<*>?
+    var interact: Boolean
     var hovered: Boolean
 
     fun mousePress(x: Double, y: Double, button: Int): Boolean {

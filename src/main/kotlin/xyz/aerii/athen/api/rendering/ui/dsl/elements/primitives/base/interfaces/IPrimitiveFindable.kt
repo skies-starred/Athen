@@ -8,12 +8,14 @@ interface IPrimitiveFindable<T> : IPrimitiveSelf<T> where T : IPrimitiveElement<
     }
 
     fun find(x: Double, y: Double): IPrimitiveElement<*>? {
+        if (!self.visible) return null
+
         for (c in self.children.asReversed()) {
             val a = c.find(x, y) ?: continue
             return a
         }
 
-        if (contains(x, y)) {
+        if (self.interact && contains(x, y)) {
             return self
         }
 

@@ -13,11 +13,13 @@ open class RectanglePrimitive : IPrimitiveElement<RectanglePrimitive>() {
     override var color: Int = -1
 
     var border: Boolean = false
-    var borderInset: Boolean = false
-    var borderWidth: Int = 2
+    var borderInset: Boolean = true
+    var borderWidth: Int = 1
     var borderColor: Int = -1
 
     override fun render(graphics: GuiGraphics) {
+        if (!visible) return
+
         graphics.rectangle(x, y, width, height, color)
         if (border) graphics.outline(x, y, width, height, borderWidth, borderColor, borderInset)
 

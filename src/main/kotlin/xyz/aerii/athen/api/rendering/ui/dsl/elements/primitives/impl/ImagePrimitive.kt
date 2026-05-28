@@ -28,6 +28,7 @@ open class ImagePrimitive : IPrimitiveElement<ImagePrimitive>() {
     var textureHeight: Int = 256
 
     override fun render(graphics: GuiGraphics) {
+        if (!visible) return
         val location = location ?: return
 
         if (sprite) {

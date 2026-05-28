@@ -29,6 +29,8 @@ open class ScrollablePrimitive : IPrimitiveElement<ScrollablePrimitive>(), IPrim
     }
 
     override fun render(graphics: GuiGraphics) {
+        if (!visible) return
+
         graphics.enableScissor(x, y, x + width, y + height)
         graphics.pose().pushMatrix()
         graphics.pose().translate(0f, -scroll.toFloat())

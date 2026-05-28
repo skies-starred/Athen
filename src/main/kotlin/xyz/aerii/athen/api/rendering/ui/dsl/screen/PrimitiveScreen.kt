@@ -1,6 +1,5 @@
 package xyz.aerii.athen.api.rendering.ui.dsl.screen
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.CharacterEvent
@@ -17,11 +16,10 @@ open class PrimitiveScreen(title: String = "Primitive Screen [Athen]") : Screen(
         height = this@PrimitiveScreen.height
     }
 
-    final override fun resize(/*? < 1.21.11 { */minecraft: Minecraft, /*? }*/width: Int, height: Int) {
+    override fun init() {
         scene.width = width
         scene.height = height
-
-        super.resize(/*? < 1.21.11 { */minecraft, /*? } */width, height)
+        scene.layout()
     }
 
     //? if >= 26.1 {
