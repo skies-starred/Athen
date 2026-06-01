@@ -152,6 +152,35 @@ object SlotBindsGUI : Scram("Slot Binds Editor [Athen]") {
         rectangle(px + 6, py + 6 + client.font.lineHeight + 2, pw - 12, 1, Mocha.Surface0.argb)
 
         val binds = SlotBinds.m0
+
+        for (col in 0 until 4) {
+            val slot = 5 + col
+            val x = px + (pw - 178) / 2 + col * 20
+            val bound = fn(slot)
+            val bc = if (bound) SlotBinds.sc(slot) else 0
+            val bool = slot == selected
+
+            rectangle(x, py + ph - 136, 18, 18, if (bool) Mocha.Surface1.argb else if (bound) Mocha.Surface2.argb else Mocha.Surface0.argb)
+            outline(x, py + ph - 136, 18, 18, 1, if (bool) Mocha.Lavender.argb else if (bound) bc else Mocha.Overlay0.argb)
+
+            val lbl = slot.toString()
+            extractText(lbl, x + (18 - client.font.width(lbl)) / 2, py + ph - 136 + (18 - client.font.lineHeight) / 2 + 1, false, if (bool) Mocha.Lavender.argb else if (bound) bc else Mocha.Subtext0.argb)
+
+            zones.add(UIZone(x, py + ph - 136, 18, 18, ZoneType.SLOT, data = slot))
+            if (hovered(x, py + ph - 136, 18, 18, true)) {
+                if (selected != null && (selected!! in 36..44)) {
+                    tt = "Click to bind"
+                    tc = Mocha.Green.argb
+                } else if (bound) {
+                    tt = "L: Cycle | R: Remove"
+                    tc = bc
+                }
+
+                tx = x + 20
+                ty = py + ph - 136 + 1
+            }
+        }
+
         for (row in 0 until 3) for (col in 0 until 9) {
             val slot = 9 + row * 9 + col
             val x = px + (pw - 178) / 2 + col * 20
@@ -213,8 +242,8 @@ object SlotBindsGUI : Scram("Slot Binds Editor [Athen]") {
         }
 
         for (e in binds.int2IntEntrySet()) {
-            val posA = pos(e.intKey, px + (pw - 178) / 2, py + ph - 112, y) ?: continue
-            val posB = pos(e.intValue, px + (pw - 178) / 2, py + ph - 112, y) ?: continue
+            val posA = pos(e.intKey, px + (pw - 178) / 2, py + ph - 112, py + ph - 136, y) ?: continue
+            val posB = pos(e.intValue, px + (pw - 178) / 2, py + ph - 112, py + ph - 136, y) ?: continue
             line(posA.first, posA.second, posB.first, posB.second, SlotBinds.m2.get(e.intKey), 1)
         }
 
@@ -385,8 +414,9 @@ object SlotBindsGUI : Scram("Slot Binds Editor [Athen]") {
     private fun fn(int: Int): Boolean =
         SlotBinds.m0.containsKey(int) || SlotBinds.m1.containsKey(int)
 
-    private fun pos(slot: Int, invX: Int, invY: Int, hotY: Int): Pair<Int, Int>? =
+    private fun pos(slot: Int, invX: Int, invY: Int, armorY: Int, hotY: Int): Pair<Int, Int>? =
         when (slot) {
+            in 5..8 -> (invX + (slot - 5) * 20 + 9) to (armorY + 9)
             in 9..35 -> (invX + (slot - 9) % 9 * 20 + 9) to (invY + (slot - 9) / 9 * 20 + 9)
             in 36..44 -> (invX + (slot - 36) * 20 + 9) to (hotY + 9)
             else -> null
