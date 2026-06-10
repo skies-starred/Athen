@@ -18,6 +18,7 @@ import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.athen.utils.DiscordWebhook
 import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryStateTracker.bossToPlayer
 import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryStateTracker.tracked
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
@@ -45,6 +46,9 @@ object SlayerCarryTracker : Module(
     private val announceInParty by config.switch("Announce in party", true)
     private val showSpawnMessage by config.switch("Show spawn message", true)
     private val useCustomMessages by config.switch("Use custom messages")
+
+    private val webhookExpanded by config.expandable("Discord Webhook")
+    private val webhookUrl by config.textInput("Webhook URL", "", "https://discord.com/api/webhooks/...").childOf { webhookExpanded }
 
     private val voidExpanded by config.expandable("Voidgloom Prices")
     private val voidT3Price by config.textInput("T3 Price (M)", "0.8, 0.65").childOf { voidExpanded }
@@ -236,6 +240,10 @@ object SlayerCarryTracker : Module(
             if (announceInParty) "pc $player: ${result.current}/${result.total}".command()
             if (result.completed) {
                 "<${Mocha.Green.argb}>Completed bosses for <aqua>$player <gray>[${slayerType.short}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]<r> in <yellow>${result.totalTime.toDuration()}".parse().modMessage()
+
+                val t = result.totalTime.toInt()
+                val timeStr = if (t >= 60) "${t / 60}m ${t % 60}s" else "${t}s"
+                DiscordWebhook.send(webhookUrl, "Completed ${result.amount}x ${carry.getType()} carries for $player ($timeStr)")
 
                 SlayerCarryStateTracker.add(player, result.amount, carry.getType())
                 tracked.remove(player)

@@ -19,6 +19,7 @@ import xyz.aerii.athen.events.WorldRenderEvent
 import xyz.aerii.athen.events.core.runWhen
 import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.modMessage
+import xyz.aerii.athen.utils.DiscordWebhook
 import xyz.aerii.athen.modules.Module
 import xyz.aerii.athen.modules.impl.dungeon.carry.DungeonCarryStateTracker.tracked
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
@@ -43,6 +44,9 @@ object DungeonCarryTracker : Module(
 ), ICommand {
     private val announceInParty by config.switch("Announce in party", true)
     private val showStartMessage by config.switch("Show start message", true)
+
+    private val webhookExpanded by config.expandable("Discord Webhook")
+    private val webhookUrl by config.textInput("Webhook URL", "", "https://discord.com/api/webhooks/...").childOf { webhookExpanded }
 
     private val highlightPlayer by config.switch("Highlight player", true)
     private val playerColor by config.colorPicker("Player color", Color(0, 255, 255, 150)).dependsOn { highlightPlayer }
@@ -156,6 +160,10 @@ object DungeonCarryTracker : Module(
                     "<${Mocha.Green.argb}>Completed carries for <${TextColor.AQUA}>${teammate.name} <${TextColor.GRAY}>[${floor.name}] <r>in <${TextColor.YELLOW}>${result.totalTime.toDuration()}"
                         .parse()
                         .modMessage()
+
+                    val t = result.totalTime.toInt()
+                    val timeStr = if (t >= 60) "${t / 60}m ${t % 60}s" else "${t}s"
+                    DiscordWebhook.send(webhookUrl, "Completed ${result.amount}x ${floor.name} carries for ${teammate.name} ($timeStr)")
 
                     DungeonCarryStateTracker.add(teammate.name, result.amount, carry.getType())
                     tracked.remove(teammate.name)
