@@ -1,3 +1,5 @@
+@file:Suppress("Unused")
+
 package xyz.aerii.athen.modules.impl.slayer.carry
 
 import tech.thatgravyboat.skyblockapi.helpers.McClient
@@ -12,13 +14,13 @@ import xyz.aerii.athen.api.rendering.ui.text.vanilla.extensions.sizedText
 import xyz.aerii.athen.api.slayers.enums.type.impl.SlayerBoss
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.*
+import xyz.aerii.athen.handlers.Beacon.request
 import xyz.aerii.athen.handlers.Chronos
 import xyz.aerii.athen.handlers.Notifier.notify
 import xyz.aerii.athen.handlers.Texter.onHover
 import xyz.aerii.athen.handlers.Ticking
 import xyz.aerii.athen.handlers.Typo.modMessage
 import xyz.aerii.athen.modules.Module
-import xyz.aerii.athen.utils.DiscordWebhook
 import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryStateTracker.bossToPlayer
 import xyz.aerii.athen.modules.impl.slayer.carry.SlayerCarryStateTracker.tracked
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
@@ -28,6 +30,7 @@ import xyz.aerii.library.api.*
 import xyz.aerii.library.handlers.parser.parse
 import xyz.aerii.library.handlers.time.client
 import xyz.aerii.library.kommand.ICommand
+import xyz.aerii.library.utils.Request
 import xyz.aerii.library.utils.literal
 import xyz.aerii.library.utils.toDuration
 import java.awt.Color
@@ -47,8 +50,11 @@ object SlayerCarryTracker : Module(
     private val showSpawnMessage by config.switch("Show spawn message", true)
     private val useCustomMessages by config.switch("Use custom messages")
 
-    private val webhookExpanded by config.expandable("Discord Webhook")
-    private val webhookUrl by config.textInput("Webhook URL", "", "https://discord.com/api/webhooks/...").childOf { webhookExpanded }
+    private val _webhook by config.expandable("Discord webhook")
+    private val webhook by config.switch("Send to webhook").childOf { _webhook }
+    private val webhookEach by config.switch("Send on each kill", true).childOf { _webhook }
+    private val webhookUrl by config.textInput("Webhook URL").childOf { _webhook }
+    private val _webhookUrl by config.textInput("Requires you to add your own webhook URL!").childOf { _webhook }
 
     private val voidExpanded by config.expandable("Voidgloom Prices")
     private val voidT3Price by config.textInput("T3 Price (M)", "0.8, 0.65").childOf { voidExpanded }
@@ -238,12 +244,21 @@ object SlayerCarryTracker : Module(
 
             "Killed boss for <aqua>$player<r> in <yellow>${result.killTime.toDuration(secondsDecimals = 1)} <gray>| <yellow>${(result.killTicks / 20.0).toDuration(secondsDecimals = 1)}".parse().onHover("<red>${result.killTicks} ticks.".parse()).modMessage()
             if (announceInParty) "pc $player: ${result.current}/${result.total}".command()
-            if (result.completed) {
-                "<${Mocha.Green.argb}>Completed bosses for <aqua>$player <gray>[${slayerType.short}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]<r> in <yellow>${result.totalTime.toDuration()}".parse().modMessage()
+            if (webhookEach && webhook) {
+                webhookUrl.request(Request.POST) {
+                    body(mapOf("content" to "Completed ${result.amount}/${result.total} ${carry.getType()} carries for $player"))
+                }
+            }
 
-                val t = result.totalTime.toInt()
-                val timeStr = if (t >= 60) "${t / 60}m ${t % 60}s" else "${t}s"
-                DiscordWebhook.send(webhookUrl, "Completed ${result.amount}x ${carry.getType()} carries for $player ($timeStr)")
+            if (result.completed) {
+                val time = result.totalTime.toDuration()
+                "<${Mocha.Green.argb}>Completed bosses for <aqua>$player <gray>[${slayerType.short}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]<r> in <yellow>$time".parse().modMessage()
+
+                if (webhook) {
+                    webhookUrl.request(Request.POST) {
+                        body(mapOf("content" to "Completed ${result.amount}x ${carry.getType()} carries for $player ($time)"))
+                    }
+                }
 
                 SlayerCarryStateTracker.add(player, result.amount, carry.getType())
                 tracked.remove(player)
