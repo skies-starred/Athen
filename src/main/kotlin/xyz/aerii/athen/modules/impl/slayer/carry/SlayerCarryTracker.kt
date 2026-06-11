@@ -54,7 +54,7 @@ object SlayerCarryTracker : Module(
     private val webhook by config.switch("Send to webhook").childOf { _webhook }
     private val webhookEach by config.switch("Send on each kill", true).childOf { _webhook }
     private val webhookUrl by config.textInput("Webhook URL").childOf { _webhook }
-    private val _webhookUrl by config.textInput("Requires you to add your own webhook URL!").childOf { _webhook }
+    private val _webhookUrl by config.textParagraph("Requires you to add your own webhook URL!").childOf { _webhook }
 
     private val voidExpanded by config.expandable("Voidgloom Prices")
     private val voidT3Price by config.textInput("T3 Price (M)", "0.8, 0.65").childOf { voidExpanded }
@@ -252,7 +252,7 @@ object SlayerCarryTracker : Module(
 
             if (result.completed) {
                 val time = result.totalTime.toDuration()
-                "<${Mocha.Green.argb}>Completed bosses for <aqua>$player <gray>[${slayerType.short}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier}"}]<r> in <yellow>$time".parse().modMessage()
+                "<${Mocha.Green.argb}>Completed bosses for <aqua>$player <gray>[${slayerType.short}${if (carry.tier == -1) " Any" else " T${slayerInfo.tier?.int}"}]<r> in <yellow>$time".parse().modMessage()
 
                 if (webhook) {
                     webhookUrl.request(Request.POST) {

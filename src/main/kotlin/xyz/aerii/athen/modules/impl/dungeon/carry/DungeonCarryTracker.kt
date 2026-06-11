@@ -50,7 +50,7 @@ object DungeonCarryTracker : Module(
     private val webhook by config.switch("Send to webhook").childOf { _webhook }
     private val webhookEach by config.switch("Send on each kill", true).childOf { _webhook }
     private val webhookUrl by config.textInput("Webhook URL").childOf { _webhook }
-    private val _webhookUrl by config.textInput("Requires you to add your own webhook URL!").childOf { _webhook }
+    private val _webhookUrl by config.textParagraph("Requires you to add your own webhook URL!").childOf { _webhook }
 
     private val highlightPlayer by config.switch("Highlight player", true)
     private val playerColor by config.colorPicker("Player color", Color(0, 255, 255, 150)).dependsOn { highlightPlayer }
