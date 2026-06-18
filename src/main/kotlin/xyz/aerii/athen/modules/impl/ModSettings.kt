@@ -30,7 +30,7 @@ object ModSettings : Module(
     val oldApi by config.switch("Use old API")
 
     @JvmStatic
-    val hideGuis by config.switch("Hide GUIs in F1")
+    val hideGuis by config.switch("Hide GUIs in F1", true)
 
     private val _oldApiText by config.textParagraph("Some features may not work with the old api.")
 
