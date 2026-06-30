@@ -39,7 +39,7 @@ lwjgl-nanovg-26-1 = "3.4.1"
 skyblock-api = "4.1.10"
 classgraph = "4.8.184"
 autoupdate = "1.3.1"
-library = "005"
+library = "008"
 
 hypixel-modapi = "1.0.1"
 hypixel-modapi-fabric = "1.0.1+build.1+mc1.21"
