@@ -98,6 +98,8 @@ open class TextPrimitive : IPrimitiveElement<TextPrimitive>() {
     }
 
     companion object {
+        val NONE = TextPrimitive()
+
         inline fun text(block: TextPrimitive.() -> Unit): TextPrimitive {
             return TextPrimitive().apply(block)
         }

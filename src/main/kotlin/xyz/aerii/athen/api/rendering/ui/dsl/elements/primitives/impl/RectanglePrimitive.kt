@@ -27,6 +27,8 @@ open class RectanglePrimitive : IPrimitiveElement<RectanglePrimitive>() {
     }
 
     companion object {
+        val NONE = RectanglePrimitive()
+
         inline fun rectangle(block: RectanglePrimitive.() -> Unit): RectanglePrimitive {
             return RectanglePrimitive().apply(block)
         }

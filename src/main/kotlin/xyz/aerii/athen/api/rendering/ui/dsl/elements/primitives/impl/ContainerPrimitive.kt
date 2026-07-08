@@ -10,6 +10,8 @@ open class ContainerPrimitive : IPrimitiveElement<ContainerPrimitive>() {
     override var color: Int = -1
 
     companion object {
+        val NONE = ContainerPrimitive()
+
         inline fun container(block: ContainerPrimitive.() -> Unit): ContainerPrimitive {
             return ContainerPrimitive().apply(block)
         }

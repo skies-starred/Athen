@@ -43,6 +43,8 @@ open class ImagePrimitive : IPrimitiveElement<ImagePrimitive>() {
     }
 
     companion object {
+        val NONE = ImagePrimitive()
+
         inline fun image(block: ImagePrimitive.() -> Unit): ImagePrimitive {
             return ImagePrimitive().apply(block)
         }

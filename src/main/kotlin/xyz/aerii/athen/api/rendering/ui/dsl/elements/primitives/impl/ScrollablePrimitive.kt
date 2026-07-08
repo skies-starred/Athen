@@ -54,6 +54,8 @@ open class ScrollablePrimitive : IPrimitiveElement<ScrollablePrimitive>(), IPrim
     }
 
     companion object {
+        val NONE = ScrollablePrimitive()
+
         inline fun scrollable(block: ScrollablePrimitive.() -> Unit): ScrollablePrimitive {
             return ScrollablePrimitive().apply(block)
         }
