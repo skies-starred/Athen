@@ -1,15 +1,17 @@
 package xyz.aerii.athen.modules.impl.general.keybinds
 
-import com.mojang.serialization.Codec
-import com.mojang.serialization.codecs.RecordCodecBuilder
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
 import xyz.aerii.athen.events.InputEvent
 import xyz.aerii.athen.handlers.Scribble
 import xyz.aerii.athen.modules.Module
+import xyz.aerii.athen.modules.impl.general.keybinds.data.CategoryEntry
+import xyz.aerii.athen.modules.impl.general.keybinds.data.KeybindCondition
+import xyz.aerii.athen.modules.impl.general.keybinds.data.KeybindEntry
 import xyz.aerii.library.api.client
 import xyz.aerii.library.api.command
 import xyz.aerii.library.api.message
+import xyz.aerii.athen.modules.impl.general.keybinds.ui.KeybindsGUI
 
 @Load
 object Keybinds : Module(
@@ -116,26 +118,6 @@ object Keybinds : Module(
         categories.update {
             val idx = indexOfFirst { it.name == name }
             if (idx >= 0) set(idx, get(idx).copy(enabled = !get(idx).enabled))
-        }
-    }
-
-    data class KeybindEntry(
-        val keys: List<Int>,
-        val command: String,
-        val enabled: Boolean = true,
-        val category: String = "",
-        val condition: KeybindCondition = KeybindCondition()
-    ) {
-        companion object {
-            val CODEC: Codec<KeybindEntry> = RecordCodecBuilder.create { inst ->
-                inst.group(
-                    Codec.INT.listOf().fieldOf("keys").forGetter(KeybindEntry::keys),
-                    Codec.STRING.fieldOf("command").forGetter(KeybindEntry::command),
-                    Codec.BOOL.optionalFieldOf("enabled", true).forGetter(KeybindEntry::enabled),
-                    Codec.STRING.optionalFieldOf("category", "").forGetter(KeybindEntry::category),
-                    KeybindCondition.CODEC.optionalFieldOf("condition", KeybindCondition()).forGetter(KeybindEntry::condition)
-                ).apply(inst, ::KeybindEntry)
-            }
         }
     }
 }

@@ -1,4 +1,4 @@
-package xyz.aerii.athen.modules.impl.general.keybinds
+package xyz.aerii.athen.modules.impl.general.keybinds.data
 
 enum class KeybindWorkIn(val displayName: String) {
     OUTSIDE_GUI("Outside GUI"),
@@ -6,7 +6,6 @@ enum class KeybindWorkIn(val displayName: String) {
     EVERYWHERE("Everywhere");
 
     companion object {
-        fun from(name: String): KeybindWorkIn =
-            entries.find { it.name == name } ?: OUTSIDE_GUI
+        fun from(name: String): KeybindWorkIn = entries.find { it.name == name } ?: OUTSIDE_GUI
     }
 }

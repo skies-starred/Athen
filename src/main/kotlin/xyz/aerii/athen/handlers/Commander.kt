@@ -15,7 +15,7 @@ import xyz.aerii.athen.modules.impl.Dev.clickUiHelperCollapsed
 import xyz.aerii.athen.modules.impl.Dev.clickUiHelperHidden
 import xyz.aerii.athen.modules.impl.Dev.debug
 import xyz.aerii.athen.modules.impl.ModSettings
-import xyz.aerii.athen.modules.impl.general.keybinds.KeybindsGUI
+import xyz.aerii.athen.modules.impl.general.keybinds.ui.KeybindsGUI
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
 import xyz.aerii.athen.updater.ModUpdater
 import xyz.aerii.library.api.center

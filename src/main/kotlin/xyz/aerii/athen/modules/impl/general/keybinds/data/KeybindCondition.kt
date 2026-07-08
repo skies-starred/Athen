@@ -1,4 +1,4 @@
-package xyz.aerii.athen.modules.impl.general.keybinds
+package xyz.aerii.athen.modules.impl.general.keybinds.data
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -33,8 +33,9 @@ data class KeybindCondition(
         return true
     }
 
-    fun copy(): KeybindCondition =
-        KeybindCondition(workIn, islands.toMutableSet(), floors.toMutableSet(), classes.toMutableSet(), phases.toMutableSet())
+    fun copy(): KeybindCondition {
+        return KeybindCondition(workIn, islands.toMutableSet(), floors.toMutableSet(), classes.toMutableSet(), phases.toMutableSet())
+    }
 
     companion object {
         val CODEC: Codec<KeybindCondition> = RecordCodecBuilder.create { inst ->

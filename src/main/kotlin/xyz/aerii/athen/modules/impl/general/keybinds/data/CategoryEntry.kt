@@ -1,4 +1,4 @@
-package xyz.aerii.athen.modules.impl.general.keybinds
+package xyz.aerii.athen.modules.impl.general.keybinds.data
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
