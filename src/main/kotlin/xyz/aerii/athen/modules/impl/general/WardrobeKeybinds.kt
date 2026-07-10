@@ -54,7 +54,7 @@ object WardrobeKeybinds : Module(
     private val key7 by config.keybind("Slot 8", GLFW.GLFW_KEY_8).dependsOn { !useHotbar }.childOf { keybindExpandable }
     private val key8 by config.keybind("Slot 9", GLFW.GLFW_KEY_9).dependsOn { !useHotbar }.childOf { keybindExpandable }
 
-    private var menuRegex: Regex = Regex("^Wardrobe \\((?<cur>\\d)/(?<max>\\d)\\)$")
+    private var menuRegex: Regex = Regex("^\\((?<cur>\\d)/(?<max>\\d)\\) Armor Sets$")
     private var currentPage: Int = 0
     private var maxPage: Int = 0
     private var lastClick: Long = 0
