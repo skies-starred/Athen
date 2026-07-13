@@ -74,12 +74,7 @@ abstract class ITerminalSim(
         for ((a, b) in i.withIndex()) if (b.item != Items.BLACK_STAINED_GLASS_PANE) PacketEvent.Process.Pre(ClientboundContainerSetSlotPacket(id - 1, 0, a, b)).post()
     }
 
-    //? if >= 1.21.11 {
-    /*public override fun slotClicked(slot: Slot, slotId: Int, mouseButton: Int, type: ClickType) {
-    *///? } else {
-    public override fun slotClicked(slot: Slot?, slotId: Int, mouseButton: Int, type: ClickType?) {
-    //? }
-        if (slot == null) return
+    public override fun slotClicked(slot: Slot, slotId: Int, mouseButton: Int, type: ClickType) {
         if (slot.container != inv) return
         if (slot.item.item == Items.BLACK_STAINED_GLASS_PANE) return
         if (!c) return

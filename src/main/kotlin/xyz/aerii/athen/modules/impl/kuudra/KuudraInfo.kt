@@ -107,7 +107,7 @@ object KuudraInfo : Module(
             val hh = k.bbHeight * 0.5
 
             val c = k.renderPos.add(0.0, hh, 0.0)
-            val d = client.gameRenderer.mainCamera.position/*? >= 1.21.11 { *//*()*//*? }*/.subtract(c)
+            val d = client.gameRenderer.mainCamera.position().subtract(c)
 
             val t = minOf(fn(d.x, hw), fn(d.y, hh), fn(d.z, hw))
 

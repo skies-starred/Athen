@@ -44,8 +44,7 @@ import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.MultiBufferSource
 import org.joml.Matrix3x2f
-//? if >= 1.21.11
-//import org.lwjgl.opengl.GL33.*
+import org.lwjgl.opengl.GL33.*
 
 class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource)
     : PictureInPictureRenderer<NVGSpecialRenderer.NVGRenderState>(vertexConsumers) {
@@ -66,10 +65,8 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource)
             GlStateManager._viewport(0, 0, width, height)
         }
 
-        //? if >= 1.21.11 {
-        /*val prevSampler = glGetInteger(GL_SAMPLER_BINDING)
+        val prevSampler = glGetInteger(GL_SAMPLER_BINDING)
         glBindSampler(0, 0)
-        *///? }
 
         NVGRenderer.beginFrame(width.toFloat(), height.toFloat())
         state.renderContent()
@@ -77,9 +74,7 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource)
 
         GlStateManager._disableCull()
 
-        //? if >= 1.21.11 {
-        /*glBindSampler(0, prevSampler)
-        *///? }
+        glBindSampler(0, prevSampler)
     }
 
     override fun getTranslateY(height: Int, windowScaleFactor: Int): Float = height / 2f

@@ -3,7 +3,7 @@ package xyz.aerii.athen.api.rendering.ui.dsl.elements.primitives.impl
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import xyz.aerii.athen.api.rendering.ui.dsl.elements.primitives.base.impl.IPrimitiveElement
 
 open class ImagePrimitive : IPrimitiveElement<ImagePrimitive>() {
@@ -15,7 +15,7 @@ open class ImagePrimitive : IPrimitiveElement<ImagePrimitive>() {
 
     var sprite: Boolean = false
 
-    var location: ResourceLocation? = null
+    var location: Identifier? = null
     var pipeline: RenderPipeline = RenderPipelines.GUI_TEXTURED
 
     var u0: Float = 0f

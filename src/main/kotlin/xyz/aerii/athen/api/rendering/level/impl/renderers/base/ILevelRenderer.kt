@@ -35,7 +35,7 @@ interface ILevelRenderer {
         val ny = if (length > 0) dy / length else 0f
         val nz = if (length > 0) dz / length else 0f
 
-        buffer.addVertex(this, x1, y1, z1).setColor(color).setNormal(this, nx, ny, nz)/*? >= 1.21.11 {*//*.setLineWidth(width)*//*? }*/
-        buffer.addVertex(this, x2, y2, z2).setColor(color).setNormal(this, nx, ny, nz)/*? >= 1.21.11 {*//*.setLineWidth(width)*//*? }*/
+        buffer.addVertex(this, x1, y1, z1).setColor(color).setNormal(this, nx, ny, nz)/*? >= 1.21.11 {*/.setLineWidth(width)/*? }*/
+        buffer.addVertex(this, x2, y2, z2).setColor(color).setNormal(this, nx, ny, nz)/*? >= 1.21.11 {*/.setLineWidth(width)/*? }*/
     }
 }

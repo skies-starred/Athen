@@ -1,7 +1,7 @@
 package xyz.aerii.athen.config
 
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
 import xyz.aerii.athen.Athen
 import xyz.aerii.athen.hud.HUDElement
@@ -258,7 +258,7 @@ class ConfigBuilder(
         }
 
         companion object {
-            private val purr = SoundEvent.createVariableRangeEvent(ResourceLocation.withDefaultNamespace("entity.cat.purr"))
+            private val purr = SoundEvent.createVariableRangeEvent(Identifier.withDefaultNamespace("entity.cat.purr"))
         }
     }
 }

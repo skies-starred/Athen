@@ -29,8 +29,7 @@ public class FontMixin {
         return bool ? VisualWords.words.fn(text) : text;
     }
 
-    //~ if >= 1.21.11 'FFIZI' -> 'FFIZZI'
-    @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
     private FormattedCharSequence athen$prepareText$sequence(FormattedCharSequence seq) {
         return bool ? VisualWords.words.fn(seq) : seq;
     }

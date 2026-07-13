@@ -27,7 +27,7 @@ object LevelQueueImpl : ILevelQueue {
 
     init {
         on<WorldRenderEvent.Render> {
-            val camera = client.gameRenderer.mainCamera.position/*? >= 1.21.11 { *//*()*//*? }*/
+            val camera = client.gameRenderer.mainCamera.position()
 
             pose.pushPose()
             pose.translate(-camera.x, -camera.y, -camera.z)

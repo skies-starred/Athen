@@ -4,7 +4,7 @@ package xyz.aerii.athen.modules.impl.render
 
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.util.ARGB
 import net.minecraft.world.item.ItemStack
 import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
@@ -60,7 +60,7 @@ object ItemRarityBackground : Module(
         }.runWhen(mode.state.map { it == 0 })
 
         on<GuiEvent.Slots.Render.Pre> {
-            graphics.fn(slot.item ?: return@on, slot.x, slot.y)
+            graphics.fn(slot.item, slot.x, slot.y)
         }.runWhen(mode.state.map { it == 1 })
 
         on<GuiEvent.Slots.Render.Hotbar.Pre> {
@@ -104,7 +104,7 @@ object ItemRarityBackground : Module(
         else -> `color$special`
     }.rgb
 
-    private fun SkyBlockRarity.sprite(): ResourceLocation = when (this) {
+    private fun SkyBlockRarity.sprite(): Identifier = when (this) {
         SkyBlockRarity.COMMON -> common
         SkyBlockRarity.UNCOMMON -> uncommon
         SkyBlockRarity.RARE -> rare

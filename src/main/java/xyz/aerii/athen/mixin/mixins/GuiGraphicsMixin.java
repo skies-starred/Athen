@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -38,7 +38,7 @@ public class GuiGraphicsMixin {
 
     //~ if >= 26.1 'renderTooltip' -> 'tooltip'
     @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
-    private void athen$renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, ResourceLocation background, CallbackInfo ci) {
+    private void athen$renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, Identifier background, CallbackInfo ci) {
         boolean a = CustomTooltip.INSTANCE.getEnabled();
         boolean b = ScrollableTooltip.INSTANCE.getEnabled();
 

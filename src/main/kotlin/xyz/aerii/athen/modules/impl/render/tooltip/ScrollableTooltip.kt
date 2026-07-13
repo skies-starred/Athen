@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.lwjgl.glfw.GLFW
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.config.Category
@@ -38,8 +38,8 @@ object ScrollableTooltip : Module(
 
     private val reset by config.switch("Reset on hover")
 
-    private val background = ResourceLocation.withDefaultNamespace("tooltip/background")
-    private val frame = ResourceLocation.withDefaultNamespace("tooltip/frame")
+    private val background = Identifier.withDefaultNamespace("tooltip/background")
+    private val frame = Identifier.withDefaultNamespace("tooltip/frame")
 
     private var last: Int = 0
 
@@ -79,7 +79,7 @@ object ScrollableTooltip : Module(
     }
 
     @JvmStatic
-    fun GuiGraphics.fn(font: Font, components: List<ClientTooltipComponent>, x: Int, y: Int, positioner: ClientTooltipPositioner, background: ResourceLocation?) {
+    fun GuiGraphics.fn(font: Font, components: List<ClientTooltipComponent>, x: Int, y: Int, positioner: ClientTooltipPositioner, background: Identifier?) {
         var i = 0
         var j = if (components.size == 1) -2 else 0
 
@@ -144,11 +144,11 @@ object ScrollableTooltip : Module(
         mss = 0.0
     }
 
-    private fun fn0(r: ResourceLocation?): ResourceLocation {
+    private fun fn0(r: Identifier?): Identifier {
         return r?.withPath { "tooltip/${it}_background" } ?: background
     }
 
-    private fun fn1(r: ResourceLocation?): ResourceLocation {
+    private fun fn1(r: Identifier?): Identifier {
         return r?.withPath { "tooltip/${it}_frame" } ?: frame
     }
 }

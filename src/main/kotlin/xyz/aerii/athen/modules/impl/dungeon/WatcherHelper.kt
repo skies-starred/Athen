@@ -3,7 +3,7 @@
 package xyz.aerii.athen.modules.impl.dungeon
 
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
 import xyz.aerii.athen.annotations.Load
 import xyz.aerii.athen.annotations.OnlyIn
@@ -77,7 +77,7 @@ object WatcherHelper : Module(
     private val `text$slow` by config.textInput("Slow", "<red>Yawn...").childOf { textExpandable }
     private val `text$snail` by config.textInput("Very slow", "<red>Zzz...").childOf { textExpandable }
 
-    private val purreow = SoundEvent.createVariableRangeEvent(ResourceLocation.withDefaultNamespace("entity.cat.purreow"))
+    private val purreow = SoundEvent.createVariableRangeEvent(Identifier.withDefaultNamespace("entity.cat.purreow"))
 
     private var `blood$start`: Long = 0
     private var `blood$start$t`: Int = 0

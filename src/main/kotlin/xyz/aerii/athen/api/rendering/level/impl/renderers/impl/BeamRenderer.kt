@@ -4,9 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer./*? >= 1.21.11 {*//*rendertype.RenderTypes*//*? } else {*/RenderType/*? }*/
+import net.minecraft.client.renderer.rendertype.RenderTypes
 import net.minecraft.client.renderer.texture.OverlayTexture
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.util.ARGB
 import net.minecraft.util.Mth
 import xyz.aerii.athen.api.rendering.level.impl.renderers.base.ILevelRenderer
@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.LightTexture
 
 @LevelRenderer
 object BeamRenderer : ILevelRenderer {
-    private val beam = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/entity/beacon_beam.png")
+    private val beam = Identifier.fromNamespaceAndPath("minecraft", "textures/entity/beacon_beam.png")
 
     override fun render(poseStack: PoseStack, pose: PoseStack.Pose, consumers: MultiBufferSource.BufferSource) {
         fn(poseStack, consumers)
@@ -37,13 +37,8 @@ object BeamRenderer : ILevelRenderer {
         val scoping = client.player?.isScoping ?: false
         val s = -1f + Mth.frac(-animationTime * 0.2f - Mth.floor(-animationTime * 0.1f).toFloat())
 
-        //? if >= 1.21.11 {
-        /*val opaqueType = RenderTypes.beaconBeam(beam, false)
+        val opaqueType = RenderTypes.beaconBeam(beam, false)
         val translucentType = RenderTypes.beaconBeam(beam, true)
-        *///? } else {
-        val opaqueType = RenderType.beaconBeam(beam, false)
-        val translucentType = RenderType.beaconBeam(beam, true)
-        //? }
 
         for (beacon in LevelQueueImpl.beams) {
             val pos = beacon.pos

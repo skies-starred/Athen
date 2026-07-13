@@ -25,7 +25,7 @@ fun extractText(
         return
     }
 
-    val scale = scale * client.gameRenderer.mainCamera.position/*? >= 1.21.11 { *//*()*//*? }*/.distanceTo(pos).toFloat() / 3f
+    val scale = scale * client.gameRenderer.mainCamera.position().distanceTo(pos).toFloat() / 3f
     LevelQueueImpl.texts.add(ExtractedText(text.parse(), pos, color0, color1, scale, shadow, depth))
 }
 
@@ -45,6 +45,6 @@ fun extractText(
         return
     }
 
-    val scale = scale * client.gameRenderer.mainCamera.position/*? >= 1.21.11 { *//*()*//*? }*/.distanceTo(pos).toFloat() / 3f
+    val scale = scale * client.gameRenderer.mainCamera.position().distanceTo(pos).toFloat() / 3f
     LevelQueueImpl.texts.add(ExtractedText(text, pos, color0, color1, scale, shadow, depth))
 }

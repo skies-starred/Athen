@@ -39,9 +39,9 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster./*? >= 1.21.11 { *//*spider.*//*? }*/CaveSpider
 import net.minecraft.world.entity.monster.Creeper
-import net.minecraft.world.entity.monster./*? >= 1.21.11 {*//*spider.*//*? }*/Spider
+import net.minecraft.world.entity.monster.spider.CaveSpider
+import net.minecraft.world.entity.monster.spider.Spider
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.ducks.entity.EntityDuck
 import xyz.aerii.athen.events.EntityEvent
@@ -77,7 +77,7 @@ object EntityAPI {
         var d2 = Double.MAX_VALUE
         var t = Int.MAX_VALUE
 
-        val es = level.getEntities(ent, ent.boundingBox.inflate(0.0, 1.0, 0.0)) ?: return
+        val es = level.getEntities(ent, ent.boundingBox.inflate(0.0, 1.0, 0.0))
         for (e0 in es) {
             var e = e0
 

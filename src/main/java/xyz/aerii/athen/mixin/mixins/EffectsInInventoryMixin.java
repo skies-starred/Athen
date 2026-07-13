@@ -10,17 +10,8 @@ import xyz.aerii.athen.modules.impl.render.RenderOptimiser;
 
 @Mixin(EffectsInInventory.class)
 public class EffectsInInventoryMixin {
-    @Inject(
-            //? if >= 26.1 {
-            /*method = "extractRenderState",
-            *///? } else if >= 1.21.11 {
-            /*method = "render",
-            *///? } else {
-            method = "renderEffects",
-            //? }
-            at = @At("HEAD"),
-            cancellable = true
-    )
+    //~ if >= 26.1 'render' -> 'extractRenderState'
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void athen$renderEffects(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo ci) {
         if (!RenderOptimiser.getEffects()) return;
 

@@ -33,21 +33,13 @@ public class AbstractContainerScreenMixin {
 
     //~ if >= 26.1 'renderSlot' -> 'extractSlot'
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
-    //? >= 1.21.11 {
-    /*private void athen$onRenderSlot$pre(GuiGraphics guiGraphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
-    *///? } else {
-    private void athen$onRenderSlot$pre(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
-    //? }
+    private void athen$onRenderSlot$pre(GuiGraphics guiGraphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         if (new GuiEvent.Slots.Render.Pre(guiGraphics, slot).post()) ci.cancel();
     }
 
     //~ if >= 26.1 'renderSlot' -> 'extractSlot'
     @Inject(method = "renderSlot", at = @At("RETURN"))
-    //? >= 1.21.11 {
-    /*private void athen$onRenderSlot$post(GuiGraphics guiGraphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
-    *///? } else {
-    private void athen$onRenderSlot$post(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
-    //? }
+    private void athen$onRenderSlot$post(GuiGraphics guiGraphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         new GuiEvent.Slots.Render.Post(guiGraphics, slot).post();
     }
 

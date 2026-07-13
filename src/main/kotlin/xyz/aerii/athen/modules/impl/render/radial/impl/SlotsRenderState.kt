@@ -52,10 +52,10 @@ class SlotsRenderState(
             val start = i * step + gap * .5f + off
             val end = (i + 1) * step - gap * .5f + off
 
-            val c0 = Mth.cos(start/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
-            val s0 = Mth.sin(start/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
-            val c1 = Mth.cos(end/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
-            val s1 = Mth.sin(end/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
+            val c0 = Mth.cos(start.toDouble())
+            val s0 = Mth.sin(start.toDouble())
+            val c1 = Mth.cos(end.toDouble())
+            val s1 = Mth.sin(end.toDouble())
 
             val h = i == idx || i == idx1
             val e = i == idx1 && sub.isNotEmpty()
@@ -87,10 +87,10 @@ class SlotsRenderState(
             val start = idx3 * step + gap * .5f + off
             val end = (idx3 + 1) * step - gap * .5f + off
 
-            val c0 = Mth.cos(start/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
-            val s0 = Mth.sin(start/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
-            val c1 = Mth.cos(end/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
-            val s1 = Mth.sin(end/*? >= 1.21.11 {*//*.toDouble()*//*? }*/)
+            val c0 = Mth.cos(start.toDouble())
+            val s0 = Mth.sin(start.toDouble())
+            val c1 = Mth.cos(end.toDouble())
+            val s1 = Mth.sin(end.toDouble())
 
             val h = idx3 == idx2
             val ei = bi - if (h) 2f else 0f
@@ -190,7 +190,7 @@ class SlotsRenderState(
             val off = (-PI / 2 - step / 2).toFloat()
             val s = i * step + gap * .5f + off
             val e = (i + 1) * step - gap * .5f + off
-            return floatArrayOf(Mth.cos(s/*? >= 1.21.11 {*//*.toDouble()*//*? }*/), Mth.sin(s/*? >= 1.21.11 {*//*.toDouble()*//*? }*/), Mth.cos(e/*? >= 1.21.11 {*//*.toDouble()*//*? }*/), Mth.sin(e/*? >= 1.21.11 {*//*.toDouble()*//*? }*/))
+            return floatArrayOf(Mth.cos(s.toDouble()), Mth.sin(s.toDouble()), Mth.cos(e.toDouble()), Mth.sin(e.toDouble()))
         }
 
         private fun ctr(cx: Int, cy: Int, c0: Float, s0: Float, c1: Float, s1: Float, i: Float, o: Float): Pair<Int, Int> {
