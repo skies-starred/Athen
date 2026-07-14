@@ -1,4 +1,4 @@
 jdk:
   - openjdk25
 install:
-  - ./gradlew :1.21.10:publishToMavenLocal :1.21.11:publishToMavenLocal :26.1:publishToMavenLocal
+  - ./gradlew :1.21.11:publishToMavenLocal :26.1:publishToMavenLocal
