@@ -109,7 +109,7 @@ object LoadoutKeybinds : Module(
 
         if (System.currentTimeMillis() - lastClick < ping) return
         val player = client.player ?: return
-        val container = player.containerMenu ?: return
+        val container = player.containerMenu
 
         if (key == prevPage) {
             if (currentPage > 1) guiClick(container.containerId, 17)
