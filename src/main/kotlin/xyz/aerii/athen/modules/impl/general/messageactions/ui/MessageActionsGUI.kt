@@ -150,7 +150,7 @@ object MessageActionsGUI : PrimitiveScreen("Message Actions [Athen]") {
 
                 `category$toggle`.visible = false
                 `category$delete`.visible = false
-                `category$field`.value = ""
+                `category$field`.reset(true)
                 `category$field`.visible = true
                 scene.focused = `category$field`
             }
