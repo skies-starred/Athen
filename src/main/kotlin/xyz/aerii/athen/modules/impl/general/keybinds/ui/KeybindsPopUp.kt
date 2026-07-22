@@ -289,23 +289,23 @@ class KeybindsPopUp(
         }
 
         `checkbox$classes` = multiCheckbox {
-            val classes = DungeonClass.entries.filter { it != DungeonClass.DEAD && it != DungeonClass.UNKNOWN }
+            val all = DungeonClass.entries
 
             size = FixedSizeConstraint(170, 16)
             position = AnchorPositionConstraint({ `checkbox$islands` }, PositionAnchor.BELOW, 0, 16)
             label = "Dungeon Classes"
-            items = listOf("Any") + classes.map { it.displayName }
+            items = listOf("Any") + all.map { it.displayName }
 
             selected = {
                 if (it == 0) condition.classes.isEmpty()
-                else condition.classes.contains(classes[it - 1])
+                else condition.classes.contains(all[it - 1])
             }
 
             onSelect = {
                 if (it == 0) {
                     condition.classes.clear()
                 } else {
-                    val c = classes[it - 1]
+                    val c = all[it - 1]
                     if (condition.classes.contains(c)) condition.classes.remove(c) else condition.classes.add(c)
                 }
 

@@ -32,16 +32,14 @@
 package xyz.aerii.athen.api.dungeon.enums
 
 enum class DungeonClass(val displayName: String) {
-    UNKNOWN("Unknown"),
     HEALER("Healer"),
     MAGE("Mage"),
     BERSERK("Berserk"),
     ARCHER("Archer"),
     TANK("Tank"),
-    DEAD("DEAD")
     ;
 
     companion object {
-        fun get(name: String) = entries.firstOrNull { it.displayName.equals(name, true) } ?: UNKNOWN
+        fun get(name: String) = entries.firstOrNull { it.displayName.equals(name, true) }
     }
 }
