@@ -1,271 +1,462 @@
-@file:Suppress("ConstPropertyName")
+@file:Suppress("ObjectPrivatePropertyName")
 
 package xyz.aerii.athen.modules.impl.general.slotbinds
 
 import net.minecraft.client.gui.GuiGraphics
 import org.lwjgl.glfw.GLFW
-import xyz.aerii.athen.api.rendering.ui.effects.outline.outline
+import xyz.aerii.athen.api.rendering.ui.dsl.constraints.impl.data.PositionAlignment
+import xyz.aerii.athen.api.rendering.ui.dsl.constraints.impl.position.AlignPositionConstraint
+import xyz.aerii.athen.api.rendering.ui.dsl.constraints.impl.position.CenterPositionConstraint
+import xyz.aerii.athen.api.rendering.ui.dsl.constraints.impl.position.FixedPositionConstraint
+import xyz.aerii.athen.api.rendering.ui.dsl.constraints.impl.size.FillSizeConstraint
+import xyz.aerii.athen.api.rendering.ui.dsl.constraints.impl.size.FixedSizeConstraint
+import xyz.aerii.athen.api.rendering.ui.dsl.constraints.impl.size.MixedSizeConstraint
+import xyz.aerii.athen.api.rendering.ui.dsl.constraints.impl.size.PercentSizeConstraint
+import xyz.aerii.athen.api.rendering.ui.dsl.elements.components.impl.TextFieldComponent
+import xyz.aerii.athen.api.rendering.ui.dsl.elements.components.impl.TextFieldComponent.Companion.textField
+import xyz.aerii.athen.api.rendering.ui.dsl.elements.primitives.impl.ContainerPrimitive.Companion.container
+import xyz.aerii.athen.api.rendering.ui.dsl.elements.primitives.impl.RectanglePrimitive
+import xyz.aerii.athen.api.rendering.ui.dsl.elements.primitives.impl.RectanglePrimitive.Companion.rectangle
+import xyz.aerii.athen.api.rendering.ui.dsl.elements.primitives.impl.ScrollablePrimitive
+import xyz.aerii.athen.api.rendering.ui.dsl.elements.primitives.impl.ScrollablePrimitive.Companion.scrollable
+import xyz.aerii.athen.api.rendering.ui.dsl.elements.primitives.impl.TextPrimitive
+import xyz.aerii.athen.api.rendering.ui.dsl.elements.primitives.impl.TextPrimitive.Companion.text
+import xyz.aerii.athen.api.rendering.ui.dsl.events.impl.KeyEvent
+import xyz.aerii.athen.api.rendering.ui.dsl.events.impl.MouseEvent
+import xyz.aerii.athen.api.rendering.ui.dsl.screen.PrimitiveScreen
 import xyz.aerii.athen.api.rendering.ui.shapes.line.line
-import xyz.aerii.athen.api.rendering.ui.shapes.rectangle.rectangle
-import xyz.aerii.athen.api.rendering.ui.text.vanilla.extensions.extractText
-import xyz.aerii.athen.handlers.Scram
-import xyz.aerii.athen.ui.IZoneType
-import xyz.aerii.athen.ui.InputField
-import xyz.aerii.athen.ui.UIZone
 import xyz.aerii.athen.ui.themes.Catppuccin.Mocha
-import xyz.aerii.library.api.client
-import xyz.aerii.library.utils.hovered
+import xyz.aerii.library.utils.brighten
+import xyz.aerii.library.utils.literal
 
-object SlotBindsGUI : Scram("Slot Binds Editor [Athen]") {
-    private enum class ZoneType : IZoneType {
-        PROFILE_TAB,
-        PROFILE_ADD,
-        PROFILE_NAME,
-        SLOT
-    }
-
-    private val zones = mutableListOf<UIZone>()
-    private val name = InputField("Name")
-    private var creating = false
+object SlotBindsGUI : PrimitiveScreen("Slot Binds Editor [Athen]") {
     private var deleting: String? = null
+    private var renaming: String? = null
     private var selected: Int? = null
 
-    private var s = 0
-    private var ms = 0
+    private var left: ScrollablePrimitive
+    private var preview: RectanglePrimitive
+    private var empty: TextPrimitive
 
-    private var tt: String? = null
-    private var tc = 0
-    private var tx = 0
-    private var ty = 0
+    private var `profile$new`: RectanglePrimitive
+    private var `profile$rename`: RectanglePrimitive
+    private var `profile$delete`: RectanglePrimitive
+    private var `profile$field`: TextFieldComponent
+    private lateinit var `profile$text$rename`: TextPrimitive
+    private lateinit var `profile$text$delete`: TextPrimitive
 
-    override fun isPauseScreen(): Boolean {
-        return false
-    }
+    private data class ProfileRow(val row: RectanglePrimitive, val label: TextPrimitive)
+    private data class SlotCell(val cell: RectanglePrimitive, val label: TextPrimitive)
 
-    override fun onScramInit() {
-        creating = false
-        deleting = null
-        selected = null
-        name.reset(true)
-        s = 0
-    }
+    private val rows = LinkedHashMap<String, ProfileRow>()
+    private val cells = LinkedHashMap<Int, SlotCell>()
 
-    override fun onScramClose() {
-        SlotBinds.save()
-        SlotBinds.disk()
-    }
-
-    override fun onScramRender(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
-        zones.clear()
-        tt = null
-        graphics.rectangle(0, 0, width, height, Mocha.Crust.withAlpha(0.6f))
-
-        val previewW = 210
-        val sideW = 110
-        val gapW = 6
-        val pw = sideW + gapW + previewW
-        val ph = 160
-        val px = (width - pw) / 2
-        val py = (height - ph) / 2
-
-        graphics.profiles(px, py, ph)
-        graphics.preview(px + sideW + gapW, py, previewW, ph)
-
-        tt?.let { tip ->
-            val tw = client.font.width(tip)
-            graphics.rectangle(tx, ty, tw + 8, client.font.lineHeight + 6, Mocha.Base.argb)
-            graphics.outline(tx, ty, tw + 8, client.font.lineHeight + 6, 1, Mocha.Overlay0.argb)
-            graphics.extractText(tip, tx + 4, ty + 4, false, tc)
+    init {
+        container {
+            size = FillSizeConstraint()
+            position = FixedPositionConstraint(0, 0)
+            interact = false
+            attach(scene)
         }
-    }
 
-    private fun GuiGraphics.profiles(sx: Int, sy: Int, sh: Int) {
-        val sideW = 110
-        rectangle(sx, sy, sideW, sh, Mocha.Base.argb)
-        outline(sx, sy, sideW, sh, 1, Mocha.Surface0.argb)
+        val main = container {
+            size = FixedSizeConstraint(326, 160)
+            position = CenterPositionConstraint()
+            attach(scene)
+        }
 
-        val names = SlotBinds.map0.keys
-        val lx = sx + 4
-        val lw = sideW - 8
-        val rowH = 20
+        val side = rectangle {
+            size = FixedSizeConstraint(110, 160)
+            position = FixedPositionConstraint(0, 0)
+            color = Mocha.Base.argb
+            border = true
+            borderColor = Mocha.Surface0.argb
+            interact = false
+            attach(main)
+        }
 
-        enableScissor(sx + 1, sy + 1, sx + sideW - 1, sy + sh - 1)
+        left = scrollable {
+            size = MixedSizeConstraint(PercentSizeConstraint(100f, 0f), FixedSizeConstraint(0, 136))
+            position = FixedPositionConstraint(0, 0)
+            attach(side)
+        }
 
-        var cy = sy + 4 + s
+        val bar = rectangle {
+            size = MixedSizeConstraint(PercentSizeConstraint(100f, 0f), FixedSizeConstraint(0, 24))
+            position = FixedPositionConstraint(0, 136)
+            color = Mocha.Base.argb
+            border = true
+            borderColor = Mocha.Surface0.argb
+            attach(side)
+        }
 
-        for (name in names) {
-            val hov = hovered(lx, cy, lw, rowH, true)
-            val selected = name == SlotBinds.active
+        `profile$new` = rectangle {
+            size = PercentSizeConstraint(31f, 84f)
+            position = AlignPositionConstraint(PositionAlignment.START, PositionAlignment.CENTER, 2)
+            color = Mocha.Green.argb.brighten(0.8f)
+            border = true
+            borderColor = Mocha.Green.argb.brighten(0.5f)
 
-            if (deleting == name) {
-                rectangle(lx + 1, cy + 1, lw - 2, rowH - 2, Mocha.Red.withAlpha(0.15f))
-                outline(lx + 1, cy + 1, lw - 2, rowH - 2, 1, Mocha.Red.argb)
+            on<MouseEvent.Press> {
+                cancel()
+                if (button != 0) return@on
+                deleting = null
+                renaming = null
+                visible = false
 
-                enableScissor(lx + 4, cy, lx + lw - 4, cy + rowH)
-                extractText(name, lx + 4, cy + (rowH - client.font.lineHeight) / 2 + 1, false, Mocha.Red.argb)
-                disableScissor()
-
-                if (hov) {
-                    tt = "Left click to confirm"
-                    tc = Mocha.Red.argb
-                    tx = lx + lw + 4
-                    ty = cy + 2
-                }
-            } else {
-                if (selected) rectangle(lx, cy, lw, rowH, Mocha.Surface0.argb)
-                else if (hov) rectangle(lx, cy, lw, rowH, Mocha.Surface0.withAlpha(0.5f))
-
-                if (hov && !selected) {
-                    tt = "Right click to delete"
-                    tc = Mocha.Subtext0.argb
-                    tx = lx + lw + 4
-                    ty = cy + 2
-                }
-
-                enableScissor(lx + 4, cy, lx + lw - 4, cy + rowH)
-                extractText(name, lx + 4, cy + (rowH - client.font.lineHeight) / 2 + 1, false, if (selected) Mocha.Mauve.argb else Mocha.Subtext0.argb)
-                disableScissor()
+                `profile$rename`.visible = false
+                `profile$delete`.visible = false
+                `profile$field`.reset(true)
+                `profile$field`.visible = true
+                scene.focused = `profile$field`
             }
 
-            zones.add(UIZone(lx, cy, lw, rowH, ZoneType.PROFILE_TAB, category = name))
-            cy += rowH
+            on<MouseEvent.Move.Enter> {
+                color = Mocha.Green.argb.brighten(0.9f)
+            }
+
+            on<MouseEvent.Move.Exit> {
+                color = Mocha.Green.argb.brighten(0.8f)
+            }
+
+            attach(bar)
+            adopt(text {
+                text = "+".literal()
+                color = Mocha.Base.argb
+                position = CenterPositionConstraint()
+                shadow = false
+            })
         }
 
-        if (creating) {
-            name.draw(this, lx, cy + 2, lw) { zx, zy, zw, zh -> zones.add(UIZone(zx, zy, zw, zh, ZoneType.PROFILE_NAME)) }
-        } else {
-            if (hovered(lx, cy + 2, lw, 14, true)) rectangle(lx, cy + 2, lw, 14, Mocha.Surface0.withAlpha(0.5f))
-            extractText("+", lx + (lw - client.font.width("+")) / 2, cy + 2 + (14 - client.font.lineHeight) / 2 + 1, false, Mocha.Overlay0.argb)
-            zones.add(UIZone(lx, cy + 2, lw, 14, ZoneType.PROFILE_ADD))
+        `profile$rename` = rectangle {
+            size = PercentSizeConstraint(31f, 84f)
+            position = CenterPositionConstraint()
+            color = Mocha.Surface1.argb
+            border = true
+            borderColor = Mocha.Surface0.argb
+
+            on<MouseEvent.Press> {
+                cancel()
+                if (button != 0) return@on
+                deleting = null
+                renaming = SlotBinds.active
+                visible = false
+
+                `profile$new`.visible = false
+                `profile$delete`.visible = false
+                `profile$field`.value = SlotBinds.active
+                `profile$field`.cursor = SlotBinds.active.length
+                `profile$field`.visible = true
+                scene.focused = `profile$field`
+            }
+
+            attach(bar)
+            adopt(text {
+                text = "\u270F".literal()
+                color = Mocha.Overlay0.argb
+                shadow = false
+                position = CenterPositionConstraint()
+            }.also { `profile$text$rename` = it })
         }
 
-        disableScissor()
-        ms = -maxOf(0, (names.size * rowH + 18) - (sh - 8))
-        s = s.coerceIn(ms, 0)
-    }
+        `profile$delete` = rectangle {
+            size = PercentSizeConstraint(31f, 84f)
+            position = AlignPositionConstraint(PositionAlignment.END, PositionAlignment.CENTER, -2)
+            color = Mocha.Red.argb.brighten(0.8f)
+            border = true
+            borderColor = Mocha.Red.argb.brighten(0.5f)
 
-    private fun GuiGraphics.preview(px: Int, py: Int, pw: Int, ph: Int) {
-        rectangle(px, py, pw, ph, Mocha.Base.argb)
-        outline(px, py, pw, ph, 1, Mocha.Surface0.argb)
+            on<MouseEvent.Press> {
+                cancel()
+                if (button != 0) return@on
+                val active = SlotBinds.active
 
-        extractText("Preview", px + 6, py + 6, false, Mocha.Text.argb)
-        rectangle(px + 6, py + 6 + client.font.lineHeight + 2, pw - 12, 1, Mocha.Surface0.argb)
+                if (deleting != active) {
+                    deleting = active
+                    buttons()
+                    return@on
+                }
 
-        val binds = SlotBinds.m0
+                if (SlotBinds.map0.size > 1) {
+                    SlotBinds.save()
+                    SlotBinds.delete(active)
+                }
+
+                deleting = null
+                selected = null
+                profiles()
+                slots()
+                buttons()
+            }
+
+            attach(bar)
+            adopt(text {
+                text = "\uD83D\uDDD1".literal()
+                color = Mocha.Base.argb
+                shadow = false
+                position = CenterPositionConstraint()
+            }.also { `profile$text$delete` = it })
+        }
+
+        `profile$field` = textField {
+            size = MixedSizeConstraint(PercentSizeConstraint(96f, 0f), FixedSizeConstraint(0, 18))
+            position = CenterPositionConstraint()
+            placeholder = "Name..."
+            visible = false
+
+            attach(bar)
+
+            on<KeyEvent.Press> {
+                if (key == GLFW.GLFW_KEY_ENTER) {
+                    val v = value.trim()
+                    val r = renaming
+
+                    if (r != null) {
+                        if (v.isNotEmpty() && v != r && !SlotBinds.map0.containsKey(v)) {
+                            SlotBinds.rename(r, v)
+                        }
+                        renaming = null
+                    } else {
+                        if (v.isNotEmpty() && !SlotBinds.map0.containsKey(v)) {
+                            SlotBinds.save()
+                            SlotBinds.disk()
+                            SlotBinds.add(v)
+                        }
+                    }
+
+                    `profile$field`.visible = false
+                    `profile$new`.visible = true
+                    `profile$rename`.visible = true
+                    `profile$delete`.visible = true
+                    scene.focused = null
+
+                    profiles()
+                    slots()
+                    buttons()
+                    cancel()
+                    return@on
+                }
+
+                if (key != GLFW.GLFW_KEY_ESCAPE) return@on
+                renaming = null
+                `profile$field`.visible = false
+                `profile$new`.visible = true
+                `profile$rename`.visible = true
+                `profile$delete`.visible = true
+                scene.focused = null
+                cancel()
+            }
+        }
+
+        preview = object : RectanglePrimitive() {
+            override fun render(graphics: GuiGraphics) {
+                super.render(graphics)
+
+                val x0 = x + 16
+                val y0 = y + 48
+                val y1 = y + 112
+
+                for (e in SlotBinds.m0.int2IntEntrySet()) {
+                    val a = pos(e.intKey, x0, y0, y1) ?: continue
+                    val b = pos(e.intValue, x0, y0, y1) ?: continue
+                    graphics.line(a.first, a.second, b.first, b.second, SlotBinds.m2.get(e.intKey), 1)
+                }
+            }
+
+            private fun pos(slot: Int, x: Int, y0: Int, y1: Int): Pair<Int, Int>? {
+                return when (slot) {
+                    in 9..35 -> (x + (slot - 9) % 9 * 20 + 9) to (y0 + (slot - 9) / 9 * 20 + 9)
+                    in 36..44 -> (x + (slot - 36) * 20 + 9) to (y1 + 9)
+                    else -> null
+                }
+            }
+        }.apply {
+            size = FixedSizeConstraint(210, 160)
+            position = FixedPositionConstraint(116, 0)
+            color = Mocha.Base.argb
+            border = true
+            borderColor = Mocha.Surface0.argb
+            interact = false
+            attach(main)
+        }
+
+        text {
+            text = "Preview".literal()
+            color = Mocha.Text.argb
+            position = FixedPositionConstraint(6, 6)
+            attach(preview)
+        }
+
+        rectangle {
+            size = FixedSizeConstraint(198, 1)
+            position = FixedPositionConstraint(6, 18)
+            color = Mocha.Surface0.argb
+            interact = false
+            attach(preview)
+        }
+
         for (row in 0 until 3) for (col in 0 until 9) {
-            val slot = 9 + row * 9 + col
-            val x = px + (pw - 178) / 2 + col * 20
-            val y = py + ph - 112 + row * 20
-            val bound = fn(slot)
-            val bc = if (bound) SlotBinds.sc(slot) else 0
-            val bool = slot == selected
-
-            rectangle(x, y, 18, 18, if (bool) Mocha.Surface1.argb else if (bound) Mocha.Surface2.argb else Mocha.Surface0.argb)
-            outline(x, y, 18, 18, 1, if (bool) Mocha.Lavender.argb else if (bound) bc else Mocha.Overlay0.argb)
-
-            val lbl = slot.toString()
-            extractText(lbl, x + (18 - client.font.width(lbl)) / 2, y + (18 - client.font.lineHeight) / 2 + 1, false, if (bool) Mocha.Lavender.argb else if (bound) bc else Mocha.Subtext0.argb)
-
-            zones.add(UIZone(x, y, 18, 18, ZoneType.SLOT, data = slot))
-            if (hovered(x, y, 18, 18, true)) {
-                if (selected != null && (selected!! in 36..44)) {
-                    tt = "Click to bind"
-                    tc = Mocha.Green.argb
-                } else if (bound) {
-                    tt = "L: Cycle | R: Remove"
-                    tc = bc
-                }
-
-                tx = x + 20
-                ty = y + 1
-            }
+            slot(9 + row * 9 + col, 16 + col * 20, 48 + row * 20)
         }
 
-        val y = py + ph - 48
-        rectangle(px + (pw - 178) / 2, y - 4, 178, 1, Mocha.Surface0.argb)
+        rectangle {
+            size = FixedSizeConstraint(178, 1)
+            position = FixedPositionConstraint(16, 108)
+            color = Mocha.Surface0.argb
+            interact = false
+            attach(preview)
+        }
 
         for (col in 0 until 9) {
-            val slot = 36 + col
-            val x = px + (pw - 178) / 2 + col * 20
-            val bound = fn(slot)
-            val bc = if (bound) SlotBinds.sc(slot) else 0
-            val bool = slot == selected
-
-            rectangle(x, y, 18, 18, if (bool) Mocha.Surface1.argb else if (bound) Mocha.Surface2.argb else Mocha.Surface0.argb)
-            outline(x, y, 18, 18, 1, if (bool) Mocha.Lavender.argb else if (bound) bc else Mocha.Overlay0.argb)
-
-            val lbl = slot.toString()
-            extractText(lbl, x + (18 - client.font.width(lbl)) / 2, y + (18 - client.font.lineHeight) / 2 + 1, false, if (bool) Mocha.Lavender.argb else if (bound) bc else Mocha.Subtext0.argb)
-
-            zones.add(UIZone(x, y, 18, 18, ZoneType.SLOT, data = slot))
-            if (hovered(x, y, 18, 18, true)) {
-                if (selected != null && selected!! !in 36..44) {
-                    tt = "Click to bind"
-                    tc = Mocha.Green.argb
-                } else if (bound) {
-                    tt = "L: Cycle | R: Remove"
-                    tc = bc
-                }
-
-                tx = x + 20
-                ty = y + 1
-            }
+            slot(36 + col, 16 + col * 20, 112)
         }
 
-        for (e in binds.int2IntEntrySet()) {
-            val posA = pos(e.intKey, px + (pw - 178) / 2, py + ph - 112, y) ?: continue
-            val posB = pos(e.intValue, px + (pw - 178) / 2, py + ph - 112, y) ?: continue
-            line(posA.first, posA.second, posB.first, posB.second, SlotBinds.m2.get(e.intKey), 1)
+        empty = text {
+            text = "No binds yet.".literal()
+            color = Mocha.Overlay0.argb
+            position = AlignPositionConstraint(PositionAlignment.CENTER, PositionAlignment.START, 0, 30)
+            attach(preview)
         }
 
-        if (binds.isEmpty()) {
-            extractText("No binds yet.", px + (pw - client.font.width("No binds yet.")) / 2, py + 30, false, Mocha.Overlay0.argb)
-        }
-
-        val count = "${binds.size} bind${if (binds.size != 1) "s" else ""}"
-        extractText(count, px + pw - 6 - client.font.width(count), py + ph - 6 - client.font.lineHeight, false, Mocha.Overlay0.argb)
+        buttons()
+        profiles()
+        slots()
     }
 
-    override fun onScramMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {
-        if (creating) {
-            val z = zones.firstOrNull { it.type == ZoneType.PROFILE_NAME }
-            if (z != null && hovered(z.x, z.y, z.w, z.h, true)) {
-                if (button == 0) {
-                    name.focused = true
-                    name.updateClick(mouseX, z.x)
+    override fun init() {
+        super.init()
+        deleting = null
+        renaming = null
+        selected = null
+        profiles()
+        slots()
+        buttons()
+    }
+
+    override fun onClose() {
+        SlotBinds.save()
+        SlotBinds.disk()
+        super.onClose()
+    }
+
+    private fun profiles() {
+        left.children.clear()
+        rows.clear()
+
+        var cy = 4
+        for (name in SlotBinds.map0.keys) {
+            val b0 = name == SlotBinds.active
+
+            val row = rectangle {
+                size = MixedSizeConstraint(PercentSizeConstraint(95f, 0f), FixedSizeConstraint(0, 20))
+                position = AlignPositionConstraint(PositionAlignment.CENTER, PositionAlignment.START, 0, cy)
+                color = if (b0) Mocha.Surface0.argb else Mocha.Base.argb
+
+                on<MouseEvent.Press> {
+                    cancel()
+                    if (button != 0) return@on
+                    if (name == SlotBinds.active) return@on
+
+                    SlotBinds.save()
+                    SlotBinds.disk()
+                    SlotBinds.load(name)
+                    deleting = null
+                    selected = null
+                    profiles()
+                    slots()
+                    buttons()
                 }
 
-                return true
+                on<MouseEvent.Move.Enter> {
+                    if (name != SlotBinds.active) color = Mocha.Surface0.withAlpha(0.5f)
+                }
+
+                on<MouseEvent.Move.Exit> {
+                    if (name != SlotBinds.active) color = Mocha.Base.argb
+                }
+
+                attach(left)
             }
 
-            create()
-            return true
+            val label = text {
+                text = name.literal()
+                color = if (b0) Mocha.Mauve.argb else Mocha.Subtext0.argb
+                position = AlignPositionConstraint(PositionAlignment.START, PositionAlignment.CENTER, 4)
+                attach(row)
+            }
+
+            rows[name] = ProfileRow(row, label)
+            cy += 20
+        }
+    }
+
+    private fun slots() {
+        for (id in cells.keys) {
+            val cell = cells[id] ?: continue
+            val b0 = fn(id)
+            val b1 = selected == id
+            val i0 = if (b0) SlotBinds.sc(id) else 0
+
+            cell.cell.color = if (b1) Mocha.Surface1.argb else if (b0) Mocha.Surface2.argb else Mocha.Surface0.argb
+            cell.cell.borderColor = if (b1) Mocha.Lavender.argb else if (b0) i0 else Mocha.Overlay0.argb
+            cell.label.color = if (b1) Mocha.Lavender.argb else if (b0) i0 else Mocha.Subtext0.argb
         }
 
-        val sz = zones.lastOrNull { it.type == ZoneType.SLOT && hovered(it.x, it.y, it.w, it.h, true) }
-        if (sz != null) {
-            val slot = sz.data
-            val bound = fn(slot)
+        empty.text = "${SlotBinds.m0.size} binds".literal()
+    }
 
-            if (button == 1) {
-                if (bound) SlotBinds.unbind(slot)
-                selected = null
-                return true
-            }
+    private fun buttons() {
+        val b0 = deleting == SlotBinds.active
+        val b1 = SlotBinds.map0.size > 1
 
-            if (button == 0) {
-                val s = selected
+        `profile$rename`.color = Mocha.Lavender.argb.brighten(0.8f)
+        `profile$rename`.borderColor = Mocha.Lavender.argb.brighten(0.5f)
+        `profile$text$rename`.color = Mocha.Base.argb
+
+        `profile$delete`.color = if (!b1) Mocha.Surface1.argb else if (b0) Mocha.Red.argb.brighten(0.9f) else Mocha.Red.argb.brighten(0.8f)
+        `profile$delete`.borderColor = if (!b1) Mocha.Surface0.argb else Mocha.Red.argb.brighten(0.5f)
+        `profile$text$delete`.color = if (!b1) Mocha.Overlay0.argb else Mocha.Base.argb
+        `profile$text$delete`.text = (if (b0) "✔" else "\uD83D\uDDD1").literal()
+    }
+
+    private fun fn(int: Int): Boolean {
+        return SlotBinds.m0.containsKey(int) || SlotBinds.m1.containsKey(int)
+    }
+
+    private fun slot(slot: Int, x: Int, y: Int) {
+        var label0 = TextPrimitive.NONE
+        val cell = rectangle {
+            size = FixedSizeConstraint(18, 18)
+            position = FixedPositionConstraint(x, y)
+            color = Mocha.Surface0.argb
+            border = true
+            borderColor = Mocha.Overlay0.argb
+
+            on<MouseEvent.Press> {
+                if (button == 1) {
+                    if (fn(slot)) SlotBinds.unbind(slot)
+                    selected = null
+                    slots()
+                    cancel()
+                    return@on
+                }
+
+                if (button != 0) {
+                    cancel()
+                    return@on
+                }
+
                 when {
-                    s == slot -> {
+                    selected == slot -> {
                         selected = null
                     }
 
-                    s != null && ((s in 36..44) != (slot in 36..44)) -> {
-                        SlotBinds.bind(s, slot)
+                    selected != null && ((selected in 36..44) != (slot in 36..44)) -> {
+                        SlotBinds.bind(selected ?: 0, slot)
                         selected = null
                     }
 
-                    bound && s == null -> {
+                    fn(slot) && selected == null -> {
                         SlotBinds.cycle(slot)
                     }
 
@@ -274,121 +465,19 @@ object SlotBindsGUI : Scram("Slot Binds Editor [Athen]") {
                     }
                 }
 
-                return true
-            }
-        }
-
-        if (button == 1) {
-            val z = zones.lastOrNull { it.type == ZoneType.PROFILE_TAB && it.category.isNotEmpty() && hovered(it.x, it.y, it.w, it.h, true) }
-            deleting = if (z == null || deleting == z.category) null else z.category
-            return true
-        }
-
-        if (button != 0) return false
-
-        val hit = zones.lastOrNull { hovered(it.x, it.y, it.w, it.h, true) } ?: return false
-        val zt = hit.type as? ZoneType ?: return false
-
-        when (zt) {
-            ZoneType.PROFILE_TAB -> {
-                val name = hit.category
-                if (deleting != null && deleting == name) {
-                    if (SlotBinds.map0.size > 1) {
-                        SlotBinds.save()
-                        SlotBinds.delete(name)
-                    }
-
-                    deleting = null
-                    return true
-                }
-
-                deleting = null
-                selected = null
-
-                if (name != SlotBinds.active) {
-                    SlotBinds.save()
-                    SlotBinds.disk()
-                    SlotBinds.load(name)
-                }
+                cancel()
+                slots()
             }
 
-            ZoneType.PROFILE_ADD -> {
-                SlotBinds.save()
-                SlotBinds.disk()
-
-                creating = true
-                deleting = null
-                selected = null
-
-                name.reset(true)
-                name.focused = true
-            }
-
-            ZoneType.PROFILE_NAME -> {
-                name.focused = true
-                name.updateClick(mouseX, hit.x)
-            }
-
-            ZoneType.SLOT -> {}
+            attach(preview)
+            adopt(text {
+                text = slot.toString().literal()
+                color = Mocha.Subtext0.argb
+                position = CenterPositionConstraint()
+                shadow = false
+            }.also { label0 = it })
         }
 
-        return true
+        cells[slot] = SlotCell(cell, label0)
     }
-
-    override fun onScramKeyPress(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-        if (!creating) return super.onScramKeyPress(keyCode, scanCode, modifiers)
-
-        if (keyCode == GLFW.GLFW_KEY_ENTER) {
-            create()
-            return true
-        }
-
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            name.reset(true)
-            creating = false
-            return true
-        }
-
-        if (name.focused) {
-            name.handleKey(keyCode, modifiers)
-        }
-
-        return true
-    }
-
-    override fun onScramCharType(char: Char): Boolean {
-        if (creating && name.focused) return name.handleChar(char)
-        return super.onScramCharType(char)
-    }
-
-    override fun onScramMouseScroll(mouseX: Int, mouseY: Int, horizontal: Double, vertical: Double): Boolean {
-        val pw = 110 + 6 + 210
-        val px = (width - pw) / 2
-        if (mouseX < px || mouseX > px + 110) return false
-
-        s = (s + (vertical * 10).toInt()).coerceIn(-maxOf(0, (SlotBinds.map0.size * 20 + 18) - 152), 0)
-        return true
-    }
-
-    private fun create() {
-        val str = name.value.trim()
-        if (str.isNotEmpty() && !SlotBinds.map0.containsKey(str)) {
-            SlotBinds.save()
-            SlotBinds.disk()
-            SlotBinds.add(str)
-        }
-
-        name.reset(true)
-        creating = false
-    }
-
-    private fun fn(int: Int): Boolean =
-        SlotBinds.m0.containsKey(int) || SlotBinds.m1.containsKey(int)
-
-    private fun pos(slot: Int, invX: Int, invY: Int, hotY: Int): Pair<Int, Int>? =
-        when (slot) {
-            in 9..35 -> (invX + (slot - 9) % 9 * 20 + 9) to (invY + (slot - 9) / 9 * 20 + 9)
-            in 36..44 -> (invX + (slot - 36) * 20 + 9) to (hotY + 9)
-            else -> null
-        }
 }

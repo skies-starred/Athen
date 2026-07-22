@@ -342,6 +342,20 @@ object SlotBinds : Module(
         sync(map0[active] ?: Int2IntOpenHashMap(), map1[active])
     }
 
+    fun rename(old: String, new: String) {
+        if (old == new || new.isBlank() || map0.containsKey(new)) return
+
+        val entries0 = map0.entries.toList()
+        val entries1 = map1.entries.toList()
+        map0.clear()
+        map1.clear()
+
+        for ((k, v) in entries0) map0[if (k == old) new else k] = v
+        for ((k, v) in entries1) map1[if (k == old) new else k] = v
+
+        if (active == old) active = new
+    }
+
     private fun rk(k: Int) {
         val v = m0.remove(k)
         m2.remove(k)
