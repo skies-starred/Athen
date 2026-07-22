@@ -41,32 +41,22 @@ import xyz.aerii.library.utils.stripped
 
 class DungeonPlayer(
     val name: String,
-    dungeonClass: DungeonClass? = null,
-    classLevel: Int? = null
+    dungeonClass: DungeonClass? = null
 ) {
     var deaths = 0
 
     var dungeonClass: DungeonClass? = dungeonClass
         internal set
 
-    var classLevel: Int? = classLevel
-        internal set
-
-    var cataLevel: Int? = null
-        internal set
-
-    var dead = false
-        internal set
-
     val entity by Expirable(::d) { !it.isAlive }
 
     init {
-        Athen.LOGGER.debug("Created KuudraPlayer with entity: {}", entity)
+        Athen.LOGGER.debug("Created DungeonPlayer with entity: {}", entity)
     }
 
     private fun d(): Entity? =
         level?.players()?.find { it.uuid.version() == 4 && it.name.stripped() == name }
 
     override fun toString() =
-        "DungeonPlayer(name='$name', dead=$dead, class=$dungeonClass, classLevel=$classLevel, cataLevel=$cataLevel)"
+        "DungeonPlayer(name='$name, class=$dungeonClass)"
 }

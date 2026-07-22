@@ -33,13 +33,8 @@
 package xyz.aerii.athen.api.dungeon
 
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
-import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonKey
-import tech.thatgravyboat.skyblockapi.api.data.MayorPerks
-import tech.thatgravyboat.skyblockapi.utils.extentions.parseRomanOrArabic
-import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.anyMatch
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.find
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findThenNull
-import tech.thatgravyboat.skyblockapi.utils.regex.matchWhen
 import xyz.aerii.athen.annotations.Priority
 import xyz.aerii.athen.api.dungeon.enums.DungeonClass
 import xyz.aerii.athen.api.dungeon.enums.DungeonPlayer
@@ -56,18 +51,8 @@ import xyz.aerii.library.utils.stripped
 @Priority
 object DungeonAPI {
     // <editor-fold desc="Regex & Variables">
-    private val watcherSpawnedAllRegex = Regex("""^\[BOSS] The Watcher: That will be enough for now\.$""")
-    private val watcherKilledAllRegex = Regex("^\\[BOSS] The Watcher: You have proven yourself\\. You may pass\\.$")
-
     private val dungeonFloorRegex = Regex("The Catacombs \\((?<floor>.+)\\)")
 
-    private val keyObtainedRegex = Regex("^(?:\\[.+] ?)?\\w+ has obtained (?<type>\\w+) Key!$")
-    private val keyPickedUpRegex = Regex("^A (?<type>\\w+) Key was picked up!$")
-
-    private val witherDoorOpenRegex = Regex("^\\w+ opened a WITHER door!$")
-    private val bloodDoorOpenRegex = Regex("^The BLOOD DOOR has been opened!$")
-
-    private val startRegex = Regex("^\\[NPC] Mort: Here, I found this map when I first entered the dungeon\\.$")
     private val endRegex = Regex("""^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$""")
     private val bossStartRegex = Regex("^\\[BOSS] (?<boss>.+?):")
 
@@ -78,57 +63,60 @@ object DungeonAPI {
     private val playerGhostRegex = Regex("^ ☠ (?<name>[A-Za-z0-9_]+) .+ became a ghost\\.$")
 
     private val cataRegex = Regex("^ Catacombs (?<level>\\d+):")
-    private val locationRegex = Regex(" *[⏣ф] *(?<location>(?:\\s?[^ൠ\\s]+)*)(?: ൠ x\\d)?")
+    private val locationRegex = Regex(" *[⏣ф\uE067\uE020] *(?<location>(?:\\s?[^[ൠ\uE018]\\s]+)*)(?: [ൠ\uE018] x\\d)?")
 
     val bloodOpened: Observable<Boolean> = Observable(false)
     val bloodKilledAll: Observable<Boolean> = Observable(false)
     val bloodSpawnedAll: Observable<Boolean> = Observable(false)
-
-    var floorStarted = false
-        private set
-    var floorCompleted = false
-        private set
-
-    var witherKeys = 0
-        private set
-    var bloodKeys = 0
-        private set
 
     val F7Phase: Observable<Int> = Observable(0)
     val P3Phase: Observable<Int> = Observable(0)
     val floor: Observable<DungeonFloor?> = Observable(null)
     val inBoss: Observable<Boolean> = Observable(false)
 
-    var uniqueClass = false
+    var started = false
+        private set
+
+    var complete = false
+        private set
+
+    var unique = false
         private set
 
     var teammates: List<DungeonPlayer> = emptyList()
         private set
 
-    var ownPlayer: DungeonPlayer? = null
+    var self: DungeonPlayer? = null
         private set
 
     val dungeonClass: DungeonClass?
-        get() = ownPlayer?.dungeonClass
-
-    val classLevel: Int
-        get() = ownPlayer?.classLevel ?: 0
-
-    val cataLevel: Int
-        get() = ownPlayer?.cataLevel ?: 0
-
-    val isPaul: Boolean
-        get() = MayorPerks.EZPZ.active
+        get() = self?.dungeonClass
     // </editor-fold>
 
     init {
         on<LocationEvent.Hypixel.Island> {
-            reset()
+            "DungeonAPI: Cleaning up.".devMessage()
+
+            bloodKilledAll.value = false
+            bloodSpawnedAll.value = false
+            bloodOpened.value = false
+
+            complete = false
+            started = false
+
+            unique = false
+            inBoss.value = false
+            F7Phase.value = 0
+            P3Phase.value = 0
+            floor.value = null
+
+            teammates = emptyList()
+            self = null
         }
 
         on<TabListEvent.Change> {
             val firstColumn = new.firstOrNull() ?: return@on
-            val ownName = name
+            val str = name
             val next = arrayOfNulls<DungeonPlayer>(5)
 
             for (i in 0 until 5) {
@@ -138,55 +126,35 @@ object DungeonAPI {
                 val match = playerTabRegex.find(firstColumn[idx].stripped()) ?: continue
                 val name = match.groups["name"]?.value ?: continue
                 val classStr = match.groups["class"]?.value ?: "EMPTY"
-                val level = match.groups["level"]?.value?.parseRomanOrArabic()
 
                 val player = teammates.getOrNull(i)?.takeIf { it.name == name } ?: DungeonPlayer(name)
-
                 player.dungeonClass = DungeonClass.get(classStr)
-                player.classLevel = level
-                player.dead = classStr == "DEAD"
 
-                if (name == ownName) ownPlayer = player
+                if (name == str) self = player
                 next[i] = player
             }
 
             teammates = next.filterNotNull()
         }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
 
-        on<TabListEvent.Change> {
-            val lines = new.getOrNull(3) ?: return@on
+        on<LocationEvent.Hypixel.Area> {
+            dungeonFloorRegex.find(new.string, "floor") { (f) ->
+                val old = floor.value
+                val new = DungeonFloor.getByName(f)
+                if (old == new) return@find
 
-            for (line in lines) {
-                cataRegex.findThenNull(line.stripped(), "level") { (level) ->
-                    if (level.toIntOrNull() == null || level.toIntOrNull() == cataLevel) return@findThenNull
-
-                    ownPlayer?.cataLevel = level.toInt()
-                } ?: return@on
-            }
-        }.runWhen(SkyBlockIsland.DUNGEON_HUB.inIsland)
-
-        on<ScoreboardEvent.Update> {
-            locationRegex.anyMatch(new, "location") { (location) ->
-                dungeonFloorRegex.find(location, "floor") { (f) ->
-                    val old = floor.value
-                    val new = DungeonFloor.getByName(f)
-
-                    if (old == new) return@find
-
-                    floor.value = new
-                    floor.value?.let { DungeonEvent.Enter(it).post() }
-                }
+                floor.value = new
+                floor.value?.let { DungeonEvent.Enter(it).post() }
             }
         }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
 
         on<MessageEvent.Chat.Receive> {
-            playerGhostRegex.findThenNull(stripped, "name") { (name) ->
-                var name = name
-                if (name == "You") player?.let { name = it.name.stripped() }
+            playerGhostRegex.findThenNull(stripped, "name") { (s) ->
+                var n0 = s
+                if (n0 == "You") n0 = name
 
                 for (t in teammates) {
-                    if (t.name != name) continue
-                    t.dead = true
+                    if (t.name != n0) continue
                     t.deaths++
                     DungeonEvent.Player.Death(t).post()
                     "DungeonAPI: Player died! Player deaths: ${t.deaths}".devMessage()
@@ -201,70 +169,43 @@ object DungeonAPI {
             }
 
             when {
-                watcherSpawnedAllRegex.matches(stripped) -> {
+                stripped == "[BOSS] The Watcher: That will be enough for now." -> {
                     bloodSpawnedAll.value = true
-                    return@on
                 }
 
-                watcherKilledAllRegex.matches(stripped) -> {
+                stripped == "[BOSS] The Watcher: You have proven yourself. You may pass." -> {
                     bloodKilledAll.value = true
-                    return@on
                 }
 
                 uniqueClassRegex.matches(stripped) -> {
-                    uniqueClass = true
-                    return@on
+                    unique = true
                 }
 
                 endRegex.matches(stripped) -> {
-                    floorCompleted = true
+                    complete = true
                     floor.value?.let { (DungeonEvent.End(it)).post() }
                     "DungeonAPI: Floor ended.".devMessage()
-                    return@on
                 }
 
-                !floorStarted && startRegex.matches(stripped) -> {
-                    floorStarted = true
+                !started && stripped == "[NPC] Mort: Here, I found this map when I first entered the dungeon." -> {
+                    started = true
                     floor.value?.let { (DungeonEvent.Start(it)).post() }
                     "DungeonAPI: Floor started.".devMessage()
-                    return@on
                 }
 
                 sectionCompleteRegex.matches(stripped) -> {
                     P3Phase.value++
                     "DungeonAPI: P3 Phase set to $P3Phase.".devMessage()
-                    return@on
                 }
 
                 stripped == "[BOSS] Storm: I should have known that I stood no chance." -> {
                     P3Phase.value = 1
                     "DungeonAPI: P3 Phase set to 1.".devMessage()
-                    return@on
                 }
 
                 stripped == "The Core entrance is opening!" -> {
                     P3Phase.value = 0
                     "DungeonAPI: P3 Phase set to 0.".devMessage()
-                    return@on
-                }
-            }
-
-            matchWhen(stripped) {
-                case(keyObtainedRegex, "type") { (type) ->
-                    handleGetKey(type)
-                }
-
-                case(keyPickedUpRegex, "type") { (type) ->
-                    handleGetKey(type)
-                }
-
-                case(witherDoorOpenRegex) {
-                    if (witherKeys > 0) --witherKeys
-                }
-
-                case(bloodDoorOpenRegex) {
-                    if (bloodKeys > 0) --bloodKeys
-                    bloodOpened.value = true
                 }
             }
         }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
@@ -284,38 +225,5 @@ object DungeonAPI {
                 }
             }
         }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
-    }
-
-    fun reset() {
-        "DungeonAPI: Cleaning up.".devMessage()
-
-        bloodKilledAll.value = false
-        bloodSpawnedAll.value = false
-        bloodOpened.value = false
-
-        floorCompleted = false
-        floorStarted = false
-
-        witherKeys = 0
-        bloodKeys = 0
-
-        uniqueClass = false
-        inBoss.value = false
-        F7Phase.value = 0
-        P3Phase.value = 0
-        floor.value = null
-
-        teammates = emptyList()
-        ownPlayer = null
-    }
-
-    private fun handleGetKey(type: String) {
-        val key = DungeonKey.getById(type) ?: return
-        when (key) {
-            DungeonKey.WITHER -> ++witherKeys
-            DungeonKey.BLOOD -> ++bloodKeys
-        }
-
-        DungeonEvent.KeyPickUp(key).post()
     }
 }

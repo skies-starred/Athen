@@ -34,8 +34,4 @@ sealed class DungeonEvent {
             val items: List<ItemStack>
         ) : Event()
     }
-
-    data class KeyPickUp(
-        val key: DungeonKey
-    ) : Event()
 }
