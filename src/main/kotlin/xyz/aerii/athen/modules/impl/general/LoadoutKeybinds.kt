@@ -38,8 +38,8 @@ object LoadoutKeybinds : Module(
 
     private val swapKey by config.switch("Swap key").childOf { keybindExpandable }
     private val swapKeybind by config.keybind("Swap keybind").dependsOn { swapKey }.childOf { keybindExpandable }
-    private val swapKey1 by config.dropdown("Swap slot 1", listOf("Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6", "Slot 7", "Slot 8", "Slot 9")).dependsOn { swapKey }.childOf { keybindExpandable }
-    private val swapKey2 by config.dropdown("Swap slot 2", listOf("Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6", "Slot 7", "Slot 8", "Slot 9")).dependsOn { swapKey }.childOf { keybindExpandable }
+    private val swapKey1 by config.dropdown("Swap slot 1", listOf("Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6", "Slot 7", "Slot 8", "Slot 9", "Slot 10", "Slot 11", "Slot 12")).dependsOn { swapKey }.childOf { keybindExpandable }
+    private val swapKey2 by config.dropdown("Swap slot 2", listOf("Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6", "Slot 7", "Slot 8", "Slot 9", "Slot 10", "Slot 11", "Slot 12")).dependsOn { swapKey }.childOf { keybindExpandable }
 
     private val prevPage by config.keybind("Previous page").childOf { keybindExpandable }
     private val nextPage by config.keybind("Next page").childOf { keybindExpandable }
@@ -64,18 +64,18 @@ object LoadoutKeybinds : Module(
     var open: Boolean = false
 
     val slots = listOf(
-        LoadoutSlot(14, { acc(0) }, { key0 }),
-        LoadoutSlot(15, { acc(1) }, { key1 }),
-        LoadoutSlot(16, { acc(2) }, { key2 }),
-        LoadoutSlot(23, { acc(3) }, { key3 }),
-        LoadoutSlot(24, { acc(4) }, { key4 }),
-        LoadoutSlot(25, { acc(5) }, { key5 }),
-        LoadoutSlot(32, { acc(6) }, { key6 }),
-        LoadoutSlot(33, { acc(7) }, { key7 }),
-        LoadoutSlot(34, { acc(8) }, { key8 }),
-        LoadoutSlot(41, { acc(8) }, { key9 }),
-        LoadoutSlot(42, { acc(8) }, { key10 }),
-        LoadoutSlot(43, { acc(8) }, { key11 })
+        LoadoutSlot(0, 14, { acc(0) }, { key0 }),
+        LoadoutSlot(1, 15, { acc(1) }, { key1 }),
+        LoadoutSlot(2, 16, { acc(2) }, { key2 }),
+        LoadoutSlot(3, 23, { acc(3) }, { key3 }),
+        LoadoutSlot(4, 24, { acc(4) }, { key4 }),
+        LoadoutSlot(5, 25, { acc(5) }, { key5 }),
+        LoadoutSlot(6, 32, { acc(6) }, { key6 }),
+        LoadoutSlot(7, 33, { acc(7) }, { key7 }),
+        LoadoutSlot(8, 34, { acc(8) }, { key8 }),
+        LoadoutSlot(9, 41, { acc(8) }, { key9 }),
+        LoadoutSlot(10, 42, { acc(8) }, { key10 }),
+        LoadoutSlot(11, 43, { acc(8) }, { key11 })
     )
 
     init {
@@ -123,8 +123,8 @@ object LoadoutKeybinds : Module(
 
         if (swapKey && key == swapKeybind) {
             if (swapKey1 == swapKey2) return
-            val slot1 = slots.find { it.idx == swapKey1 + 14 }?.takeIf { it.slot?.item?.isEmpty == false } ?: return
-            val slot2 = slots.find { it.idx == swapKey2 + 14 }?.takeIf { it.slot?.item?.isEmpty == false } ?: return
+            val slot1 = slots.getOrNull(swapKey1)?.takeIf { it.slot?.item?.isEmpty == false } ?: return
+            val slot2 = slots.getOrNull(swapKey1)?.takeIf { it.slot?.item?.isEmpty == false } ?: return
             val s = if (slot1.equipped) slot2.idx else slot1.idx
 
             guiClick(container.containerId, s)
@@ -151,6 +151,7 @@ object LoadoutKeybinds : Module(
     }
 
     data class LoadoutSlot(
+        val index: Int,
         val idx: Int,
         val acc: () -> KeyMappingAccessor,
         val keybind: () -> Int
