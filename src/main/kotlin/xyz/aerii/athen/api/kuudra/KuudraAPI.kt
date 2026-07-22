@@ -125,7 +125,7 @@ object KuudraAPI {
             val e = entity as? Giant ?: return@on
 
             if (supplies.any { it.entity == e } || fuels.any { it.entity == e }) return@on
-            if (e.mainHandItem?.getTexture() !in set0) return@on
+            if (e.mainHandItem.getTexture() !in set0) return@on
 
             val s = AbstractSupply(e)
             if (phase == KuudraPhase.Supply) supplies += s
