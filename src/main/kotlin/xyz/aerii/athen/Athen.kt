@@ -82,7 +82,7 @@ object Athen : ClientModInitializer {
     private fun ping() {
         "ping".api.request(type = Request.POST) {
             body(mapOf(
-                "uuid" to (client.user.profileId ?: client.player?.uuid ?: client.user.name),
+                "uuid" to (client.user.profileId),
                 "mod_version" to modVersion,
                 "game_version" to SharedConstants.getCurrentVersion().name()
             ))
