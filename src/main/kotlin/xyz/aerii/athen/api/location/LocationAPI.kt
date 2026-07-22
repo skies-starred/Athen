@@ -38,6 +38,8 @@ import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.anyMatch
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findGroup
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.aerii.athen.annotations.Priority
+import xyz.aerii.athen.api.location.area.base.ISkyBlockArea
+import xyz.aerii.athen.api.location.area.impl.CustomSkyBlockArea
 import xyz.aerii.athen.events.LocationEvent
 import xyz.aerii.athen.events.ScoreboardEvent
 import xyz.aerii.athen.events.TabListEvent
@@ -59,7 +61,7 @@ object LocationAPI {
 
     val island = Observable<SkyBlockIsland?>(null)
 
-    val area = Observable(SkyBlockArea.NONE)
+    val area: Observable<ISkyBlockArea> = Observable(SkyBlockArea.NONE)
 
     var serverId: String? = null
         private set
@@ -121,7 +123,7 @@ object LocationAPI {
         on<ScoreboardEvent.Update> {
             locationRegex.anyMatch(added, "location") { (location) ->
                 val old = area.value
-                area.value = SkyBlockArea.getByKey(location) ?: SkyBlockArea.NONE
+                area.value = SkyBlockArea.getByKey(location) ?: CustomSkyBlockArea(location)
                 LocationEvent.Hypixel.Area(old, area.value).post()
             }
 
