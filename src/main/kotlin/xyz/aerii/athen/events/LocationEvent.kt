@@ -3,6 +3,7 @@ package xyz.aerii.athen.events
 import net.hypixel.data.type.ServerType
 import xyz.aerii.athen.api.location.SkyBlockArea
 import xyz.aerii.athen.api.location.SkyBlockIsland
+import xyz.aerii.athen.api.location.area.base.ISkyBlockArea
 import xyz.aerii.athen.events.core.Event
 
 sealed class LocationEvent {
@@ -21,8 +22,8 @@ sealed class LocationEvent {
         ) : Event()
 
         data class Area(
-            val old: SkyBlockArea,
-            val new: SkyBlockArea
+            val old: ISkyBlockArea,
+            val new: ISkyBlockArea
         ) : Event()
     }
 

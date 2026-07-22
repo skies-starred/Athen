@@ -59,7 +59,7 @@ object ProtectItems : Module(
     init {
         on<PlayerEvent.Drop> {
             if (item?.fn() != true) return@on
-            if (!gui && DungeonAPI.floorStarted) return@on
+            if (!gui && DungeonAPI.started) return@on
 
             "Prevented dropping item! <gray>[ProtectItems]".parse().modMessage()
             cancel()
