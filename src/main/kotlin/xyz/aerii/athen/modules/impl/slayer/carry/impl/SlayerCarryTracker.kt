@@ -430,7 +430,7 @@ object SlayerCarryTracker : Module(
         }
 
         tracked.update { add(SlayerCarryPlayer(name, type, tier, count)) }
-        "<green>Now tracking <aqua>$name <gray>[${type.short}${tier?.let { " T$it" } ?: " Any"}] x$count!".parse().modMessage()
+        "<green>Now tracking <aqua>$name <gray>[${type.short}${tier?.let { " T${it.int}" } ?: " Any"}] x$count!".parse().modMessage()
     }
 
     private val SlayerBoss.price: Map<SlayerTier, String>?
