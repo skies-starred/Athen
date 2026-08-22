@@ -301,7 +301,10 @@ enum class SkyBlockArea(val key: String, val displayName: String, override val s
     RAMPARTS_QUARRY("ramparts_quarry", "Rampart's Quarry"),
     FAR_RESERVE("far_reserve", "Far Reserve"),
     UPPER_MINES("upper_mines", "Upper Mines"),
-    ABANDONED_QUARRY("abandoned_quarry", "Abandoned Quarry")
+    ABANDONED_QUARRY("abandoned_quarry", "Abandoned Quarry"),
+
+    // Critter Safari
+    SAFARI_ZONE("safari_zone", "Safari Zone")
     ;
 
     val inArea: Observable<Boolean>

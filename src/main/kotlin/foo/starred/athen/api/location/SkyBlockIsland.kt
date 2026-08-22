@@ -51,6 +51,8 @@ enum class SkyBlockIsland(val id: String, displayName: String? = null) {
     BACKWATER_BAYOU("fishing_1"),
     LOTUS_ATOLL("lotus_atoll"),
     GALATEA("foraging_2"),
+    TORRHUS_CANYON("foraging_3"),
+    SAFARI("safari", "Critter Safari"),
 
     THE_RIFT("rift"),
     DARK_AUCTION("dark_auction"),
