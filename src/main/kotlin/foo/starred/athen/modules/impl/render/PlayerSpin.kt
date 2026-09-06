@@ -24,7 +24,7 @@ object PlayerSpin : Module(
     private val body1 by config.slider("Body speed", 1f, 0f, 10f, double = true)
 
     init {
-        on<WorldRenderEvent.Entity.Pre> {
+        on<WorldRenderEvent.Entity> {
             val r = renderState as? AvatarRenderState ?: return@on
             val e = entity as? LocalPlayer ?: return@on
 

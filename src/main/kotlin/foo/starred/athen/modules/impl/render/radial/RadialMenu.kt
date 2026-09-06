@@ -268,7 +268,7 @@ object RadialMenu : Module(
             i0 = RadialRenderState.hit(mouseSX, mouseSY, x1, y1, maxOf(1, current.size), radius1, radius2, direction || (type == 2 && i2 != -1))
         }.runWhen(open)
 
-        on<GuiEvent.Render.Post> {
+        on<GuiEvent.Render.Any.Post> {
             val x = graphics.guiWidth() / 2
             val y = graphics.guiHeight() / 2
             val size = maxOf(1, current.size)

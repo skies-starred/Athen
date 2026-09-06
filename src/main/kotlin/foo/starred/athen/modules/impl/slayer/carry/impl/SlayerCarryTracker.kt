@@ -344,7 +344,7 @@ object SlayerCarryTracker : Module(
             }
         }
 
-        on<WorldRenderEvent.Entity.Post> {
+        on<WorldRenderEvent.Entity> {
             val e = entity as? LivingEntity ?: return@on
             if (e.carry == null) return@on
 

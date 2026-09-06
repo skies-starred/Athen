@@ -14,22 +14,18 @@ import net.minecraft.world.item.ItemStack
 
 sealed class GuiEvent {
     sealed class Render {
-        data class Pre(
-            val graphics: GuiGraphicsExtractor
-        ) : Event()
-
-        data class Main(
-            val graphics: GuiGraphicsExtractor
-        ) : Event()
-
-        data class Post(
-            val graphics: GuiGraphicsExtractor
-        ) : Event()
-
-        sealed class Container {
+        sealed class Any {
             data class Pre(
                 val graphics: GuiGraphicsExtractor
-            ) : CancellableEvent()
+            ) : Event()
+
+            data class Main(
+                val graphics: GuiGraphicsExtractor
+            ) : Event()
+
+            data class Post(
+                val graphics: GuiGraphicsExtractor
+            ) : Event()
         }
 
         sealed class Screen {
@@ -73,21 +69,17 @@ sealed class GuiEvent {
 
     sealed class Slots {
         sealed class Render {
-            data class Pre(
-                val graphics: GuiGraphicsExtractor,
-                val slot: Slot
-            ) : CancellableEvent()
+            sealed class Any {
+                data class Pre(
+                    val graphics: GuiGraphicsExtractor,
+                    val slot: Slot
+                ) : CancellableEvent()
 
-            data class Post(
-                val graphics: GuiGraphicsExtractor,
-                val slot: Slot
-            ) : Event()
-
-            data class Update(
-                val graphics: GuiGraphicsExtractor,
-                val slot: Slot,
-                val renders: MutableList<(GuiGraphicsExtractor, Slot) -> Unit>
-            ) : CancellableEvent()
+                data class Post(
+                    val graphics: GuiGraphicsExtractor,
+                    val slot: Slot
+                ) : Event()
+            }
 
             sealed class Hotbar {
                 data class Pre(
@@ -106,20 +98,22 @@ sealed class GuiEvent {
             }
         }
 
-        data class Click(
-            val slot: Slot?,
-            val slotId: Int,
-            val mouseButton: Int,
-            val clickType: ContainerInput
-        ) : CancellableEvent()
+        sealed class Input {
+            data class Click(
+                val slot: Slot?,
+                val slotId: Int,
+                val mouseButton: Int,
+                val clickType: ContainerInput
+            ) : CancellableEvent()
 
-        data class Hover(
-            val slot: Slot
-        ) : Event()
+            data class Hover(
+                val slot: Slot
+            ) : Event()
 
-        data class Unhover(
-            val slot: Slot
-        ) : Event()
+            data class Unhover(
+                val slot: Slot
+            ) : Event()
+        }
     }
 
     sealed class Items {

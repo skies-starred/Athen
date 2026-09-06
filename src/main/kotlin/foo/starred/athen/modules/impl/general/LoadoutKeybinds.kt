@@ -100,7 +100,7 @@ object LoadoutKeybinds : Module(
             if (open) fn(keyEvent.button())
         }
 
-        on<GuiEvent.Render.Container.Pre> {
+        on<GuiEvent.Render.Screen.Pre> {
             if (open) cancel()
         }.runWhen(cancelRender.state)
     }

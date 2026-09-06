@@ -9,21 +9,12 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.state.level.CameraRenderState
 
 sealed class WorldRenderEvent {
-    sealed class Entity {
-        data class Pre(
-            val renderState: EntityRenderState,
-            val poseStack: PoseStack,
-            val cameraRenderState: CameraRenderState,
-            val entity: net.minecraft.world.entity.Entity?
-        ) : CancellableEvent()
-
-        data class Post(
-            val renderState: EntityRenderState,
-            val poseStack: PoseStack,
-            val cameraRenderState: CameraRenderState,
-            val entity: net.minecraft.world.entity.Entity?
-        ) : Event()
-    }
+    class Entity(
+        val renderState: EntityRenderState,
+        val poseStack: PoseStack,
+        val cameraRenderState: CameraRenderState,
+        val entity: net.minecraft.world.entity.Entity?
+    ) : CancellableEvent()
 
     data object Extract : Event()
 

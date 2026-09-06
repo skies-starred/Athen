@@ -50,7 +50,7 @@ object ScrollableTooltip : Module(
     private var sc: Double = 1.0
 
     init {
-        on<GuiEvent.Slots.Hover> {
+        on<GuiEvent.Slots.Input.Hover> {
             if (reset) reset()
         }
 

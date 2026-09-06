@@ -33,11 +33,11 @@ object GameTint : Module(
             _state.value = false
         }
 
-        on<GuiEvent.Render.Pre>(-100) {
+        on<GuiEvent.Render.Any.Pre>(-100) {
             graphics.tint()
         }.runWhen(state and last.state.map { !it })
 
-        on<GuiEvent.Render.Post>(-100) {
+        on<GuiEvent.Render.Any.Post>(-100) {
             graphics.tint()
         }.runWhen(state and last.state)
 

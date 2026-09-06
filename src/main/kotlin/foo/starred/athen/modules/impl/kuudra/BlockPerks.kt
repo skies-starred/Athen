@@ -52,7 +52,7 @@ object BlockPerks : Module(
             menu = false
         }
 
-        on<GuiEvent.Slots.Render.Pre> {
+        on<GuiEvent.Slots.Render.Any.Pre> {
             if (!menu) return@on
             if (!key.bound) return@on
             if (key.pressed) return@on
@@ -63,7 +63,7 @@ object BlockPerks : Module(
             cancel()
         }.runWhen(cancelRender.state)
 
-        on<GuiEvent.Slots.Click> {
+        on<GuiEvent.Slots.Input.Click> {
             if (!menu) return@on
             if (!key.bound) return@on
             if (key.pressed) return@on

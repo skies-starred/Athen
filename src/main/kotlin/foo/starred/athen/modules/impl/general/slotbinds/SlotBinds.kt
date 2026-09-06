@@ -177,7 +177,7 @@ object SlotBinds : Module(
             }
         }
 
-        on<GuiEvent.Slots.Click> {
+        on<GuiEvent.Slots.Input.Click> {
             //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
             val s = client.screen as? InventoryScreen ?: return@on
             val h = slot?.index ?: return@on
@@ -245,11 +245,10 @@ object SlotBinds : Module(
             cancel()
         }
 
-        on<GuiEvent.Slots.Render.Post> {
+        on<GuiEvent.Render.Screen.Post> {
             //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
             val s = client.screen as? InventoryScreen ?: return@on
             val m = s.menu.slots
-            if (slot != m.last()) return@on
 
             val pose = Matrix3x2f(graphics.pose())
             val screen = graphics.scissorStack.peek()

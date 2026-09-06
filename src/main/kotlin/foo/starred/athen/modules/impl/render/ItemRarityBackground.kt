@@ -59,7 +59,7 @@ object ItemRarityBackground : Module(
             graphics.fn(item, x, y)
         }.runWhen(mode.state.map { it == 0 })
 
-        on<GuiEvent.Slots.Render.Pre> {
+        on<GuiEvent.Slots.Render.Any.Pre> {
             graphics.fn(slot.item, slot.x, slot.y)
         }.runWhen(mode.state.map { it == 1 })
 

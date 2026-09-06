@@ -20,18 +20,18 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 public abstract class GuiMixin {
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     private void athen$render$pre(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        new GuiEvent.Render.Pre(graphics).post();
+        new GuiEvent.Render.Any.Pre(graphics).post();
     }
 
     //~ if >= 26.2 'gui/Gui;' -> 'gui/Hud;'
     @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractSleepOverlay(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
     private void athen$render$main(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        new GuiEvent.Render.Main(graphics).post();
+        new GuiEvent.Render.Any.Main(graphics).post();
     }
 
     @Inject(method = "extractRenderState", at = @At("TAIL"))
     private void athen$render$post(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        new GuiEvent.Render.Post(graphics).post();
+        new GuiEvent.Render.Any.Post(graphics).post();
     }
 
     @Inject(method = "extractCrosshair", at = @At("HEAD"), cancellable = true)

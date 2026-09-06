@@ -112,7 +112,7 @@ object WardrobeKeybinds : Module(
             if (inMenu) fn(keyEvent.button())
         }
 
-        on<GuiEvent.Render.Container.Pre> {
+        on<GuiEvent.Render.Screen.Pre> {
             if (inMenu) cancel()
         }.runWhen(cancelRender.state)
     }

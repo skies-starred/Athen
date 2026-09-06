@@ -20,7 +20,7 @@ object ArrowHitboxes : Module(
     private val thickness by config.slider("Thickness", 2f, 1f, 10f)
 
     init {
-        on<WorldRenderEvent.Entity.Post> {
+        on<WorldRenderEvent.Entity> {
             if (renderState !is ArrowRenderState) return@on
             val entity = entity ?: return@on
 

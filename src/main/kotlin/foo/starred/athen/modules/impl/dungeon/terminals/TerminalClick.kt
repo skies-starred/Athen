@@ -40,7 +40,7 @@ object TerminalClick : Module(
             clicks.add(Click(mouseSX, mouseSY, keyEvent.button()))
         }.runWhen(TerminalAPI.opened)
 
-        on<GuiEvent.Render.Post> {
+        on<GuiEvent.Render.Any.Post> {
             val cs = clicks.toList()
             if (cs.isEmpty()) return@on
 

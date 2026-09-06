@@ -17,7 +17,7 @@ object HUDManager {
     val elements = mutableMapOf<String, HUDElement>()
 
     init {
-        on<GuiEvent.Render.Main> {
+        on<GuiEvent.Render.Any.Main> {
             //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
             if (client.screen is HUDEditor) return@on
             //~ if >= 26.2 'client.options.hideGui' -> 'client.gui.hud.isHidden'

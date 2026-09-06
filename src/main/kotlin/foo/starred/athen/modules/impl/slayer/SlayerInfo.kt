@@ -118,7 +118,7 @@ object SlayerInfo : Module(
             hideCache.clear()
         }
 
-        on<WorldRenderEvent.Entity.Pre> {
+        on<WorldRenderEvent.Entity> {
             if (entities.isEmpty()) return@on
 
             val entity = entity as? ArmorStand ?: return@on

@@ -55,11 +55,11 @@ object RenderOptimiser :  Module(
         get() = enabled && _effects
 
     init {
-        on<WorldRenderEvent.Entity.Pre> {
+        on<WorldRenderEvent.Entity> {
             renderState.displayFireAnimation = false
         }.runWhen(entityFire.state)
 
-        on<WorldRenderEvent.Entity.Pre> {
+        on<WorldRenderEvent.Entity> {
             val r = renderState as? AvatarRenderState ?: return@on
             val e = entity ?: return@on
 
@@ -71,7 +71,7 @@ object RenderOptimiser :  Module(
             r.fn0()
         }.runWhen(armor0.state)
 
-        on<WorldRenderEvent.Entity.Pre> {
+        on<WorldRenderEvent.Entity> {
             val r = renderState as? HumanoidRenderState ?: return@on
             if (r is AvatarRenderState) return@on
 

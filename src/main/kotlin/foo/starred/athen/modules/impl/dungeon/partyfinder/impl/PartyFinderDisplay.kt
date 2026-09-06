@@ -99,14 +99,14 @@ object PartyFinderDisplay : Module(
             }
         }
 
-        on<GuiEvent.Slots.Render.Pre> {
+        on<GuiEvent.Slots.Render.Any.Pre> {
             if (!menu0) return@on
             val color = data[slot.index]?.status?.color?.takeIf { it.alpha > 10 } ?: return@on
 
             graphics.rectangle(slot.x, slot.y, 16, 16, color)
         }.runWhen(highlight.state)
 
-        on<GuiEvent.Slots.Render.Post> {
+        on<GuiEvent.Slots.Render.Any.Post> {
             if (!menu0) return@on
             val s = data[slot.index]?.members?.size?.toString() ?: return@on
 

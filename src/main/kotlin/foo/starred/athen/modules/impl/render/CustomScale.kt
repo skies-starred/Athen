@@ -23,7 +23,7 @@ object CustomScale : Module(
     val chibiness by config.slider("Chibi factor", 2f, 1f, 5f, double = true)
 
     init {
-        on<WorldRenderEvent.Entity.Pre> {
+        on<WorldRenderEvent.Entity> {
             val r = renderState as? AvatarRenderState ?: return@on
             if (!entity.fn()) return@on
 

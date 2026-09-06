@@ -60,7 +60,7 @@ object ProtectItems : Module(
             cancel()
         }
 
-        on<GuiEvent.Slots.Click> {
+        on<GuiEvent.Slots.Input.Click> {
             if (slot?.item?.fn() != true) return@on
             if (move && clickType != ContainerInput.THROW && !fn0()) return@on
 
@@ -68,7 +68,7 @@ object ProtectItems : Module(
             cancel()
         }
 
-        on<GuiEvent.Slots.Render.Post> {
+        on<GuiEvent.Slots.Render.Any.Post> {
             if (!slot.item.fn()) return@on
             if (renderKey && !renderKeybind.pressed) return@on
 

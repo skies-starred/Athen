@@ -62,7 +62,7 @@ object ItemTweaks : Module(
     private val `showItemHex$keybind` by hex.keybind("Keybind").`watch$tooltip`()
 
     init {
-        on<GuiEvent.Slots.Render.Post> {
+        on<GuiEvent.Slots.Render.Any.Post> {
             if (slot.item.item != Items.CAKE) return@on
 
             cakeRegex.findOrNull(slot.item.displayName.stripped(), "year") {

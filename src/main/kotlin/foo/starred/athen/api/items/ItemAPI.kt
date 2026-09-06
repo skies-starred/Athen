@@ -17,7 +17,7 @@ object ItemAPI { // TODO: make this check the parent config of added keys if the
     private val `watched$tooltip` = mutableListOf<() -> Int>()
 
     init {
-        on<GuiEvent.Slots.Hover> {
+        on<GuiEvent.Slots.Input.Hover> {
             slot.item.takeIf { !it.isEmpty }?.`athen$cached$tooltip` = null
         }
 

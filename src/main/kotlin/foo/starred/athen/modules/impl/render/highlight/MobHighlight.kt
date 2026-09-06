@@ -229,7 +229,7 @@ object MobHighlight : Module(
             }
         }
 
-        on<WorldRenderEvent.Entity.Pre> {
+        on<WorldRenderEvent.Entity> {
             val e = entity ?: return@on
             val color = map.get(e.id).takeIf { it != Int.MIN_VALUE }?.or(0xFF000000.toInt()) ?: return@on
             fn1(e.renderBoundingBox, color)

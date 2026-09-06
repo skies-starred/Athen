@@ -25,12 +25,6 @@ public class EntityRenderDispatcherMixin {
     @Inject(method = "submit", at = @At("HEAD"), cancellable = true)
     private void athen$submit$pre(EntityRenderState renderState, CameraRenderState camera, double x, double y, double z, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
         Entity entity = ((EntityRenderStateDuck) renderState).athen$getEntity();
-        if (new WorldRenderEvent.Entity.Pre(renderState, poseStack, camera, entity).post()) ci.cancel();
-    }
-
-    @Inject(method = "submit", at = @At(value = "RETURN"))
-    private void athen$submit$post(EntityRenderState renderState, CameraRenderState camera, double x, double y, double z, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
-        Entity entity = ((EntityRenderStateDuck) renderState).athen$getEntity();
-        new WorldRenderEvent.Entity.Post(renderState, poseStack, camera, entity).post();
+        if (new WorldRenderEvent.Entity(renderState, poseStack, camera, entity).post()) ci.cancel();
     }
 }
