@@ -15,6 +15,9 @@ fabric-api-26-2 = "0.158.0+26.2"
 modmenu-26-1 = "3rsoV1bk"
 modmenu-26-2 = "njXb639R"
 
+caxton-26-1 = "paJOxYlD"
+caxton-26-2 = "wVI9Rvrv"
+
 entityculling-26-1 = "DhN0G638"
 entityculling-26-2 = "iiF6U3Ne"
 
@@ -55,6 +58,9 @@ cascade-26-2 = { module = "foo.starred:cascade", version.ref = "cascade-26-2" }
 
 modmenu-26-1 = { module = "maven.modrinth:modmenu", version.ref = "modmenu-26-1" }
 modmenu-26-2 = { module = "maven.modrinth:modmenu", version.ref = "modmenu-26-2" }
+
+caxton-26-1 = { module = "maven.modrinth:caxton", version.ref = "caxton-26-1" }
+caxton-26-2 = { module = "maven.modrinth:caxton", version.ref = "caxton-26-2" }
 
 entityculling-26-1 = { module = "maven.modrinth:entityculling", version.ref = "entityculling-26-1" }
 entityculling-26-2 = { module = "maven.modrinth:entityculling", version.ref = "entityculling-26-2" }

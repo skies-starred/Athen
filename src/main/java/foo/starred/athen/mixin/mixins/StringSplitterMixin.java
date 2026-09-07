@@ -14,42 +14,67 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.List;
+import java.util.Optional;
 
-@Mixin(StringSplitter.class)
+@Mixin(value = StringSplitter.class, priority = 2000)
 public abstract class StringSplitterMixin {
     @Unique
     private static final long[] athen$widths = new long[4096];
+
+    @Unique
+    private static final StringBuilder athen$sb = new StringBuilder();
+
+    @Unique
+    private static int athen$hash0;
 
     @Shadow
     public abstract float stringWidth(FormattedCharSequence text);
 
     @ModifyReturnValue(method = "stringWidth(Lnet/minecraft/network/chat/FormattedText;)F", at = @At("RETURN"))
     private float athen$stringWidth(float original, FormattedText text) {
-        if (!(text instanceof Component component)) return original;
+        if (text == null) return original;
         if (!VisualWords.INSTANCE.getEnabled()) return original;
         if (VisualWords.words.getMap0().isEmpty()) return original;
 
-        final String string = component.getString();
-        final int hash0 = athen$hash(component);
+        final String string = athen$extract(text);
+        final int hash0 = athen$hash0;
         final int hash1 = (string.hashCode() ^ hash0) & 4095;
 
         final int version = VisualWords.words.getVersion();
         final AbstractTextReplacer.Companion.Entry entry = VisualWords.words.getEntries()[hash1];
 
-        if (entry.version == version && entry.style == hash0 && string.equals(entry.string)) {
-            final int version0 = version ^ string.hashCode() ^ hash0;
-            final long packed = athen$widths[hash1];
-
-            if ((int) (packed >>> 32) == version0 && packed != 0L) {
-                return Float.intBitsToFloat((int) packed);
-            }
-
-            final float width = this.stringWidth(entry.sequence);
-            athen$widths[hash1] = ((long) version0 << 32) | (Float.floatToIntBits(width) & 0xFFFFFFFFL);
-            return width;
+        if (entry.version != version || entry.style != hash0 || !string.equals(entry.string)) {
+            return original;
         }
 
-        return original;
+        final int version0 = version ^ string.hashCode() ^ hash0;
+        final long packed = athen$widths[hash1];
+        if ((int) (packed >>> 32) == version0 && packed != 0L) {
+            return Float.intBitsToFloat((int) packed);
+        }
+
+        final float width = this.stringWidth(entry.sequence);
+        athen$widths[hash1] = ((long) version0 << 32) | (Float.floatToIntBits(width) & 0xFFFFFFFFL);
+        return width;
+    }
+
+    @Unique
+    private static String athen$extract(FormattedText text) {
+        if (text instanceof Component component) {
+            athen$hash0 = athen$hash(component);
+            return component.getString();
+        }
+
+        athen$sb.setLength(0);
+        athen$hash0 = 0;
+
+        text.visit((style, str) -> {
+            athen$sb.append(str);
+            athen$hash0 = 31 * athen$hash0 + athen$hash(style);
+            return Optional.empty();
+        }, Style.EMPTY);
+
+        return athen$sb.toString();
     }
 
     @Unique

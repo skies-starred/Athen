@@ -44,6 +44,8 @@ dependencies {
     minecraft("com.mojang:minecraft:$ver")
 
     localRuntime("devauth".global)
+
+    compileOnly("caxton".versioned)
     compileOnly("entityculling".versioned)
     compileOnly("exordium".versioned)
     compileOnly("iris".versioned)

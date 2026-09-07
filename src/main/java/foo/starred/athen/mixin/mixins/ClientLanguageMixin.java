@@ -14,8 +14,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.List;
+import java.util.Optional;
 
-@Mixin(ClientLanguage.class)
+@Mixin(value = ClientLanguage.class, priority = 2000)
 public abstract class ClientLanguageMixin {
     @Unique
     private static int athen$last = -1;
@@ -23,10 +24,15 @@ public abstract class ClientLanguageMixin {
     @Unique
     private static final LongOpenHashSet athen$unmodified = new LongOpenHashSet(1024);
 
+    @Unique
+    private static final StringBuilder athen$sb = new StringBuilder();
+
+    @Unique
+    private static int athen$hash0;
+
     @ModifyReturnValue(method = "getVisualOrder(Lnet/minecraft/network/chat/FormattedText;)Lnet/minecraft/util/FormattedCharSequence;", at = @At("RETURN"))
     private FormattedCharSequence athen$getVisualOrder(FormattedCharSequence original, FormattedText logicalOrderText) {
-        if (original == null) return null;
-        if (!(logicalOrderText instanceof Component component)) return original;
+        if (original == null || logicalOrderText == null) return null;
         if (!VisualWords.INSTANCE.getEnabled()) return original;
         if (VisualWords.words.getMap0().isEmpty()) return original;
 
@@ -36,8 +42,8 @@ public abstract class ClientLanguageMixin {
             athen$last = version;
         }
 
-        final String string = component.getString();
-        final int hash0 = athen$hash(component);
+        final String string = athen$extract(logicalOrderText);
+        final int hash0 = athen$hash0;
         final long key = ((long) string.hashCode() << 32) | (hash0 & 0xFFFFFFFFL);
 
         if (athen$unmodified.contains(key)) {
@@ -50,8 +56,7 @@ public abstract class ClientLanguageMixin {
             return entry.sequence;
         }
 
-        final Component replaced = VisualWords.words.fn(component);
-        if (replaced == component) {
+        if (athen$bool(logicalOrderText, string)) {
             if (athen$unmodified.size() >= 4096) athen$unmodified.clear();
             athen$unmodified.add(key);
             return original;
@@ -63,6 +68,40 @@ public abstract class ClientLanguageMixin {
         entry.style = hash0;
         entry.sequence = sequence;
         return sequence;
+    }
+
+    @Unique
+    private static boolean athen$bool(FormattedText text, String string) {
+        boolean bool = false;
+        for (String word : VisualWords.words.getMap0().keySet()) {
+            if (!string.contains(word)) continue;
+
+            bool = true;
+            break;
+        }
+
+        if (!bool) return true;
+        return text instanceof Component c && VisualWords.words.fn(c) == c;
+    }
+
+    @Unique
+    private static String athen$extract(FormattedText text) {
+        if (text instanceof Component component) {
+            athen$hash0 = athen$hash(component);
+            return component.getString();
+        }
+
+        athen$sb.setLength(0);
+        athen$hash0 = 0;
+
+        text.visit((style, str) -> {
+            athen$sb.append(str);
+            athen$hash0 = 31 * athen$hash0 + athen$hash(style);
+
+            return Optional.empty();
+        }, Style.EMPTY);
+
+        return athen$sb.toString();
     }
 
     @Unique
