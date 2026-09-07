@@ -19,22 +19,26 @@ object ContainerScale : Module(
 
     @JvmStatic
     val x0: Float
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
         get() = (client.screen?.width ?: 0) / 2f
 
     @JvmStatic
     val y0: Float
+        //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
         get() = (client.screen?.height ?: 0) / 2f
 
     @JvmStatic
     val bool: Boolean
         get() {
             if (!enabled) return false
+            //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
             val screen = client.screen ?: return false
             return if (inventory) screen is InventoryScreen else screen is AbstractContainerScreen<*>
         }
 
     init {
         on<GuiEvent.Render.Screen.Pre>(Int.MIN_VALUE) {
+            //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
             val screen = client.screen as? AbstractContainerScreen<*> ?: return@on
 
             graphics.fillGradient(0, 0, screen.width, screen.height, -1072689136, -804253680)
@@ -45,6 +49,7 @@ object ContainerScale : Module(
         }
 
         on<GuiEvent.Render.Screen.Post>(Int.MIN_VALUE) {
+            //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
             if (client.screen !is AbstractContainerScreen<*>) return@on
 
             graphics.pose().popMatrix()
