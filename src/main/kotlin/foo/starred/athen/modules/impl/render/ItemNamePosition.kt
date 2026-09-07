@@ -5,7 +5,7 @@ package foo.starred.athen.modules.impl.render
 import foo.starred.athen.annotations.Load
 import foo.starred.athen.api.rendering.ui.text.vanilla.extensions.sizedText
 import foo.starred.athen.config.Category
-import foo.starred.athen.hud.Resolute
+import foo.starred.athen.hud.HUDManager
 import foo.starred.athen.modules.Module
 import foo.starred.athen.utils.render.fcs
 import foo.starred.snowbird.api.client
@@ -24,8 +24,8 @@ object ItemNamePosition : Module(
     }
 
     @JvmStatic
-    fun x(): Int = ((hud.x + int / 2) * Resolute.scale).toInt()
+    fun x(): Int = ((hud.x + int / 2) * HUDManager.scale).toInt()
 
     @JvmStatic
-    fun y(): Int = (hud.y * Resolute.scale).toInt()
+    fun y(): Int = (hud.y * HUDManager.scale).toInt()
 }

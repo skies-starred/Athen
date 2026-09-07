@@ -8,6 +8,8 @@ import foo.starred.athen.modules.impl.Dev
 import foo.starred.athen.ui.themes.Catppuccin.Mocha
 import foo.starred.snowbird.api.client
 import foo.starred.snowbird.utils.literal
+import foo.starred.snowbird.utils.mouseSX
+import foo.starred.snowbird.utils.mouseSY
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.KeyEvent
@@ -32,28 +34,27 @@ object HUDEditor : Screen("HUD Editor [Athen]".literal()) {
         get() = dragging ?: _act.filter { it.render }.asReversed().firstOrNull { it.isHovered(mx, my) }
 
     override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
-        mx = Resolute.mx
-        my = Resolute.my
+        mx = mouseSX / HUDManager.scale
+        my = mouseSY / HUDManager.scale
 
         dragging?.apply {
             x = mx - x0
             y = my - y0
 
             if (!snappy) return@apply
-
             val pad = 4f * scale
-
             x = (((x - pad) / 8f).roundToInt() * 8f) + pad
             y = (((y - pad) / 8f).roundToInt() * 8f) + pad
         }
 
-        Resolute.push(graphics)
-        graphics.fill(0, 0, Resolute.width.toInt(), Resolute.height.toInt(), Mocha.Lavender.withAlpha(0.1f))
+        graphics.pose().pushMatrix()
+        graphics.pose().scale(HUDManager.scale)
+        graphics.fill(0, 0, HUDManager.width.toInt(), HUDManager.height.toInt(), Mocha.Lavender.withAlpha(0.1f))
 
         if (grid) {
             val color = Mocha.Surface0.withAlpha(0.35f)
-            val rw = Resolute.width.toInt()
-            val rh = Resolute.height.toInt()
+            val rw = HUDManager.width.toInt()
+            val rh = HUDManager.height.toInt()
 
             var gx = 0
             while (gx <= rw) {
@@ -98,7 +99,7 @@ object HUDEditor : Screen("HUD Editor [Athen]".literal()) {
         }
 
         Help.render(graphics)
-        Resolute.pop(graphics)
+        graphics.pose().popMatrix()
 
         super.extractRenderState(graphics, mouseX, mouseY, delta)
     }
@@ -133,6 +134,9 @@ object HUDEditor : Screen("HUD Editor [Athen]".literal()) {
         return true
     }
 
+    override fun mouseMoved(x: Double, y: Double) {
+    }
+
     override fun keyPressed(event: KeyEvent): Boolean {
         if (event.key() == InputConstants.KEY_G) {
             if ((event.modifiers() and InputConstants.MOD_CONTROL) != 0) snappy = !snappy
@@ -146,13 +150,13 @@ object HUDEditor : Screen("HUD Editor [Athen]".literal()) {
         when (event.key()) {
             InputConstants.KEY_H -> {
                 val e = active ?: return false
-                e.x = (Resolute.width - e.width * e.scale) / 2f
+                e.x = (HUDManager.width - e.width * e.scale) / 2f
                 return true
             }
 
             InputConstants.KEY_V -> {
                 val e = active ?: return false
-                e.y = (Resolute.height - e.height * e.scale) / 2f
+                e.y = (HUDManager.height - e.height * e.scale) / 2f
                 return true
             }
 
