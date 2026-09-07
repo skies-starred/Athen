@@ -5,8 +5,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.loom)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.fletchingTable)
     `maven-publish`
 }
 
@@ -30,14 +28,6 @@ repositories {
 
     maven("https://maven.starred.foo/releases")
     maven("https://maven.starred.foo/snapshots")
-}
-
-fletchingTable {
-    mixins.create("main", Action {
-        mixin("default", "$modId.mixins.json") {
-            env("CLIENT")
-        }
-    })
 }
 
 dependencies {

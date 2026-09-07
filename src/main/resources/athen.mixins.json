@@ -2,6 +2,7 @@
   "required": false,
   "package": "foo.starred.athen.mixin",
   "compatibilityLevel": "JAVA_21",
+  "plugin": "foo.starred.athen.mixin.AthenMixinLoaderPlugin",
   "mixins": [],
   "injectors": {
     "defaultRequire": 1

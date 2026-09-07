@@ -1,7 +1,5 @@
 [versions]
 loom = "1.17-SNAPSHOT"
-fletchingTable = "0.1.0-alpha.22"
-ksp = "2.3.11"
 kotlin = "2.4.10"
 
 devauth = "1.2.1"
@@ -81,5 +79,3 @@ hypixel-modapi-fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 loom = { id = "net.fabricmc.fabric-loom", version.ref = "loom" }
-fletchingTable = { id = "dev.kikugie.fletching-table.fabric", version.ref = "fletchingTable" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
