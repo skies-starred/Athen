@@ -40,6 +40,7 @@ object ContainerScale : Module(
         on<GuiEvent.Render.Screen.Pre>(Int.MIN_VALUE) {
             //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
             val screen = client.screen as? AbstractContainerScreen<*> ?: return@on
+            if (!bool) return@on
 
             graphics.fillGradient(0, 0, screen.width, screen.height, -1072689136, -804253680)
             graphics.pose().pushMatrix()
@@ -50,7 +51,7 @@ object ContainerScale : Module(
 
         on<GuiEvent.Render.Screen.Post>(Int.MIN_VALUE) {
             //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
-            if (client.screen !is AbstractContainerScreen<*>) return@on
+            if (!bool) return@on
 
             graphics.pose().popMatrix()
         }
