@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static foo.starred.snowbird.api.ClientKt.getClient;
+import static foo.starred.snowbird.api.ClientKt.client;
 
 @Mixin(MouseHandler.class)
 public class MouseHandlerMixin {
@@ -59,7 +59,7 @@ public class MouseHandlerMixin {
     private void athen$xpos(CallbackInfoReturnable<Double> cir) {
         if (!ContainerScale.getBool()) return;
 
-        double x0 = athen$x(getClient().getWindow());
+        double x0 = athen$x(client.getWindow());
         double x1 = athen$correct(this.xpos * x0, ContainerScale.getX0());
         cir.setReturnValue(x1 / x0);
     }
@@ -68,7 +68,7 @@ public class MouseHandlerMixin {
     private void athen$ypos(CallbackInfoReturnable<Double> cir) {
         if (!ContainerScale.getBool()) return;
 
-        double y0 = athen$y(getClient().getWindow());
+        double y0 = athen$y(client.getWindow());
         double y1 = athen$correct(this.ypos * y0, ContainerScale.getY0());
         cir.setReturnValue(y1 / y0);
     }

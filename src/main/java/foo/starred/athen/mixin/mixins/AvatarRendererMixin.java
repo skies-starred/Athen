@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static foo.starred.snowbird.api.ClientKt.getClient;
+import static foo.starred.snowbird.api.ClientKt.client;
 
 @Mixin(AvatarRenderer.class)
 public class AvatarRendererMixin {
@@ -35,7 +35,7 @@ public class AvatarRendererMixin {
     private void athen$shouldShowName(Avatar entity, double distanceToCameraSq, CallbackInfoReturnable<Boolean> cir) {
         if (!RenderTweaks.getNametag()) return;
 
-        final LocalPlayer a = getClient().player;
+        final LocalPlayer a = client.player;
         if (a == null) return;
         if (a != entity) return;
 

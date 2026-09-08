@@ -29,8 +29,8 @@ skyblock-api = "4.2.23"
 classgraph = "4.8.184"
 kommand = "1.0.2"
 
-snowbird-26-1 = "019+26.1"
-snowbird-26-2 = "019+26.2"
+snowbird-26-1 = "021+26.1"
+snowbird-26-2 = "021+26.2"
 
 cascade-26-1 = "036+26.1"
 cascade-26-2 = "036+26.2"
