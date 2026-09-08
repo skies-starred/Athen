@@ -14,7 +14,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+//~ if >= 26.2 'Quaternionf' -> 'Quaternionfc'
 import org.joml.Quaternionf;
+//~ if >= 26.2 'Vector3f' -> 'Vector3fc'
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -25,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(value = GuiGraphicsExtractor.class, priority = Integer.MAX_VALUE)
-public class GuiGraphicsMixin {
+public class GuiGraphicsExtractorMixin {
     @Inject(method = "item(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At("HEAD"))
     private void athen$renderItem(LivingEntity owner, Level level, ItemStack itemStack, int x, int y, int seed, CallbackInfo ci) {
         new GuiEvent.Items.Render.Pre(self(), itemStack, x, y).post();
@@ -49,6 +51,8 @@ public class GuiGraphicsMixin {
     }
 
     @Inject(method = "entity", at = @At("HEAD"), cancellable = true)
+    //~ if >= 26.2 'Vector3f' -> 'Vector3fc'
+    //~ if >= 26.2 'Quaternionf' -> 'Quaternionfc'
     private void athen$entity(EntityRenderState renderState, float scale, Vector3f translation, Quaternionf rotation, Quaternionf overrideCameraAngle, int x0, int y0, int x1, int y1, CallbackInfo ci) {
         if (!ContainerScale.getBool()) return;
 
