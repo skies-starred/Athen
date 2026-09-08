@@ -20,10 +20,12 @@ import foo.starred.snowbird.api.repeat
 import foo.starred.snowbird.api.scheduling.scheduler.extensions.clientTicks
 import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.literal
+import foo.starred.updater.logic.source.impl.ModrinthUpdateSource
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import net.fabricmc.api.ClientModInitializer
+import net.minecraft.SharedConstants
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import kotlin.time.Duration.Companion.hours
@@ -45,6 +47,7 @@ object Athen : ClientModInitializer {
 
     override fun onInitializeClient() {
         AnnotationLoader.load()
+        ModrinthUpdateSource("athen", mc = SharedConstants.getCurrentVersion().name()).init(modVersion)
 
         on<LocationEvent.Server.Connect> {
             Scheduler.schedule(20.clientTicks) { li() }

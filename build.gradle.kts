@@ -48,10 +48,10 @@ dependencies {
     implementation("hypixel-modapi-fabric".global)
 
     shadow("classgraph".global)
-    shadow("autoupdate".global)
     shadow("kommand".global)
     shadow("snowbird".versioned)
     shadow("cascade".versioned)
+    shadow("updater".versioned)
 
     shadow("skyblock-api".global) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$ver") }

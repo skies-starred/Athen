@@ -27,7 +27,6 @@ iris-26-2 = "oaD6KQls"
 
 skyblock-api = "4.2.19"
 classgraph = "4.8.184"
-autoupdate = "1.3.1"
 kommand = "1.0.2"
 
 snowbird-26-1 = "019+26.1"
@@ -35,6 +34,9 @@ snowbird-26-2 = "019+26.2"
 
 cascade-26-1 = "036+26.1"
 cascade-26-2 = "036+26.2"
+
+updater-26-1 = "1.0.3+26.1"
+updater-26-2 = "1.0.3+26.2"
 
 hypixel-modapi = "1.0.1"
 hypixel-modapi-fabric = "1.0.1+build.1+mc1.21"
@@ -54,6 +56,9 @@ snowbird-26-2 = { module = "foo.starred:snowbird", version.ref = "snowbird-26-2"
 cascade-26-1 = { module = "foo.starred:cascade", version.ref = "cascade-26-1" }
 cascade-26-2 = { module = "foo.starred:cascade", version.ref = "cascade-26-2" }
 
+updater-26-1 = { module = "foo.starred:updater", version.ref = "updater-26-1" }
+updater-26-2 = { module = "foo.starred:updater", version.ref = "updater-26-2" }
+
 modmenu-26-1 = { module = "maven.modrinth:modmenu", version.ref = "modmenu-26-1" }
 modmenu-26-2 = { module = "maven.modrinth:modmenu", version.ref = "modmenu-26-2" }
 
@@ -71,7 +76,6 @@ iris-26-2 = { module = "maven.modrinth:iris", version.ref = "iris-26-2" }
 
 skyblock-api = { module = "tech.thatgravyboat:skyblock-api", version.ref = "skyblock-api" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
-autoupdate = { module = "moe.nea:libautoupdate", version.ref = "autoupdate" }
 kommand = { module = "foo.starred:kommand", version.ref = "kommand" }
 hypixel-modapi = { module = "net.hypixel:mod-api", version.ref = "hypixel-modapi" }
 hypixel-modapi-fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixel-modapi-fabric" }
