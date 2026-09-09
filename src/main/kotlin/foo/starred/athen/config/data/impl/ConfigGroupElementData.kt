@@ -5,6 +5,7 @@ import foo.starred.athen.config.data.base.IConfigElementData
 data class ConfigGroupElementData(
     override val name: String,
     override val key: String,
+    val collapsed: Boolean = true,
     override val parent: String? = null,
     override val description: String? = null
 ) : IConfigElementData {

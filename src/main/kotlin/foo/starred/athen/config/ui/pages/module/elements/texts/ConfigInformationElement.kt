@@ -31,7 +31,7 @@ class ConfigInformationElement(
 
         adopt(text {
             wrapper = CascadeTextWrapper
-            text = "<#89B4FA>! <dark_gray>| <#CDD6F4>${config.text}".parse()
+            text = "<#89B4FA>! <dark_gray>| <#CDD6F4>${config.text}".parse(true)
             textSize = 9.5f
             color = Catppuccin.Mocha.Text.argb
             position = AlignPositionConstraint(PositionAlignment.START, PositionAlignment.CENTER, 6f, 0f)

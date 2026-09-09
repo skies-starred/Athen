@@ -148,7 +148,7 @@ object ConfigModuleSettingsPage {
 
             val inner = split(block.subList(1, block.size))
             val full = inner.sumOf { if (it.size == 1 && it[0] is ConfigInformationElementData && it == inner.last()) 30 else 26 }.toFloat()
-            val start = if (ConfigManager.get(first.key) as? Boolean ?: false) full else 0f
+            val start = if (ConfigManager.get(first.key) as? Boolean ?: !first.collapsed) full else 0f
 
             val header = container {
                 position = FixedPositionConstraint(0f, 0f)
@@ -211,7 +211,7 @@ object ConfigModuleSettingsPage {
             val pair = mutableListOf<IConfigElementData>()
 
             for (item in list) {
-                if (item !is ConfigInformationElementData && item !is ConfigVariablesElementData) {
+                if (item !is ConfigInformationElementData) {
                     pair += item
                     if (pair.size < 2) continue
 
@@ -252,18 +252,9 @@ object ConfigModuleSettingsPage {
     }
 
     private fun cell(parent: IPrimitiveElement<*>, config: IConfigElementData, x0: Float) {
-        when (config) {
-            is ConfigInformationElementData -> {
-                ConfigInformationElement.of(parent, config)
-                return
-            }
-
-            is ConfigVariablesElementData -> {
-                ConfigVariablesElement.of(parent, config)
-                return
-            }
-
-            else -> {}
+        if (config is ConfigInformationElementData) {
+            ConfigInformationElement.of(parent, config)
+            return
         }
 
         container {
@@ -292,6 +283,7 @@ object ConfigModuleSettingsPage {
                 is ConfigKeybindElementData -> ConfigKeybindElement.of(content, config)
                 is ConfigSelectorElementData -> ConfigSelectorElement.of(content, config)
                 is ConfigMultiSelectorElementData -> ConfigMultiSelectorElement.of(content, config)
+                is ConfigVariablesElementData -> ConfigVariablesElement.of(content, config)
                 is ConfigColorPickerElementData -> ConfigColorPickerElement.of(content, config)
                 is ConfigHudElementData -> ConfigHUDElement.of(content, config)
                 else -> {}

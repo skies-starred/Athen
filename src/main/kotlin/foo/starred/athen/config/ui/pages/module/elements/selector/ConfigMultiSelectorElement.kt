@@ -107,8 +107,10 @@ class ConfigMultiSelectorElement(
                     val width0 = 114f / (config.options.size - page * 3).coerceIn(1, 3)
 
                     val text = config.options[index]
-                    text0.text = text.literal()
                     val width1 = CascadeFonts.arial.width(text, 8f)
+                    if (width1 <= width0 - 6f) return@on
+
+                    text0.text = text.literal()
                     val width2 = width1 + 12f
 
                     box.size = FixedSizeConstraint(width2, 16f)

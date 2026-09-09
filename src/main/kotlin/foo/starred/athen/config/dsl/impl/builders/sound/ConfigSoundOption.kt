@@ -20,7 +20,7 @@ class ConfigSoundOption(
     private val volume0: Float = 1f,
     parent: String? = null
 ) : ReadOnlyProperty<Any?, ConfigSoundOption> {
-    private val group = ConfigGroupBuilder(builder, name, parent)
+    private val group = ConfigGroupBuilder(builder, name, parent0 = parent)
 
     var enabled: Boolean = enabled0
         private set

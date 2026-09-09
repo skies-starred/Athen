@@ -12,9 +12,10 @@ import kotlin.reflect.KProperty
 class ConfigGroupBuilder(
     override val builder: ConfigMainBuilder,
     private val name: String,
+    private val collapsed: Boolean = true,
     parent0: String? = null
 ) : ElementBuilder<ConfigGroupBuilder>(parent0), ConfigScope, ReadOnlyProperty<Any?, ConfigGroupBuilder> {
-    private val state = Observable(false)
+    private val state = Observable(!collapsed)
 
     override val parent: String
         get() = key
@@ -25,10 +26,10 @@ class ConfigGroupBuilder(
     operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): ReadOnlyProperty<Any?, ConfigGroupBuilder> {
         key = "${builder.configKey}.expandable_${property.name}"
 
-        val data = ConfigGroupElementData(name, key, super<ElementBuilder>.parent, description)
+        val data = ConfigGroupElementData(name, key, collapsed, super<ElementBuilder>.parent, description)
         builder.feature.option(data)
 
-        ConfigManager.observe(key) { state.value = it as? Boolean ?: false }
+        ConfigManager.observe(key) { state.value = it as? Boolean ?: !collapsed }
         return this
     }
 

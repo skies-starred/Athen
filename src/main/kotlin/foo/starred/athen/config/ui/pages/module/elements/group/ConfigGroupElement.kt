@@ -18,7 +18,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor
 
 object ConfigGroupElement {
     fun of(parent: IPrimitiveElement<*>, config: ConfigGroupElementData, function: (Boolean) -> Unit) {
-        var expanded = ConfigManager.get(config.key) as? Boolean ?: false
+        var expanded = ConfigManager.get(config.key) as? Boolean ?: !config.collapsed
 
         val image = object : ImagePrimitive() {
             init {

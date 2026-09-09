@@ -23,23 +23,24 @@ object ItemValue : Module(
     "Shows the craft cost, and lowest bin of items.",
     Category.GENERAL
 ) {
-    private val craft by config.switch("Craft cost")
-    private val `craft$style` by config.input("Craft style", "Craft Cost: <aqua>#price")
-
-    private val lbin by config.switch("Lowest BIN")
-    private val `lbin$style` by config.input("Lowest BIN style", "Lowest BIN: <aqua>#price")
-
-    private val bazaar by config.switch("Bazaar")
-    private val `bazaar$oneLine` by config.switch("One line")
-    private val `bazaar$style` by config.input("Bazaar style", "Bazaar: <aqua>#buy <gray>| <aqua>#sell #individual")
-    private val `bazaar$style$buy` by config.input("Bazaar buy style", "Bazaar Buy: <aqua>#price #individual")
-    private val `bazaar$style$sell` by config.input("Bazaar sell style", "Bazaar Sell: <aqua>#price #individual")
-    private val `bazaar$style$individual` by config.input("Individual count style", "<gray>[#count@#price]")
-    private val variables by config.variables("Variables", listOf("#price"))
-    private val variables0 by config.variables("Bazaar", listOf("#buy", "#sell", "#individual"))
-    private val variables1 by config.variables("Individual", listOf("#count", "#price"))
-
     private val number by config.selector("Number style", listOf("Abbreviate", "Comma"))
+
+    private val auctions by config.group("Auction value", false)
+    private val craft by auctions.switch("Craft cost")
+    private val `craft$style` by auctions.input("Craft style", "Craft Cost: <aqua>#price")
+
+    private val lbin by auctions.switch("Lowest BIN")
+    private val `lbin$style` by auctions.input("Lowest BIN style", "Lowest BIN: <aqua>#price")
+    private val variables by auctions.variables("#price")
+
+    private val bazaars by config.group("Bazaar value", false)
+    private val bazaar by bazaars.switch("Bazaar")
+    private val `bazaar$oneLine` by bazaars.switch("One line")
+    private val `bazaar$style` by bazaars.input("Bazaar style", "Bazaar: <aqua>#buy <gray>| <aqua>#sell #individual")
+    private val `bazaar$style$buy` by bazaars.input("Bazaar buy style", "Bazaar Buy: <aqua>#price #individual")
+    private val `bazaar$style$sell` by bazaars.input("Bazaar sell style", "Bazaar Sell: <aqua>#price #individual")
+    private val `bazaar$style$individual` by bazaars.input("Individual count style", "<gray>[#count@#price]")
+    private val variables0 by bazaars.variables("#buy", "#sell", "#individual", "#price", "#count")
 
     init {
         on<GuiEvent.Tooltip.Update> {

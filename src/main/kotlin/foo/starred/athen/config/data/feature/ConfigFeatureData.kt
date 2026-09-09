@@ -23,7 +23,7 @@ data class ConfigFeatureData(
             is ConfigKeybindElementData -> default(data.key, data.default)
             is ConfigMultiSelectorElementData -> default(data.key, data.default)
             is ConfigHudElementData -> default(data.key, data.default)
-            is ConfigGroupElementData -> default(data.key, false)
+            is ConfigGroupElementData -> default(data.key, !data.collapsed)
             else -> {}
         }
     }

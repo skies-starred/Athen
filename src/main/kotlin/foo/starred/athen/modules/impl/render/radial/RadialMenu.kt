@@ -53,7 +53,7 @@ object RadialMenu : Module(
         RadialEditor.open()
     }
 
-    private val _unused1 by config.information("The configs can be exported/imported using the command <red>\"/athen radial [export|import]\"<r>. View all commands using <red>\"/athen radial help\"<r>!")
+    private val _unused1 by config.information("View all commands using <red>\"/athen radial help\"<r>!")
 
     private val json = JsonStore("features/radialMenu")
     private val stack = ArrayDeque<List<RadialSlot>>()

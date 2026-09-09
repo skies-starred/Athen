@@ -44,8 +44,8 @@ interface ConfigScope {
         return option(default, ConfigMultiSelectorElementData(name, "", options, default))
     }
 
-    fun group(name: String): ConfigGroupBuilder {
-        return ConfigGroupBuilder(builder, name, parent)
+    fun group(name: String, collapsed: Boolean = true): ConfigGroupBuilder {
+        return ConfigGroupBuilder(builder, name, collapsed, parent)
     }
 
     fun sound(name: String, default: String = "block.note_block.pling", enabled: Boolean = true, pitch: Float = 1f, volume: Float = 1f): ConfigSoundOption {
