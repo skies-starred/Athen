@@ -424,12 +424,11 @@ class KeybindsPopUp(
             size = FixedSizeConstraint(w, (client.font?.lineHeight ?: 9) + 8)
             position = MixedPositionConstraint(CenterPositionConstraint(), AnchorPositionConstraint({ box }, PositionAnchor.BELOW, 0, 6))
             color = Mocha.Base.argb
+            visible = false
 
             effect(OutlineEffect {
                 color = Mocha.Overlay0.argb
             })
-
-            visible = false
 
             attach(box)
             adopt(text {

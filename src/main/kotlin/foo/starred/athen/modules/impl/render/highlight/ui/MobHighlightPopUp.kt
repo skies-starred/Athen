@@ -190,12 +190,12 @@ class MobHighlightPopUp(
             size = FixedSizeConstraint(16, 16)
             position = AlignPositionConstraint(PositionAlignment.START, PositionAlignment.CENTER, 0)
             color = 0xFFFF0000.toInt()
+            interact = false
 
             effect(OutlineEffect {
                 color = Mocha.Surface2.argb
             })
 
-            interact = false
             attach(`color$row`)
         }
 

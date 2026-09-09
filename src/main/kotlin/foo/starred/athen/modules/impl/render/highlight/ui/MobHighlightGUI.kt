@@ -71,12 +71,12 @@ object MobHighlightGUI : CascadeScreen("Mob Highlights [Athen]", CascadeGeometri
             size = FixedSizeConstraint(110, 300)
             position = FixedPositionConstraint(0, 0)
             color = Mocha.Base.argb
+            interact = false
 
             effect(OutlineEffect {
                 color = Mocha.Surface0.argb
             })
 
-            interact = false
             attach(main)
         }
 
@@ -90,12 +90,12 @@ object MobHighlightGUI : CascadeScreen("Mob Highlights [Athen]", CascadeGeometri
             size = FixedSizeConstraint(460, 260)
             position = FixedPositionConstraint(116, 0)
             color = Mocha.Base.argb
+            interact = false
 
             effect(OutlineEffect {
                 color = Mocha.Surface0.argb
             })
 
-            interact = false
             attach(main)
         }
 
@@ -109,12 +109,12 @@ object MobHighlightGUI : CascadeScreen("Mob Highlights [Athen]", CascadeGeometri
             size = FixedSizeConstraint(460, 34)
             position = FixedPositionConstraint(116, 266)
             color = Mocha.Base.argb
+            interact = false
 
             effect(OutlineEffect {
                 color = Mocha.Surface0.argb
             })
 
-            interact = false
             attach(main)
         }
 
@@ -394,12 +394,12 @@ object MobHighlightGUI : CascadeScreen("Mob Highlights [Athen]", CascadeGeometri
                 size = FixedSizeConstraint(14, 14)
                 position = AlignPositionConstraint(PositionAlignment.START, PositionAlignment.CENTER, 8)
                 color = color0 or 0xFF000000.toInt()
+                interact = false
 
                 effect(OutlineEffect {
                     color = Mocha.Surface2.argb
                 })
 
-                interact = false
                 attach(row)
             }
 
@@ -417,12 +417,11 @@ object MobHighlightGUI : CascadeScreen("Mob Highlights [Athen]", CascadeGeometri
                 size = FixedSizeConstraint(width, 14)
                 position = AlignPositionConstraint(PositionAlignment.END, PositionAlignment.CENTER, -8)
                 color = Mocha.Surface2.argb
+                interact = false
 
                 effect(OutlineEffect {
                     color = Mocha.Crust.argb
                 })
-
-                interact = false
 
                 attach(row)
                 adopt(text {

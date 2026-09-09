@@ -65,12 +65,12 @@ object SlayerCarryGUI : CascadeScreen("Slayer Carries [Athen]") {
             size = FixedSizeConstraint(110, 300)
             position = FixedPositionConstraint(0, 0)
             color = Mocha.Base.argb
+            interact = false
 
             effect(OutlineEffect {
                 color = Mocha.Surface0.argb
             })
 
-            interact = false
             attach(main)
         }
 
@@ -84,12 +84,12 @@ object SlayerCarryGUI : CascadeScreen("Slayer Carries [Athen]") {
             size = FixedSizeConstraint(460, 260)
             position = FixedPositionConstraint(116, 0)
             color = Mocha.Base.argb
+            interact = false
 
             effect(OutlineEffect {
                 color = Mocha.Surface0.argb
             })
 
-            interact = false
             attach(main)
         }
 
@@ -103,12 +103,12 @@ object SlayerCarryGUI : CascadeScreen("Slayer Carries [Athen]") {
             size = FixedSizeConstraint(460, 34)
             position = FixedPositionConstraint(116, 266)
             color = Mocha.Base.argb
+            interact = false
 
             effect(OutlineEffect {
                 color = Mocha.Surface0.argb
             })
 
-            interact = false
             attach(main)
         }
 
@@ -314,12 +314,11 @@ object SlayerCarryGUI : CascadeScreen("Slayer Carries [Athen]") {
                 size = FixedSizeConstraint(w, 16)
                 position = AlignPositionConstraint(PositionAlignment.START, PositionAlignment.CENTER, 8)
                 color = Mocha.Surface2.argb
+                interact = false
 
                 effect(OutlineEffect {
                     color = Mocha.Crust.argb
                 })
-
-                interact = false
 
                 attach(row)
                 adopt(text {

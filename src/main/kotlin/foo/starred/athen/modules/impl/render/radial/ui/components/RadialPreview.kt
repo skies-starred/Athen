@@ -29,8 +29,6 @@ class RadialPreview(main: ContainerPrimitive) {
                 color = Mocha.Surface0.argb
             })
 
-            attach(main)
-
             on<MouseEvent.Press> {
                 if (button != 0) return@on
                 cancel()
@@ -94,6 +92,8 @@ class RadialPreview(main: ContainerPrimitive) {
                 if (RadialMenu.type == 0 && list0.getOrNull(h0)?.sub?.isNotEmpty() == true) RadialEditor.reload(h0, 0)
                 else RadialEditor.reload(h0, -1)
             }
+
+            attach(main)
         }
 
         renderState {

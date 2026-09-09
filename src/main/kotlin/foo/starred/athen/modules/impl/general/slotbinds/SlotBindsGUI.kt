@@ -74,12 +74,12 @@ object SlotBindsGUI : CascadeScreen("Slot Binds Editor [Athen]") {
             size = FixedSizeConstraint(110, 160)
             position = FixedPositionConstraint(0, 0)
             color = Mocha.Base.argb
+            interact = false
 
             effect(OutlineEffect {
                 color = Mocha.Surface0.argb
             })
 
-            interact = false
             attach(main)
         }
 

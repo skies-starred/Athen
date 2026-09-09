@@ -55,12 +55,11 @@ class RadialForm(mid: ContainerPrimitive) {
             size = FillSizeConstraint()
             position = FixedPositionConstraint(0, 0)
             color = Mocha.Base.argb
+            interact = false
 
             effect(OutlineEffect {
                 color = Mocha.Surface0.argb
             })
-
-            interact = false
 
             attach(mid)
 

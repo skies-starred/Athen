@@ -1,15 +1,15 @@
-@file:Suppress("PrivatePropertyName")
+@file:Suppress("PrivatePropertyName", "LocalVariableName")
 
-package foo.starred.athen.modules.impl.general.messageactions.ui
+package foo.starred.athen.modules.impl.general.messageactions.ui.impl
 
 import foo.starred.athen.api.rendering.ui.components.impl.MultiCheckboxComponent
 import foo.starred.athen.api.rendering.ui.components.impl.MultiCheckboxComponent.Companion.multiCheckbox
 import foo.starred.athen.api.rendering.ui.components.impl.TextFieldComponent
 import foo.starred.athen.api.rendering.ui.components.impl.TextFieldComponent.Companion.textField
 import foo.starred.athen.modules.impl.general.messageactions.MessageActions
-import foo.starred.athen.modules.impl.general.messageactions.actions.IMessageAction
-import foo.starred.athen.modules.impl.general.messageactions.data.ActionEntry
-import foo.starred.athen.modules.impl.general.messageactions.data.MatchType
+import foo.starred.athen.modules.impl.general.messageactions.actions.base.IMessageAction
+import foo.starred.athen.modules.impl.general.messageactions.actions.data.MessageActionEntry
+import foo.starred.athen.modules.impl.general.messageactions.actions.data.MessageMatchType
 import foo.starred.athen.ui.themes.Catppuccin.Mocha
 import foo.starred.cascade.constraints.impl.data.PositionAnchor
 import foo.starred.cascade.constraints.impl.position.AnchorPositionConstraint
@@ -39,25 +39,24 @@ class MessageActionsPopUp(
     private var action = 0
     private var cancel = false
     private var category = ""
-    private var match = MatchType.CONTAINS
+    private var match = MessageMatchType.CONTAINS
     private var categories: List<String> = emptyList()
 
     private var title: TextPrimitive = TextPrimitive.NONE
     private var pattern: TextFieldComponent
-    private var value: TextFieldComponent
     private var delay: TextFieldComponent
+    private var panel: ContainerPrimitive
     private var `checkbox$match`: MultiCheckboxComponent
     private var `checkbox$category`: MultiCheckboxComponent
-    private var `value$label`: TextPrimitive = TextPrimitive.NONE
-    private var `value$disabled`: RectanglePrimitive
     private var `cancel$box`: RectanglePrimitive
     private lateinit var `cancel$box$outline`: OutlineEffect
-    private lateinit var `cancel$inner`: RectanglePrimitive
+    private lateinit var `cancel$text`: TextPrimitive
 
-    data class ActionEntryData(val index: Int, val entry: ActionEntry)
+    data class ActionEntryData(val index: Int, val entry: MessageActionEntry)
     data class ActionButton(val rect: RectanglePrimitive, val text: TextPrimitive, val outline: OutlineEffect, val id: Int)
 
     private val actions = mutableListOf<ActionButton>()
+    private val inputs = LinkedHashMap<String, TextFieldComponent>()
 
     init {
         size = FillSizeConstraint()
@@ -141,14 +140,14 @@ class MessageActionsPopUp(
         `checkbox$match` = multiCheckbox {
             size = FixedSizeConstraint(170, 16)
             position = AnchorPositionConstraint({ pattern0 }, PositionAnchor.BELOW, 184, 2)
-            items = MatchType.entries.map { it.displayName }
+            items = MessageMatchType.entries.map { it.displayName }
 
             selected {
-                match == MatchType.entries[it]
+                match == MessageMatchType.entries[it]
             }
 
             select {
-                match = MatchType.entries[it]
+                match = MessageMatchType.entries[it]
                 `checkbox$match`.text = match.displayName
             }
 
@@ -169,14 +168,14 @@ class MessageActionsPopUp(
         }
 
         val all = IMessageAction.all()
-        val aw = (354 - (all.size - 1) * 4) / all.size
-        for ((idx, a) in all.withIndex()) {
+        val width = (354 - (all.size - 1) * 4) / all.size
+        for ((index, type) in all.withIndex()) {
             lateinit var outline: OutlineEffect
             var label = TextPrimitive.NONE
 
             val rect = rectangle {
-                size = FixedSizeConstraint(aw, 16)
-                position = FixedPositionConstraint(idx * (aw + 4), 0)
+                size = FixedSizeConstraint(width, 16)
+                position = FixedPositionConstraint(index * (width + 4), 0)
                 color = Mocha.Surface1.argb
 
                 effect(OutlineEffect {
@@ -184,71 +183,46 @@ class MessageActionsPopUp(
                 }.also { outline = it })
 
                 on<MouseEvent.Press> {
-                    cancel()
                     if (button != 0) return@on
-                    action = a.id
-                    updateActionButtons()
-                    updateValueState()
+                    cancel()
+
+                    action = type.id
+                    actions()
+                    values()
                 }
 
                 on<MouseEvent.Move.Enter> {
-                    if (action != a.id) color = Mocha.Surface2.argb
+                    if (action == type.id) return@on
+                    color = Mocha.Surface2.argb
                 }
 
                 on<MouseEvent.Move.Exit> {
-                    if (action != a.id) color = Mocha.Surface1.argb
+                    if (action == type.id) return@on
+                    color = Mocha.Surface1.argb
                 }
 
                 attach(row0)
                 adopt(text {
-                    text = a.name.literal()
+                    text = type.name.literal()
                     color = Mocha.Text.argb
                     shadow = false
                     position = CenterPositionConstraint()
                 }.also { label = it })
             }
 
-            actions.add(ActionButton(rect, label, outline, a.id))
+            actions.add(ActionButton(rect, label, outline, type.id))
         }
 
-        `value$label` = text {
-            text = "Value".literal()
-            color = Mocha.Overlay0.argb
-            position = AnchorPositionConstraint({ row0 }, PositionAnchor.BELOW, 0, 8)
-            attach(box)
-        }
-
-        text {
+        val `category$label` = text {
             text = "Category".literal()
             color = Mocha.Subtext0.argb
-            position = AnchorPositionConstraint({ row0 }, PositionAnchor.BELOW, 184, 8)
-            attach(box)
-        }
-
-        value = textField {
-            size = FixedSizeConstraint(170, 16)
-            position = AnchorPositionConstraint({ `value$label` }, PositionAnchor.BELOW, 0, 2)
-            placeholder = "Action value"
-            attach(box)
-        }
-
-        `value$disabled` = rectangle {
-            size = FixedSizeConstraint(170, 16)
-            position = AnchorPositionConstraint({ `value$label` }, PositionAnchor.BELOW, 0, 2)
-            color = Mocha.Crust.argb
-
-            effect(OutlineEffect {
-                color = Mocha.Surface0.argb
-            })
-
-            interact = false
-            visible = true
+            position = AnchorPositionConstraint({ row0 }, PositionAnchor.BELOW, 0, 8)
             attach(box)
         }
 
         `checkbox$category` = multiCheckbox {
             size = FixedSizeConstraint(170, 16)
-            position = AnchorPositionConstraint({ `value$label` }, PositionAnchor.BELOW, 184, 2)
+            position = AnchorPositionConstraint({ `category$label` }, PositionAnchor.BELOW, 0, 2)
             items = listOf("Uncategorized")
 
             selected {
@@ -263,43 +237,16 @@ class MessageActionsPopUp(
             attach(box)
         }
 
-        `cancel$box` = rectangle {
-            size = FixedSizeConstraint(14, 14)
-            position = AnchorPositionConstraint({ `value$label` }, PositionAnchor.BELOW, 0, 27)
-            color = Mocha.Base.argb
-
-            effect(OutlineEffect {
-                color = Mocha.Overlay0.argb
-            }.also { `cancel$box$outline` = it })
-
-            on<MouseEvent.Press> {
-                cancel()
-                if (button != 0) return@on
-                cancel = !cancel
-                `cancel$box$outline`.color = if (cancel) Mocha.Red.argb else Mocha.Overlay0.argb
-                `cancel$inner`.visible = cancel
-            }
-
-            attach(box)
-            adopt(rectangle {
-                size = FixedSizeConstraint(8, 8)
-                position = CenterPositionConstraint()
-                color = Mocha.Red.argb
-                interact = false
-                visible = false
-            }.also { `cancel$inner` = it })
-        }
-
-        text {
-            text = "Cancel message".literal()
+        val `delay$label` = text {
+            text = "Delay".literal()
             color = Mocha.Subtext0.argb
-            position = AnchorPositionConstraint({ `cancel$box` }, PositionAnchor.RIGHT, 4, 3)
+            position = AnchorPositionConstraint({ row0 }, PositionAnchor.BELOW, 184, 8)
             attach(box)
         }
 
         delay = textField {
             size = FixedSizeConstraint(170, 16)
-            position = AnchorPositionConstraint({ `value$label` }, PositionAnchor.BELOW, 184, 26)
+            position = AnchorPositionConstraint({ `delay$label` }, PositionAnchor.BELOW, 0, 2)
             placeholder = "Delay (seconds)"
 
             on<KeyEvent.Type> {
@@ -310,6 +257,48 @@ class MessageActionsPopUp(
 
                 cancel()
             }
+
+            attach(box)
+        }
+
+        val `cancel$label` = text {
+            text = "Cancel message".literal()
+            color = Mocha.Subtext0.argb
+            position = AnchorPositionConstraint({ `checkbox$category` }, PositionAnchor.BELOW, 0, 8)
+            attach(box)
+        }
+
+        `cancel$box` = rectangle {
+            size = FixedSizeConstraint(170, 16)
+            position = AnchorPositionConstraint({ `cancel$label` }, PositionAnchor.BELOW, 0, 2)
+            color = Mocha.Surface1.argb
+
+            effect(OutlineEffect {
+                color = if (cancel) Mocha.Green.argb else Mocha.Red.argb
+                inset = false
+            }.also { `cancel$box$outline` = it })
+
+            on<MouseEvent.Press> {
+                if (button != 0) return@on
+                cancel()
+                cancel = !cancel
+                `cancel$box$outline`.color = if (cancel) Mocha.Green.argb else Mocha.Red.argb
+                `cancel$text`.text = (if (cancel) "True" else "False").literal()
+                `cancel$text`.color = if (cancel) Mocha.Green.argb else Mocha.Red.argb
+            }
+
+            attach(box)
+            adopt(text {
+                text = (if (cancel) "True" else "False").literal()
+                color = if (cancel) Mocha.Green.argb else Mocha.Red.argb
+                position = CenterPositionConstraint()
+            }.also { `cancel$text` = it })
+        }
+
+        panel = container {
+            size = FixedSizeConstraint(354, 70)
+            position = AnchorPositionConstraint({ `checkbox$category` }, PositionAnchor.BELOW, 0, 8)
+            interact = false
 
             attach(box)
         }
@@ -338,8 +327,10 @@ class MessageActionsPopUp(
             })
 
             on<MouseEvent.Press> {
-                if (button == 0) onClose()
+                if (button != 0) return@on
+
                 cancel()
+                onClose()
             }
 
             on<MouseEvent.Move.Enter> {
@@ -374,10 +365,18 @@ class MessageActionsPopUp(
                 if (pattern.isEmpty()) return@on cancel()
 
                 val delay = delay.value.toDoubleOrNull() ?: 0.0
-                val new = ActionEntry(pattern, match, action, value.value, entry?.entry?.enabled ?: true, category, cancel, delay)
+                val fields = IMessageAction.get(action)?.fields ?: emptyList()
+                val data = mutableMapOf<String, String>()
 
-                if (entry == null) MessageActions.add(new.pattern, new.match, new.id, new.value, new.category, new.cancel, new.delay)
-                else MessageActions.update(entry!!.index, new)
+                for ((key, _, _, default) in fields) {
+                    data[key] = inputs[key]?.value ?: default
+                }
+
+                val action = IMessageAction.create(action, data)
+                val new = MessageActionEntry(pattern, match, action, entry?.entry?.enabled ?: true, category, cancel, delay)
+
+                if (entry != null) MessageActions.update(entry!!.index, new)
+                else MessageActions.add(new.pattern, new.match, new.action, new.category, new.cancel, new.delay)
 
                 onClose()
                 cancel()
@@ -403,26 +402,14 @@ class MessageActionsPopUp(
     fun open(entry: ActionEntryData?, selectedCategory: String?) {
         this.entry = entry
 
-        if (entry != null) {
-            pattern.value = entry.entry.pattern
-            pattern.cursor = pattern.value.length
-            match = entry.entry.match
-            action = entry.entry.id
-            value.value = entry.entry.value
-            value.cursor = value.value.length
-            cancel = entry.entry.cancel
-            category = entry.entry.category
-            delay.value = if (entry.entry.delay > 0.0) entry.entry.delay.toString() else ""
-            delay.cursor = delay.value.length
-        } else {
-            pattern.reset(true)
-            match = MatchType.CONTAINS
-            action = 0
-            value.reset(true)
-            cancel = false
-            category = selectedCategory ?: ""
-            delay.reset(true)
-        }
+        pattern.value = entry?.entry?.pattern ?: ""
+        pattern.cursor = pattern.value.length
+        match = entry?.entry?.match ?: CONTAINS
+        action = entry?.entry?.action?.id ?: 0
+        cancel = entry?.entry?.cancel ?: false
+        category = entry?.entry?.category ?: selectedCategory ?: ""
+        delay.value = entry?.entry?.delay?.takeIf { it > 0.0 }?.toString() ?: ""
+        delay.cursor = delay.value.length
 
         title.text = (if (entry == null) "Create Action" else "Edit Action").literal()
 
@@ -431,29 +418,87 @@ class MessageActionsPopUp(
         `checkbox$category`.text = category.ifEmpty { "Uncategorized" }
         `checkbox$match`.text = match.displayName
 
-        updateActionButtons()
-        updateValueState()
+        actions()
+        values(entry?.entry?.action?.serializable)
 
-        `cancel$box$outline`.color = if (cancel) Mocha.Red.argb else Mocha.Overlay0.argb
-        `cancel$inner`.visible = cancel
-
+        `cancel$box$outline`.color = if (cancel) Mocha.Green.argb else Mocha.Red.argb
+        `cancel$text`.text = (if (cancel) "True" else "False").literal()
+        `cancel$text`.color = if (cancel) Mocha.Green.argb else Mocha.Red.argb
         gui.scene.focused = this
     }
 
-    private fun updateActionButtons() {
-        for (btn in actions) {
-            val selected = btn.id == action
-            btn.rect.color = if (selected) Mocha.Lavender.argb else Mocha.Surface1.argb
-            btn.outline.color = if (selected) Mocha.Lavender.argb else Mocha.Overlay0.argb
-            btn.text.color = if (selected) Mocha.Base.argb else Mocha.Text.argb
+    private fun actions() {
+        for ((rect, text, outline, id) in actions) {
+            val selected = id == action
+
+            rect.color = if (selected) Mocha.Lavender.argb else Mocha.Surface1.argb
+            outline.color = if (selected) Mocha.Lavender.argb else Mocha.Overlay0.argb
+            text.color = if (selected) Mocha.Base.argb else Mocha.Text.argb
         }
     }
 
-    private fun updateValueState() {
-        val disabled = action == 0
-        value.visible = !disabled
-        `value$disabled`.visible = disabled
-        `value$label`.color = if (disabled) Mocha.Overlay0.argb else Mocha.Subtext0.argb
-        `value$label`.text = (if (disabled) "Value" else IMessageAction.all().firstOrNull { it.id == action }?.name ?: "Value").literal()
+    private fun values(map: Map<String, String>? = null) {
+        panel.children.clear()
+        inputs.clear()
+
+        val fields = IMessageAction.get(action)?.fields ?: emptyList()
+        if (fields.isEmpty()) {
+            text {
+                text = "Value".literal()
+                color = Mocha.Overlay0.argb
+                position = FixedPositionConstraint(184, 0)
+                attach(panel)
+            }
+
+            rectangle {
+                size = FixedSizeConstraint(170, 16)
+                position = FixedPositionConstraint(184, 10)
+                color = Mocha.Crust.argb
+                interact = false
+
+                effect(OutlineEffect {
+                    color = Mocha.Surface0.argb
+                    inset = false
+                })
+
+                attach(panel)
+            }
+
+            return
+        }
+
+        for ((i, field) in fields.withIndex()) {
+            val (key, label, holder, default, numeric) = field
+
+            val i1 = i + 1
+            val x0 = if (i1 % 2 == 0) 0 else 184
+            val y0 = (i1 / 2) * 36
+
+            text {
+                text = label.literal()
+                color = Mocha.Subtext0.argb
+                position = FixedPositionConstraint(x0, y0)
+                attach(panel)
+            }
+
+            inputs[key] = textField {
+                size = FixedSizeConstraint(170, 16)
+                position = FixedPositionConstraint(x0, y0 + 10)
+                placeholder = holder.ifEmpty { label }
+                value = map?.get(key) ?: default
+                cursor = value.length
+
+                attach(panel)
+
+                if (!numeric) return@textField
+                on<KeyEvent.Type> {
+                    if (char.code < 32) return@on
+                    if (char.code == 127) return@on
+                    if (char.isDigit()) return@on
+
+                    cancel()
+                }
+            }
+        }
     }
 }

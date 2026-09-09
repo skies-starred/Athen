@@ -50,8 +50,6 @@ class RadialTree(private val side0: ScrollablePrimitive) {
                     color = if (b0) Mocha.Lavender.argb else Mocha.Surface0.argb
                 })
 
-                attach(side0)
-
                 on<MouseEvent.Press> {
                     cancel()
                     if (button != 0) return@on
@@ -69,6 +67,7 @@ class RadialTree(private val side0: ScrollablePrimitive) {
                     color = if (RadialEditor.main == i1 && RadialEditor.sub < 0) Mocha.Surface1.argb else Mocha.Mantle.argb
                 }
 
+                attach(side0)
                 adopt(item {
                     item = list0[i1].item
                     position = AlignPositionConstraint(PositionAlignment.START, PositionAlignment.CENTER, 4, 0)
@@ -196,8 +195,6 @@ class RadialTree(private val side0: ScrollablePrimitive) {
                             color = if (b3) Mocha.Lavender.argb else Mocha.Surface0.argb
                         })
 
-                        attach(side0)
-
                         on<MouseEvent.Press> {
                             cancel()
                             if (button != 0) return@on
@@ -213,6 +210,8 @@ class RadialTree(private val side0: ScrollablePrimitive) {
                         on<MouseEvent.Move.Exit> {
                             color = if (RadialEditor.main == i1 && RadialEditor.sub == i2) Mocha.Surface1.argb else Mocha.Mantle.argb
                         }
+
+                        attach(side0)
 
                         adopt(item {
                             item = list0[i1].sub[i2].item
