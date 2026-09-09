@@ -33,14 +33,14 @@ object EndermanPhaseColor : Module(
     init {
         on<SlayerEvent.Boss.Spawn> {
             if (slayerInfo.type != SlayerBoss.Voidgloom) return@on
-            if (!slayerInfo.owned && (!all || slayerInfo.owner != null)) return@on
+            if (!slayerInfo.owned && !all) return@on
 
             map[entity] = normal.rgb
         }
 
         on<SlayerEvent.Boss.Death> {
             if (slayerInfo.type != SlayerBoss.Voidgloom) return@on
-            if (!slayerInfo.owned && (!all || slayerInfo.owner != null)) return@on
+            if (!slayerInfo.owned && !all) return@on
 
             map -= entity
         }
@@ -57,7 +57,7 @@ object EndermanPhaseColor : Module(
                     continue
                 }
 
-                map[k] = if (k.attachedStripped.any { "Hits " in it }) hits.rgb else normal.rgb
+                map[k] = if (k.attachedStripped.any { " Hits" in it }) hits.rgb else normal.rgb
             }
         }
     }
