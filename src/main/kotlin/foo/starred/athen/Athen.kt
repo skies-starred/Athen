@@ -47,7 +47,7 @@ object Athen : ClientModInitializer {
 
     override fun onInitializeClient() {
         AnnotationLoader.load()
-        ModrinthUpdateSource("athen", mc = SharedConstants.getCurrentVersion().name()).init(modVersion)
+        ModrinthUpdateSource("athen").init(modVersion)
 
         on<LocationEvent.Server.Connect> {
             Scheduler.schedule(20.clientTicks) { li() }
