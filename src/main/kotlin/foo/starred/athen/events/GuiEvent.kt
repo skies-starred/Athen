@@ -81,6 +81,16 @@ sealed class GuiEvent {
                 ) : Event()
             }
 
+            sealed class Menu {
+                data class Start(
+                    val graphics: GuiGraphicsExtractor
+                ) : CancellableEvent()
+
+                data class End(
+                    val graphics: GuiGraphicsExtractor
+                ) : Event()
+            }
+
             sealed class Hotbar {
                 data class Pre(
                     val graphics: GuiGraphicsExtractor,
