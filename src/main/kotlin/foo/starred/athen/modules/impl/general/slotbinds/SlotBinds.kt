@@ -245,27 +245,27 @@ object SlotBinds : Module(
             cancel()
         }
 
-        on<GuiEvent.Render.Screen.Post> {
+        on<GuiEvent.Slots.Render.Menu.End> {
             //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
-            val s = client.screen as? InventoryScreen ?: return@on
-            val m = s.menu.slots
+            val screen = client.screen as? InventoryScreen ?: return@on
+            val slots = screen.menu.slots
 
             val pose = Matrix3x2f(graphics.pose())
-            val screen = graphics.scissorStack.peek()
+            val scissor = graphics.scissorStack.peek()
 
             for (e in m0.int2IntEntrySet()) {
-                val a = m.getOrNull(e.intKey) ?: continue
-                val b = m.getOrNull(e.intValue) ?: continue
+                val a = slots.getOrNull(e.intKey) ?: continue
+                val b = slots.getOrNull(e.intValue) ?: continue
                 val c = m2.get(e.intKey)
 
-                graphics.stroke(a.x + 8f, a.y + 8f, b.x + 8f, b.y + 8f, c, 1f, pose, screen)
+                graphics.stroke(a.x + 8f, a.y + 8f, b.x + 8f, b.y + 8f, c, 1f, pose, scissor)
 
                 graphics.outline(a.x, a.y, 16, 16, 1, c, true)
                 graphics.outline(b.x, b.y, 16, 16, 1, c, true)
             }
 
             val l = last0 ?: return@on
-            val a = m.getOrNull(l) ?: return@on
+            val a = slots.getOrNull(l) ?: return@on
 
             graphics.outline(a.x, a.y, 16, 16, 1, inset = true)
         }
