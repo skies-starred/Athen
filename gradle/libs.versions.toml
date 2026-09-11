@@ -35,8 +35,8 @@ snowbird-26-2 = "021+26.2"
 cascade-26-1 = "036+26.1"
 cascade-26-2 = "036+26.2"
 
-updater-26-1 = "1.0.4+26.1"
-updater-26-2 = "1.0.4+26.2"
+updater-26-1 = "1.0.6+26.1"
+updater-26-2 = "1.0.6+26.2"
 
 hypixel-modapi = "1.0.1"
 hypixel-modapi-fabric = "1.0.1+build.1+mc1.21"
