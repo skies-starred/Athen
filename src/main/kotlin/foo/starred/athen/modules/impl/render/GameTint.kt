@@ -16,7 +16,7 @@ object GameTint : Module(
     "Tints the game screen in the color of your choice!",
     Category.RENDER
 ) {
-    private val color by config.colorPicker("Tint color", 0x00000019)
+    private val color by config.colorPicker("Tint color", 0x19000000)
     private val last = config.switch("Tint HUDs", true).unique("hudTint")
     private val gui = config.switch("Tint GUIs", true).unique("screenTint")
 

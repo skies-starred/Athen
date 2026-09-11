@@ -53,12 +53,12 @@ object PartyFinderDisplay : Module(
     private val stack = config.switch("Party stack size", true).unique("stackSize")
 
     private val highlight = config.switch("Highlight parties").unique("highlight")
-    val `color$allowed` by config.colorPicker("Joinable color", 0x55FF55)
-    val `color$maybe` by config.colorPicker("Dupe color", 0xFFFF00)
-    val `color$blocked` by config.colorPicker("Blocked color", 0xFF0000)
-    val `color$vc` by config.colorPicker("VC color", 0x7300FF)
-    val `color$perm` by config.colorPicker("Perm color", 0x00FFFF)
-    val `color$carry` by config.colorPicker("Carry color", 0x640000)
+    val `color$allowed` by config.colorPicker("Joinable color", 0xFF55FF55)
+    val `color$maybe` by config.colorPicker("Dupe color", 0xFFFFFF00)
+    val `color$blocked` by config.colorPicker("Blocked color", 0xFFFF0000)
+    val `color$vc` by config.colorPicker("VC color", 0xFF7300FF)
+    val `color$perm` by config.colorPicker("Perm color", 0xFF00FFFF)
+    val `color$carry` by config.colorPicker("Carry color", 0xFF640000)
     private val _unused by config.information("Want to hide a color? You can set it's opacity to 0!")
 
     private val noteRegex = Regex("^Note: (?<note>.+)")

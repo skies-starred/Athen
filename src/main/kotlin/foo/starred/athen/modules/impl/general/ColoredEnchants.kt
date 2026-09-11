@@ -54,7 +54,7 @@ object ColoredEnchants : Module(
     private val `normal$style` by normal.multiSelector("Normal style", l)
 
     private val bad by config.group("Bad-level enchants")
-    private val `bad$color` by bad.colorPicker("Bad color", 0xAAAAAAFF)
+    private val `bad$color` by bad.colorPicker("Bad color", 0xFFAAAAAA)
     private val `bad$style` by bad.multiSelector("Bad style", l)
 
     private val List<Int>.bold: Boolean

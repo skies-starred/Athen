@@ -15,7 +15,7 @@ object ArrowHitboxes : Module(
     "Shows the hitboxes for arrows",
     Category.RENDER
 ) {
-    private val color by config.colorPicker("Color", Catppuccin.Mocha.Green.rgba)
+    private val color by config.colorPicker("Color", Catppuccin.Mocha.Green.argb)
     private val thickness by config.slider("Thickness", 2f, 1f, 10f)
 
     init {
