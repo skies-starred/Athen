@@ -15,7 +15,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: 25
           distribution: 'microsoft'
 
       - name: Setup Gradle
@@ -43,27 +43,14 @@ jobs:
         uses: actions/upload-artifact@v4
         id: upload
         with:
-          name: build-artifacts
+          name: ${{ github.event.repository.name }}
           path: build/libs/
-
-      - name: Zip build output
-        run: cd build/libs && zip -r ../../build-output.zip . && cd ../..
-
-      - name: Upload to builds.aerii.xyz
-        env:
-          UPLOAD_KEY: ${{ secrets.UPLOAD_KEY }}
-        run: |
-          curl -X POST https://builds.aerii.xyz/upload \
-            -H "Authorization: $UPLOAD_KEY" \
-            -F "file=@build-output.zip" \
-            -F "commit=${{ github.sha }}" \
-            -F "branch=${{ github.ref_name }}"
 
       - name: Notify Discord
         env:
           NOTIFY_TOKEN: ${{ secrets.NOTIFY_TOKEN }}
         run: |
-          curl -X POST "https://builds.aerii.xyz/notify?type=build" \
+          curl -X POST "https://data.starred.foo/builds/notify?type=build" \
             -H "Content-Type: application/json" \
             -H "Authorization: $NOTIFY_TOKEN" \
             -d "{
