@@ -19,7 +19,6 @@ import foo.starred.snowbird.utils.toDurationFromMillis
 import net.minecraft.world.phys.Vec3
 import tech.thatgravyboat.skyblockapi.api.profile.party.PartyAPI
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
-import java.awt.Color
 
 @Load
 @OnlyIn(skyblock = true)
@@ -31,8 +30,8 @@ object IchorPool : Module(
     private val onlyKuudra by config.switch("Only in Kuudra")
     private val notifyParty by config.switch("Notify party", true)
     private val prio by config.switch("Prioritize own", true)
-    private val textColor by config.colorPicker("Text color", Color(Catppuccin.Mocha.Teal.argb, true))
-    private val color by config.colorPicker("Circle color", Color(Catppuccin.Mocha.Sapphire.argb, true))
+    private val textColor by config.colorPicker("Text color", Catppuccin.Mocha.Teal.argb)
+    private val color by config.colorPicker("Circle color", Catppuccin.Mocha.Sapphire.argb)
     private val style by config.selector("Circle style", listOf("Outline", "Filled", "Both"), 2)
 
     private val messageRegex = Regex("^Party > (?:\\[[^]]*?] )?\\w{1,16}(?: [ቾ⚒])?: Ichor pool casted at (?<x>-?\\d+) (?<y>-?\\d+) (?<z>-?\\d+)")
@@ -71,8 +70,8 @@ object IchorPool : Module(
             val center = pos ?: return@on
             val t = (20100 - (System.currentTimeMillis() - time)).takeIf { it > 0 } ?: return@on reset()
 
-            extractStyledCircle(center, 8.0, color.rgb, style)
-            extractText(t.toDurationFromMillis(), center, textColor.rgb, depth = false, increase = true)
+            extractStyledCircle(center, 8.0, color, style)
+            extractText(t.toDurationFromMillis(), center, textColor, depth = false, increase = true)
         }
     }
 

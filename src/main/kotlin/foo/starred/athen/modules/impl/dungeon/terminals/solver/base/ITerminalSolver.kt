@@ -109,8 +109,8 @@ abstract class ITerminalSolver(val type: TerminalType) {
             graphics.blur(x0, y0, width0, height0, 0, radius, 10f, pose, scissor)
         }
 
-        graphics.roundedRectangle(x0, y0, width0, height0, TerminalSolvers.`ui$bg`.rgb, radius, pose, scissor)
-        graphics.hollowRectangle(x0, y0, width0, height0, bw, TerminalSolvers.`ui$border`.rgb, radius, pose, scissor)
+        graphics.roundedRectangle(x0, y0, width0, height0, TerminalSolvers.`ui$bg`, radius, pose, scissor)
+        graphics.hollowRectangle(x0, y0, width0, height0, bw, TerminalSolvers.`ui$border`, radius, pose, scissor)
 
         graphics.header(x, y, grid.width, grid.head, scale, pose, scissor)
         graphics.render(x - int1 * grid.spacing + grid.padding + inset - 1f, y + grid.head + grid.top - grid.spacing + grid.padding + inset - 1f, 0f, scale, pose, scissor)
@@ -169,8 +169,8 @@ abstract class ITerminalSolver(val type: TerminalType) {
             blur(x1, y1, width1, height1, -1, radius, 10f, pose, scissor)
         }
 
-        roundedRectangle(x1, y1, width1, height1, TerminalSolvers.`ui$header`.rgb, radius, pose, scissor)
-        hollowRectangle(x1, y1, width1, height1, thickness, TerminalSolvers.`ui$border`.rgb, radius, pose, scissor)
+        roundedRectangle(x1, y1, width1, height1, TerminalSolvers.`ui$header`, radius, pose, scissor)
+        hollowRectangle(x1, y1, width1, height1, thickness, TerminalSolvers.`ui$border`, radius, pose, scissor)
 
         val size = 11f * scale
         font.extract(this, title, (x + width / 2) * scale - font.width(title, size) / 2, (y + height / 2) * scale - (font.regular.height * size) / 2, Mocha.Text.rgba, false, size)

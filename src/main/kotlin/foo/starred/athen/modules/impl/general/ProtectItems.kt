@@ -17,6 +17,9 @@ import foo.starred.athen.events.core.runWhen
 import foo.starred.athen.modules.Module
 import foo.starred.athen.ui.themes.Catppuccin
 import foo.starred.athen.utils.command
+import foo.starred.athen.utils.id
+import foo.starred.athen.utils.lore
+import foo.starred.athen.utils.uuid
 import foo.starred.snowbird.api.*
 import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.stripped
@@ -25,10 +28,6 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
-import tech.thatgravyboat.skyblockapi.api.datatype.getData
-import tech.thatgravyboat.skyblockapi.utils.extentions.getLore
-import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.bold
 
 @Load
 object ProtectItems : Module(
@@ -49,7 +48,7 @@ object ProtectItems : Module(
     private val types0 = json.mutableSet("type0", Codec.STRING)
 
     private val trade = Regex("^You\\s+\\w+$")
-    private val p = "<${Catppuccin.Mocha.Lavender.argb}>P".parse().apply { bold = true }.visualOrderText
+    private val p = "<bold><${Catppuccin.Mocha.Lavender.argb}>P".parse().visualOrderText
 
     init {
         on<PlayerEvent.Drop> {
@@ -78,7 +77,7 @@ object ProtectItems : Module(
         command {
             "protect" / "add" {
                 val item = held?.takeIf { !it.isEmpty } ?: return@invoke "Not holding anything!".mod()
-                val uuid = item.getData(DataTypes.UUID)?.toString()
+                val uuid = item.uuid()
                 if (!enabled) "Please turn on the feature \"ProtectItems\"".mod()
 
                 if (uuid != null) {
@@ -89,7 +88,7 @@ object ProtectItems : Module(
                     return@invoke
                 }
 
-                val sid = item.getData(DataTypes.SKYBLOCK_ID)?.skyblockId
+                val sid = item.id()
                 if (sid != null) {
                     if (sid in types0.value) return@invoke "Item skyblock id already exists in list!".mod()
                     types0.update { add(sid) }
@@ -108,7 +107,7 @@ object ProtectItems : Module(
 
             "protect" / "remove" {
                 val item = held?.takeIf { !it.isEmpty } ?: return@invoke "Not holding anything!".mod()
-                val uuid = item.getData(DataTypes.UUID)?.toString()
+                val uuid = item.uuid()
                 if (!enabled) "Please turn on the feature \"ProtectItems\"".mod()
 
                 if (uuid != null) {
@@ -119,7 +118,7 @@ object ProtectItems : Module(
                     return@invoke
                 }
 
-                val sid = item.getData(DataTypes.SKYBLOCK_ID)?.skyblockId
+                val sid = item.id()
                 if (sid != null) {
                     if (sid !in types0.value) return@invoke "Item skyblock id does not exist in list!".mod()
                     types0.update { remove(sid) }
@@ -160,10 +159,10 @@ object ProtectItems : Module(
     }
 
     private fun ItemStack.fn(): Boolean {
-        val uuid = getData(DataTypes.UUID)?.toString()
+        val uuid = uuid()
         if (uuid != null) return uuid in uuids.value
 
-        val sid = getData(DataTypes.SKYBLOCK_ID)?.skyblockId
+        val sid = id()
         if (sid != null) return sid in types0.value
 
         val id = BuiltInRegistries.ITEM.getKey(item).toString()
@@ -182,7 +181,7 @@ object ProtectItems : Module(
 
         val t0 = s.menu.slots.getOrNull(49)?.item
         if (t0?.item == Items.HOPPER && t0.hoverName.stripped() == "Sell Item") return true
-        if (t0?.getLore()?.lastOrNull()?.stripped() == "Click to buyback!") return true
+        if (t0?.lore()?.lastOrNull()?.stripped() == "Click to buyback!") return true
 
         return false
     }

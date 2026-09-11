@@ -23,7 +23,6 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
-import java.awt.Color
 
 @Load
 object CustomTooltip : Module(
@@ -51,17 +50,17 @@ object CustomTooltip : Module(
     val border by renderExpandable.switch("Border", true)
     val `border$width` by renderExpandable.slider("Border width", 1, 0, 5)
     val `border$rarity` by renderExpandable.switch("Use rarity color", true)
-    val `border$color` by renderExpandable.colorPicker("Border color", Color(Catppuccin.Mocha.Sky.argb, true))
+    val `border$color` by renderExpandable.colorPicker("Border color", Catppuccin.Mocha.Sky.argb)
 
     val background by renderExpandable.switch("Background", true)
-    val `background$color` by renderExpandable.colorPicker("Background color", Color(Catppuccin.Mocha.Surface0.withAlpha(0.9f), true))
+    val `background$color` by renderExpandable.colorPicker("Background color", Catppuccin.Mocha.Surface0.withAlpha(0.9f))
 
     val onlyName by renderExpandable.keybind("Only name toggle")
     val `onlyName$unused` by renderExpandable.information("Toggling only name mode will hide the actual tooltip and show only the name when it's toggled on.")
 
     val `text$shadow` by renderExpandable.switch("Text shadows", true)
 
-    var color: Int = `border$color`.rgb
+    var color: Int = `border$color`
     var last: Int = 0
     var xo: Double = 0.0
     var yo: Double = 0.0
@@ -72,12 +71,12 @@ object CustomTooltip : Module(
 
     init {
         on<GuiEvent.Slots.Input.Hover> {
-            color = slot.item.getData(DataTypes.RARITY)?.color?.or(0xFF000000.toInt()) ?: `border$color`.rgb
+            color = slot.item.getData(DataTypes.RARITY)?.color?.or(0xFF000000.toInt()) ?: `border$color`
             if (`scroll$reset`) reset()
         }
 
         on<GuiEvent.Close.Any> {
-            color = `border$color`.rgb
+            color = `border$color`
             name = false
             reset()
         }
@@ -116,7 +115,7 @@ object CustomTooltip : Module(
     @JvmStatic
     fun render(graphics: GuiGraphicsExtractor, font: Font, components: List<ClientTooltipComponent>, x: Int, y: Int, positioner: ClientTooltipPositioner) {
         //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
-        if (color != `border$color`.rgb && (client.screen as? AbstractContainerScreen<*>)?.hovered == null) color = `border$color`.rgb
+        if (color != `border$color` && (client.screen as? AbstractContainerScreen<*>)?.hovered == null) color = `border$color`
 
         last = Scheduler.ticks.client
         val components = if (name) components.take(1) else components

@@ -17,7 +17,7 @@ object PanesSolver : ITerminalSolver(TerminalType.PANES) {
     override val int1 = 2
 
     override fun GuiGraphicsExtractor.render(x: Float, y: Float, height: Float, scale: Float, pose: Matrix3x2f, scissor: ScreenRectangle?) {
-        val color = TerminalSolvers.`panes$correct`.rgb
+        val color = TerminalSolvers.`panes$correct`
 
         for ((slot) in list) {
             val x = (slot % 9 * float + x + 1f) * scale

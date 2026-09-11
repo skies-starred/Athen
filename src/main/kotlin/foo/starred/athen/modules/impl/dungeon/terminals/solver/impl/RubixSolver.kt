@@ -35,7 +35,7 @@ object RubixSolver : ITerminalSolver(TerminalType.RUBIX) {
             val x = (slot % 9 * float + x + 1f) * scale
             val y = ((slot / 9) * float + y + height + 1f) * scale
 
-            val color = if (button > 0) TerminalSolvers.`rubix$positive`.rgb else TerminalSolvers.`rubix$negative`.rgb
+            val color = if (button > 0) TerminalSolvers.`rubix$positive` else TerminalSolvers.`rubix$negative`
             slot(x, y, 16f * scale, 16f * scale, color, scale, pose, scissor)
 
             val string = button.toString()

@@ -5,6 +5,7 @@ package foo.starred.athen.modules.impl.slayer
 import com.mojang.serialization.Codec
 import foo.starred.athen.annotations.Load
 import foo.starred.athen.annotations.OnlyIn
+import foo.starred.athen.api.messaging.enums.MessageColors
 import foo.starred.athen.api.messaging.impl.MessagingAPI.mod
 import foo.starred.athen.api.scheduling.Scheduler
 import foo.starred.athen.api.slayers.enums.tier.SlayerTier
@@ -20,7 +21,6 @@ import foo.starred.snowbird.api.repeat
 import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.stripped
 import foo.starred.snowbird.utils.toDuration
-import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 
 @Load
 @OnlyIn(skyblock = true)
@@ -102,7 +102,7 @@ object SlayerTimers : Module(
 
                 else -> {
                     val a = time < pb * 1.1
-                    val c0 = if (a) Mocha.Peach.argb else TextColor.RED
+                    val c0 = if (a) Mocha.Peach.argb else MessageColors.RED.color
                     val c1 = if (a) Mocha.Pink.argb else Mocha.Red.argb
                     "<$c0>" to pb2.parse(str1, (time - pb).toDuration(secondsDecimals = 1), pb.toDuration(secondsDecimals = 1), "<$c0>", "<$c1>", "$time0")
                 }

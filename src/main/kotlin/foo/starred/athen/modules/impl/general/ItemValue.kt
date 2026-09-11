@@ -8,12 +8,11 @@ import foo.starred.athen.api.skyblock.PriceAPI.price
 import foo.starred.athen.config.Category
 import foo.starred.athen.events.GuiEvent
 import foo.starred.athen.modules.Module
+import foo.starred.athen.utils.id
 import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.abbreviate
 import foo.starred.snowbird.utils.formatted
 import net.minecraft.network.chat.Component
-import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
-import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import tech.thatgravyboat.skyblockapi.api.item.calculator.getItemValue
 
 @Load
@@ -48,7 +47,7 @@ object ItemValue : Module(
             val bool = price?.bazaar == null
 
             if (craft && bool) run {
-                if (item.getData(DataTypes.SKYBLOCK_ID)?.skyblockId == null) return@run
+                if (item.id() == null) return@run
                 val long = item.getItemValue().price.takeIf { it != 0L } ?: return@run
                 tooltip.add(`craft$style`.prs(long))
             }

@@ -20,9 +20,11 @@ import foo.starred.athen.modules.impl.dungeon.partyfinder.enums.PartyFinderClass
 import foo.starred.athen.modules.impl.dungeon.partyfinder.enums.PartyFinderSlotStatus
 import foo.starred.athen.ui.themes.Catppuccin
 import foo.starred.athen.utils.contains
+import foo.starred.athen.utils.lore
 import foo.starred.snowbird.api.client
 import foo.starred.snowbird.api.mainThread
 import foo.starred.snowbird.api.text.parser.impl.parse
+import foo.starred.snowbird.utils.alpha
 import foo.starred.snowbird.utils.formatted
 import foo.starred.snowbird.utils.stripped
 import foo.starred.snowbird.utils.toMS
@@ -37,7 +39,6 @@ import tech.thatgravyboat.skyblockapi.utils.extentions.parseRomanNumeral
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findGroup
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findGroups
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findThenNull
-import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.hours
 
@@ -52,12 +53,12 @@ object PartyFinderDisplay : Module(
     private val stack = config.switch("Party stack size", true).unique("stackSize")
 
     private val highlight = config.switch("Highlight parties").unique("highlight")
-    val `color$allowed` by config.colorPicker("Joinable color", Color(0,255, 0))
-    val `color$maybe` by config.colorPicker("Dupe color", Color(255, 255, 0))
-    val `color$blocked` by config.colorPicker("Blocked color", Color(255, 0, 0))
-    val `color$vc` by config.colorPicker("VC color", Color(115, 0, 255))
-    val `color$perm` by config.colorPicker("Perm color", Color(0, 255, 255))
-    val `color$carry` by config.colorPicker("Carry color", Color(100, 0, 0))
+    val `color$allowed` by config.colorPicker("Joinable color", 0x55FF55)
+    val `color$maybe` by config.colorPicker("Dupe color", 0xFFFF00)
+    val `color$blocked` by config.colorPicker("Blocked color", 0xFF0000)
+    val `color$vc` by config.colorPicker("VC color", 0x7300FF)
+    val `color$perm` by config.colorPicker("Perm color", 0x00FFFF)
+    val `color$carry` by config.colorPicker("Carry color", 0x640000)
     private val _unused by config.information("Want to hide a color? You can set it's opacity to 0!")
 
     private val noteRegex = Regex("^Note: (?<note>.+)")
@@ -140,7 +141,7 @@ object PartyFinderDisplay : Module(
                 if (i >= 54) break
                 if (it.item != Items.PLAYER_HEAD) continue
 
-                val lore = it.get(DataComponents.LORE)?.lines()?.takeIf { it.size >= 4 } ?: continue
+                val lore = it.lore()?.takeIf { it.size >= 4 } ?: continue
                 val lore0 = lore.map { it.stripped() }
 
                 val members = mutableSetOf<Pair<String, PartyFinderClassType>>()

@@ -22,12 +22,12 @@ import foo.starred.athen.modules.impl.general.messageactions.actions.impl.NoActi
 import foo.starred.athen.modules.impl.general.messageactions.ui.data.MessageActionsCategoryEntry
 import foo.starred.athen.modules.impl.general.messageactions.ui.impl.MessageActionsGUI
 import foo.starred.athen.utils.command
+import foo.starred.snowbird.api.client
 import foo.starred.snowbird.utils.colorCoded
 import foo.starred.snowbird.utils.compress
 import foo.starred.snowbird.utils.decompress
 import foo.starred.snowbird.utils.safely
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import tech.thatgravyboat.skyblockapi.helpers.McClient
 import java.lang.reflect.Type
 
 @Load
@@ -148,12 +148,12 @@ object MessageActions : Module(
 
             "export" / "messageactions" {
                 disk()
-                McClient.clipboard = gson.toJson(mapOf("actions" to actions, "categories" to categories)).compress()
+                client.keyboardHandler.clipboard = gson.toJson(mapOf("actions" to actions, "categories" to categories)).compress()
                 "Exported ${actions.size} actions to clipboard!".mod()
             }
 
             "import" / "messageactions" {
-                val a = McClient.clipboard
+                val a = client.keyboardHandler.clipboard
                 if (a.isEmpty()) return@invoke "No data found in clipboard!".mod()
 
                 safely {

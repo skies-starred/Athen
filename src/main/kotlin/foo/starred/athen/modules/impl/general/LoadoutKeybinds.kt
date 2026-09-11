@@ -12,12 +12,12 @@ import foo.starred.athen.events.core.runWhen
 import foo.starred.athen.mixin.accessors.KeyMappingAccessor
 import foo.starred.athen.modules.Module
 import foo.starred.athen.utils.guiClick
+import foo.starred.athen.utils.lore
 import foo.starred.snowbird.api.bound
 import foo.starred.snowbird.api.client
 import foo.starred.snowbird.api.pressed
 import foo.starred.snowbird.utils.stripped
 import net.minecraft.world.inventory.Slot
-import tech.thatgravyboat.skyblockapi.utils.extentions.getLore
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
 
 @Load
@@ -170,7 +170,7 @@ object LoadoutKeybinds : Module(
 
         val equipped: Boolean
             get() {
-                val a = slot?.item?.getLore() ?: return false
+                val a = slot?.item?.lore() ?: return false
                 return a.getOrNull(a.lastIndex - 1)?.stripped()?.isEmpty() ?: false
             }
     }

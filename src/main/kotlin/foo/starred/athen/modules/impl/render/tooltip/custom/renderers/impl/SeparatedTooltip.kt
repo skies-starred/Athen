@@ -51,8 +51,8 @@ object SeparatedTooltip : ITooltipRenderer {
     }
 
     private fun GuiGraphicsExtractor.box(x: Int, y: Int, w: Int, h: Int, bw: Int) {
-        if (CustomTooltip.background) rectangle(x, y, w, h, CustomTooltip.`background$color`.rgb)
-        if (CustomTooltip.border && bw > 0) outline(x, y, w, h, bw, if (CustomTooltip.`border$rarity`) CustomTooltip.color else CustomTooltip.`border$color`.rgb)
+        if (CustomTooltip.background) rectangle(x, y, w, h, CustomTooltip.`background$color`)
+        if (CustomTooltip.border && bw > 0) outline(x, y, w, h, bw, if (CustomTooltip.`border$rarity`) CustomTooltip.color else CustomTooltip.`border$color`)
     }
 
     private fun GuiGraphicsExtractor.components(font: Font, comps: List<ClientTooltipComponent>, tx: Int, boxX: Int, boxY: Int, boxW: Int, boxH: Int, startY: Int, width: Int, totalHeight: Int) {
@@ -74,7 +74,7 @@ object SeparatedTooltip : ITooltipRenderer {
     }
 
     private fun GuiGraphicsExtractor.fade(x: Int, y: Int, w: Int, h: Int, scrollY: Int, contentHeight: Int) {
-        val bg = CustomTooltip.`background$color`.rgb or 0xFF000000.toInt()
+        val bg = CustomTooltip.`background$color` or 0xFF000000.toInt()
         val bgT = bg and 0x00FFFFFF
 
         enableScissor(x, y, x + w, y + h)

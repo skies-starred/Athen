@@ -5,6 +5,7 @@ package foo.starred.athen.modules.impl.general
 import foo.starred.athen.annotations.Load
 import foo.starred.athen.annotations.OnlyIn
 import foo.starred.athen.api.items.ItemAPI.`watch$tooltip`
+import foo.starred.athen.api.messaging.enums.MessageColors
 import foo.starred.athen.api.rendering.ui.text.vanilla.extensions.extractText
 import foo.starred.athen.config.Category
 import foo.starred.athen.events.GuiEvent
@@ -13,6 +14,7 @@ import foo.starred.athen.modules.Module
 import foo.starred.snowbird.api.bound
 import foo.starred.snowbird.api.client
 import foo.starred.snowbird.api.pressed
+import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.colorCoded
 import foo.starred.snowbird.utils.literal
 import foo.starred.snowbird.utils.stripped
@@ -22,14 +24,11 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
-import tech.thatgravyboat.skyblockapi.utils.extentions.format
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
-import tech.thatgravyboat.skyblockapi.utils.text.TextColor
-import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
-import java.awt.Color
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.time.toJavaInstant
 
 @Load
 @OnlyIn(skyblock = true)
@@ -43,7 +42,7 @@ object ItemTweaks : Module(
     private val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm").withZone(ZoneId.systemDefault())
 
     private val showItemStars = config.switch("Item stars as stack size").unique("showItemStars")
-    private val starColor by config.colorPicker("Star Color", Color.RED)
+    private val starColor by config.colorPicker("Star Color", MessageColors.RED.color)
 
     private val cakeNumbers = config.switch("Cake numbers").unique("cakeNumbers")
 
@@ -56,7 +55,7 @@ object ItemTweaks : Module(
 
     private val hex by config.group("Hex style")
     private val showItemHex = hex.switch("Show hex color").unique("showItemHex")
-    private val `showItemHex$style` by hex.input("Style", "&7Color: #hex")
+    private val `showItemHex$style` by hex.input("Style", "<gray>Color: #hex")
     private val `showItemHex$color` by hex.switch("Color the hex")
     private val `showItemHex$box` by hex.switch("Display color box", true)
     private val `showItemHex$keybind` by hex.keybind("Keybind").`watch$tooltip`()
@@ -92,7 +91,7 @@ object ItemTweaks : Module(
         on<GuiEvent.Tooltip.Update> {
             if (!showItemAge) return@on
             val instant = item.getData(DataTypes.TIMESTAMP) ?: return@on
-            val timestamp = dateFormatter.format(instant)
+            val timestamp = dateFormatter.format(instant.toJavaInstant())
             val age = (Instant.now().toEpochMilli() - instant.toEpochMilliseconds()).toDurationFromMillis(true)
 
             tooltip.add(1, age.stamp(timestamp).literal())
@@ -111,7 +110,7 @@ object ItemTweaks : Module(
             if (stars <= 0) return@on
 
             val str = stars.toString()
-            graphics.extractText(str, x + 17 - client.font.width(str), y + 18 - client.font.lineHeight, color = starColor.rgb)
+            graphics.extractText(str, x + 17 - client.font.width(str), y + 18 - client.font.lineHeight, color = starColor)
         }.runWhen(showItemStars.state)
     }
 
@@ -126,6 +125,6 @@ object ItemTweaks : Module(
             .replace("&", "§")
             .replace("#hex", "")
             .literal()
-            .append(String.format("#%06X", this).literal { color = if (`showItemHex$color`) this@hex else TextColor.DARK_GRAY })
-            .apply { if (`showItemHex$box`) append("⬛".literal { color = this@hex }) }
+            .append("<${if (`showItemHex$color`) this@hex else MessageColors.DARK_GRAY.color}>" + String.format("#%06X", this).parse())
+            .apply { if (`showItemHex$box`) append("<${this@hex}>⬛".parse()) }
 }

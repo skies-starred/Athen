@@ -21,7 +21,6 @@ import foo.starred.athen.ui.themes.Catppuccin
 import foo.starred.athen.utils.render.fcs
 import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.alert
-import java.awt.Color
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])
@@ -31,7 +30,7 @@ object BuildInfo : Module(
     Category.KUUDRA
 ) {
     private val waypoints = config.switch("Unfinished build waypoint", true).unique("waypoints")
-    private val color by config.colorPicker("Color", Color(Catppuccin.Mocha.Red.argb, true))
+    private val color by config.colorPicker("Color", Catppuccin.Mocha.Red.argb)
     private val stun by config.switch("Stun notification", true)
     private val `stun$percent` by config.slider("Notify at", 90, 1, 100, "%")
     private val `stun$message` by config.input("Notification message", "<red>Stun!")
@@ -72,7 +71,7 @@ object BuildInfo : Module(
         on<WorldRenderEvent.Extract> {
             if (!render) return@on
 
-            for (e in KuudraSupply.every) if (!e.built) extractFrameBox(e.buildAABB, color.rgb, depth = false)
+            for (e in KuudraSupply.every) if (!e.built) extractFrameBox(e.buildAABB, color, depth = false)
         }.runWhen(waypoints.state)
     }
 }

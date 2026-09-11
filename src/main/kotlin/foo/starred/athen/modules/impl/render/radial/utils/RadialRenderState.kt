@@ -59,8 +59,8 @@ class RadialRenderState(
         val r01 = RadialMenu.radius1
         val r02 = RadialMenu.radius2
 
-        val hover = RadialMenu.`color$hover`.rgb
-        val color = RadialMenu.`color$normal`.rgb
+        val hover = RadialMenu.`color$hover`
+        val color = RadialMenu.`color$normal`
 
         for (i in 0 until num) {
             val angle0 = i * step + ORIGIN

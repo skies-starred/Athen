@@ -10,7 +10,6 @@ import foo.starred.athen.config.dsl.impl.builders.sound.ConfigSoundOption
 import foo.starred.athen.hud.HUDElement
 import foo.starred.athen.hud.HUDManager
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import java.awt.Color
 
 interface ConfigScope {
     val builder: ConfigMainBuilder
@@ -32,8 +31,8 @@ interface ConfigScope {
         return option(default, ConfigSelectorElementData(name, "", options, default))
     }
 
-    fun colorPicker(name: String, default: Color = Color(0, 255, 255, 127)): ConfigOptionBuilder<Color> {
-        return option(default, ConfigColorPickerElementData(name, "", default))
+    fun colorPicker(name: String, default: Number = -1): ConfigOptionBuilder<Int> {
+        return option(default.toInt(), ConfigColorPickerElementData(name, "", default.toInt()))
     }
 
     fun keybind(name: String, default: Int = -1): ConfigOptionBuilder<Int> {

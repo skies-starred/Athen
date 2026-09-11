@@ -9,7 +9,6 @@ import foo.starred.athen.modules.Module
 import foo.starred.snowbird.api.data.Observable
 import foo.starred.snowbird.api.data.Observable.Companion.and
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import java.awt.Color
 
 @Load
 object GameTint : Module(
@@ -17,7 +16,7 @@ object GameTint : Module(
     "Tints the game screen in the color of your choice!",
     Category.RENDER
 ) {
-    private val color by config.colorPicker("Tint color", Color(0, 0, 0, 25))
+    private val color by config.colorPicker("Tint color", 0x00000019)
     private val last = config.switch("Tint HUDs", true).unique("hudTint")
     private val gui = config.switch("Tint GUIs", true).unique("screenTint")
 

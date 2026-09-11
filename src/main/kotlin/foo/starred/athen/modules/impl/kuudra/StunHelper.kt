@@ -25,7 +25,6 @@ import net.minecraft.world.phys.HitResult
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
-import java.awt.Color
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])
@@ -37,7 +36,7 @@ object StunHelper : Module(
     private val highlightPod by config.switch("Highlight pods", true)
     private val highlightSpecific by config.switch("Highlight exact block")
     private val pod by config.selector("Exact pod", listOf("Left", "Middle", "Right"))
-    private val boxColor by config.colorPicker("Color", Color(Catppuccin.Mocha.Sapphire.argb, true))
+    private val boxColor by config.colorPicker("Color", Catppuccin.Mocha.Sapphire.argb)
     private val depthTest by config.switch("Depth test", true)
     private val blockAbility by config.switch("Block pickaxe ability", true)
     private val blockOverride by config.keybind("Block override key")
@@ -121,7 +120,7 @@ object StunHelper : Module(
                 else null
 
             for (p in KuudraPod.entries) {
-                if (highlightPod && belly) extractFrameBox(p.aabb, boxColor.rgb, depth = depthTest)
+                if (highlightPod && belly) extractFrameBox(p.aabb, boxColor, depth = depthTest)
 
                 if (!highlightSpecific) continue
                 if (p != selected) continue
@@ -130,7 +129,7 @@ object StunHelper : Module(
                     if (offset != null) p.aabb0.move(offset.x, offset.y, offset.z)
                     else p.aabb0
 
-                extractFrameBox(aabb, boxColor.rgb, depth = false)
+                extractFrameBox(aabb, boxColor, depth = false)
             }
         }
     }

@@ -49,20 +49,20 @@ object MelodySolver : ITerminalSolver(TerminalType.MELODY) {
 
         for (i in 0 until 5) {
             val x1 = x0 + i * spacing
-            val color = if (i == correct) TerminalSolvers.`melody$correct`.rgb else TerminalSolvers.`melody$wrong`.rgb
+            val color = if (i == correct) TerminalSolvers.`melody$correct` else TerminalSolvers.`melody$wrong`
 
             when (i) {
                 current -> {
-                    roundedRectangle(x1, y0, size, size, TerminalSolvers.`melody$fill`.rgb, radius, pose, scissor)
+                    roundedRectangle(x1, y0, size, size, TerminalSolvers.`melody$fill`, radius, pose, scissor)
                     hollowRectangle(x1, y0, size, size, scale, color, radius, pose, scissor)
                 }
 
                 correct -> {
-                    hollowRectangle(x1, y0, size, size, scale, TerminalSolvers.`melody$correct`.rgb, radius, pose, scissor)
+                    hollowRectangle(x1, y0, size, size, scale, TerminalSolvers.`melody$correct`, radius, pose, scissor)
                 }
 
                 else -> {
-                    hollowRectangle(x1, y0, size, size, scale, TerminalSolvers.`melody$wrong`.rgb, radius, pose, scissor)
+                    hollowRectangle(x1, y0, size, size, scale, TerminalSolvers.`melody$wrong`, radius, pose, scissor)
                 }
             }
         }
@@ -81,16 +81,16 @@ object MelodySolver : ITerminalSolver(TerminalType.MELODY) {
 
             when {
                 slot == button * 9 + 16 -> {
-                    slot(x, y, size, size, TerminalSolvers.`melody$correct`.rgb, scale, pose, scissor)
+                    slot(x, y, size, size, TerminalSolvers.`melody$correct`, scale, pose, scissor)
                 }
 
                 slot in slots -> {
-                    slot(x, y, size, size, TerminalSolvers.`melody$wrong`.rgb, scale, pose, scissor)
+                    slot(x, y, size, size, TerminalSolvers.`melody$wrong`, scale, pose, scissor)
                 }
 
                 i0 != row -> {
                     if (i1 !in 1..5) continue
-                    slot(x, y, size, size, TerminalSolvers.`melody$other`.rgb, scale, pose, scissor)
+                    slot(x, y, size, size, TerminalSolvers.`melody$other`, scale, pose, scissor)
                 }
             }
         }

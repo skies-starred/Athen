@@ -30,7 +30,6 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.inventory.ContainerInput
 import org.joml.Matrix3x2f
-import tech.thatgravyboat.skyblockapi.helpers.McClient
 
 @Load
 object SlotBinds : Module(
@@ -131,7 +130,7 @@ object SlotBinds : Module(
             }
 
             "export" / "slotbinds" {
-                val clipboard = McClient.clipboard
+                val clipboard = client.keyboardHandler.clipboard
                 if (clipboard.isEmpty()) return@invoke "No data found in clipboard!".mod()
 
                 val data = GSON.fromJson(clipboard.decompress(), object : TypeToken<Map<String, Any>>() {}.type) as Map<String, Any>
@@ -172,7 +171,7 @@ object SlotBinds : Module(
                 val c = map1[active]
                 if (c != null) for (e in c.int2IntEntrySet()) colors[e.intKey.toString()] = e.intValue
 
-                McClient.clipboard = GSON.toJson(mapOf("name" to active, "binds" to binds, "colors" to colors)).compress()
+                client.keyboardHandler.clipboard = GSON.toJson(mapOf("name" to active, "binds" to binds, "colors" to colors)).compress()
                 "Exported profile '$active' to clipboard!".mod()
             }
         }

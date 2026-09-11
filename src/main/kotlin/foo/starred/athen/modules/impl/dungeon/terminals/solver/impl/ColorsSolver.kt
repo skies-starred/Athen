@@ -26,7 +26,7 @@ object ColorsSolver : ITerminalSolver(TerminalType.COLORS) {
     )
 
     override fun GuiGraphicsExtractor.render(x: Float, y: Float, height: Float, scale: Float, pose: Matrix3x2f, scissor: ScreenRectangle?) {
-        val color = TerminalSolvers.`colors$correct`.rgb
+        val color = TerminalSolvers.`colors$correct`
 
         for ((slot) in list) {
             val x = (slot % 9 * float + x + 1f) * scale

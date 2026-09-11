@@ -22,7 +22,6 @@ import foo.starred.snowbird.utils.mouseSY
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.sounds.SoundEvents
-import java.awt.Color
 
 @Load
 object TerminalSolvers : Module(
@@ -59,8 +58,8 @@ object TerminalSolvers : Module(
     val `ui$padding` by gui.slider("Padding", 5f, 0f, 20f, double = true)
     val `ui$gap` by gui.slider("Slot gap", 2f, 0f, 10f, double = true)
     val `ui$melodyGap` by gui.slider("Melody gap", 2f, 0f, 10f, double = true)
-    val `ui$bg` by gui.colorPicker("Background color", Color(12, 12, 15, 175))
-    val `ui$border` by gui.colorPicker("Border color", Color(0, 0, 0, 220))
+    val `ui$bg` by gui.colorPicker("Background color", 0x0C0C0FAF)
+    val `ui$border` by gui.colorPicker("Border color", 0x000000DC)
 
     private val slots by config.group("Slots")
     val `ui$slots$fill` by slots.switch("Fill", true)
@@ -70,24 +69,24 @@ object TerminalSolvers : Module(
     private val header by config.group("Header")
     val `ui$hideHeader` by header.switch("Hide header", true)
     val `ui$hideTitle` by header.switch("Hide title", true)
-    val `ui$titleColor` by header.colorPicker("Title color", Color(240, 240, 245, 230))
-    val `ui$header` by header.colorPicker("Header color", Color(10, 10, 12, 200))
+    val `ui$titleColor` by header.colorPicker("Title color", 0xF0F0F5E6)
+    val `ui$header` by header.colorPicker("Header color", 0x0A0A0CC8)
 
     val clicks by config.sound("Click sound", enabled = false )
 
     private val colors by config.group("Solver colors")
-    val `colors$correct` by colors.colorPicker("Colors: Solution", Color(46, 204, 113, 220))
-    val `names$correct` by colors.colorPicker("Names: Solution", Color(46, 204, 113, 220))
-    val `panes$correct` by colors.colorPicker("Panes: Solution", Color(46, 204, 113, 220))
-    val `numbers$first` by colors.colorPicker("Numbers: 1st", Color(46, 204, 113, 220))
-    val `numbers$second` by colors.colorPicker("Numbers: 2nd", Color(241, 196, 15, 220))
-    val `numbers$third` by colors.colorPicker("Numbers: 3rd", Color(231, 76, 60, 220))
-    val `rubix$positive` by colors.colorPicker("Rubix: Positive", Color(52, 152, 219, 220))
-    val `rubix$negative` by colors.colorPicker("Rubix: Negative", Color(231, 76, 60, 220))
-    val `melody$fill` by colors.colorPicker("Melody: Fill", Color(155, 89, 182, 220))
-    val `melody$correct` by colors.colorPicker("Melody: Correct", Color(46, 204, 113, 220))
-    val `melody$wrong` by colors.colorPicker("Melody: Wrong", Color(231, 76, 60, 220))
-    val `melody$other` by colors.colorPicker("Melody: Other", Color(24, 24, 28, 200))
+    val `colors$correct` by colors.colorPicker("Colors: Solution", 0x2ECC71DC)
+    val `names$correct` by colors.colorPicker("Names: Solution", 0x2ECC71DC)
+    val `panes$correct` by colors.colorPicker("Panes: Solution", 0x2ECC71DC)
+    val `numbers$first` by colors.colorPicker("Numbers: 1st", 0x2ECC71DC)
+    val `numbers$second` by colors.colorPicker("Numbers: 2nd", 0xF1C40FDC)
+    val `numbers$third` by colors.colorPicker("Numbers: 3rd", 0xE74C3CDC)
+    val `rubix$positive` by colors.colorPicker("Rubix: Positive", 0x3498DBDC)
+    val `rubix$negative` by colors.colorPicker("Rubix: Negative", 0xE74C3CDC)
+    val `melody$fill` by colors.colorPicker("Melody: Fill", 0x9B59B6DC)
+    val `melody$correct` by colors.colorPicker("Melody: Correct", 0x2ECC71DC)
+    val `melody$wrong` by colors.colorPicker("Melody: Wrong", 0xE74C3CDC)
+    val `melody$other` by colors.colorPicker("Melody: Other", 0x18181CC8)
 
     val scale: Float
         get() = `ui$scale` * maxOf(1f, 4f / client.window.guiScale.toFloat())

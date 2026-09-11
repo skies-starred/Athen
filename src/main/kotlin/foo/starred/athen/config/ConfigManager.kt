@@ -77,7 +77,7 @@ object ConfigManager {
 
         isJsonObject -> {
             asJsonObject.run {
-                if (has("r") && has("g") && has("b") && has("a")) Color(get("r").asInt, get("g").asInt, get("b").asInt, get("a").asInt)
+                if (has("r") && has("g") && has("b") && has("a")) Color(get("r").asInt, get("g").asInt, get("b").asInt, get("a").asInt).rgb
                 else entrySet().associate { it.key to it.value.deserialize() }
             }
         }
@@ -91,12 +91,6 @@ object ConfigManager {
         is String -> JsonPrimitive(this)
         is List<*> -> JsonArray().also { array -> forEach { it?.let { v -> array.add(v.serialize()) } } }
         is Map<*, *> -> JsonObject().apply { forEach { (k, v) -> if (k is String && v != null) add(k, v.serialize()) } }
-        is Color -> JsonObject().apply {
-            addProperty("r", red)
-            addProperty("g", green)
-            addProperty("b", blue)
-            addProperty("a", alpha)
-        }
         else -> JsonPrimitive(toString())
     }
 }

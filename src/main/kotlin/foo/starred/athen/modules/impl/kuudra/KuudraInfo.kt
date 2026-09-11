@@ -20,7 +20,6 @@ import foo.starred.athen.utils.render.renderPos
 import foo.starred.snowbird.api.client
 import foo.starred.snowbird.utils.abbreviate
 import net.minecraft.world.entity.LivingEntity
-import java.awt.Color
 import kotlin.math.abs
 
 @Load
@@ -32,7 +31,7 @@ object KuudraInfo : Module(
 ) {
     private val highlight by config.switch("Highlight", true)
     private val lineWidth by config.slider("Line width", 2f, 1f, 10f)
-    private val color by config.colorPicker("Color", Color(Catppuccin.Mocha.Peach.argb, true))
+    private val color by config.colorPicker("Color", Catppuccin.Mocha.Peach.argb)
     private val hpOnKuudra by config.switch("Draw hp on boss", true)
 
     private val hud = config.hud("Kuudra HP") {
@@ -98,7 +97,7 @@ object KuudraInfo : Module(
         val k = KuudraAPI.kuudra ?: return
 
         if (highlight) {
-            extractFrameBox(k.renderBoundingBox, color.rgb, lineWidth)
+            extractFrameBox(k.renderBoundingBox, color, lineWidth)
         }
 
         if (hpOnKuudra) {

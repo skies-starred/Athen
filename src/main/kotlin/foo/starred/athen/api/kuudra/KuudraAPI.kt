@@ -6,6 +6,8 @@ import foo.starred.athen.api.location.SkyBlockIsland
 import foo.starred.athen.events.*
 import foo.starred.athen.events.core.on
 import foo.starred.athen.events.core.runWhen
+import foo.starred.athen.utils.texture
+import foo.starred.snowbird.api.client
 import foo.starred.snowbird.api.data.Observable
 import foo.starred.snowbird.api.lazy.RefreshableLazy
 import foo.starred.snowbird.api.level
@@ -16,8 +18,6 @@ import net.minecraft.world.entity.monster.Giant
 //~ if >= 26.2 'monster.MagmaCube' -> 'monster.cubemob.MagmaCube'
 import net.minecraft.world.entity.monster.MagmaCube
 import tech.thatgravyboat.skyblockapi.helpers.McClient
-import tech.thatgravyboat.skyblockapi.helpers.McLevel
-import tech.thatgravyboat.skyblockapi.utils.extentions.getTexture
 import tech.thatgravyboat.skyblockapi.utils.extentions.serverMaxHealth
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.anyMatch
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
@@ -101,7 +101,7 @@ object KuudraAPI {
             else if (phase == KuudraPhase.Fuel) for (f in fuels) f.pos()
 
             if (ticks % 10 != 0) return@on
-            val players = McLevel.players.takeIf { it.isNotEmpty() } ?: return@on
+            val players = client.level?.players()?.takeIf { it.isNotEmpty() } ?: return@on
 
             if (phase == KuudraPhase.Supply) for (s in supplies) s.nearby = players.any { s.radAABB.contains(it.position()) }
             else if (phase == KuudraPhase.Fuel) for (f in fuels) f.nearby = players.any { f.radAABB.contains(it.position()) }
@@ -126,7 +126,7 @@ object KuudraAPI {
             val e = entity as? Giant ?: return@on
 
             if (supplies.any { it.entity == e } || fuels.any { it.entity == e }) return@on
-            if (e.mainHandItem.getTexture() !in set0) return@on
+            if (e.mainHandItem.texture() !in set0) return@on
 
             val s = AbstractSupply(e)
             if (phase == KuudraPhase.Supply) supplies += s

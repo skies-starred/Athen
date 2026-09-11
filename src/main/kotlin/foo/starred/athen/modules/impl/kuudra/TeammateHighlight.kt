@@ -11,7 +11,6 @@ import foo.starred.athen.modules.Module
 import foo.starred.athen.ui.themes.Catppuccin
 import foo.starred.athen.utils.render.renderBoundingBox
 import foo.starred.snowbird.api.name
-import java.awt.Color
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])
@@ -21,7 +20,7 @@ object TeammateHighlight : Module(
     Category.KUUDRA
 ) {
     private val lineWidth by config.slider("Line width", 2f, 1f, 10f)
-    private val color by config.colorPicker("Color", Color(Catppuccin.Mocha.Green.argb, true))
+    private val color by config.colorPicker("Color", Catppuccin.Mocha.Green.argb)
 
     init {
         on<WorldRenderEvent.Extract> {
@@ -29,7 +28,7 @@ object TeammateHighlight : Module(
                 if (p.name == name) continue
                 val e = p.entity ?: continue
 
-                extractFrameBox(e.renderBoundingBox, color.rgb, lineWidth)
+                extractFrameBox(e.renderBoundingBox, color, lineWidth)
             }
         }
     }

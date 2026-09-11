@@ -13,7 +13,6 @@ import foo.starred.athen.ui.themes.Catppuccin
 import foo.starred.snowbird.utils.withAlpha
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import net.minecraft.world.entity.Entity
-import java.awt.Color
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.THE_END])
@@ -23,8 +22,8 @@ object EndermanPhaseColor : Module(
     Category.SLAYER,
 ) {
     private val all by config.switch("Change for all bosses")
-    private val normal by config.colorPicker("Normal", Color(255, 255, 255, 127))
-    private val hits by config.colorPicker("Hit phase", Color(Catppuccin.Mocha.Lavender.argb.withAlpha(0.5f), true))
+    private val normal by config.colorPicker("Normal", Catppuccin.Mocha.Text.argb)
+    private val hits by config.colorPicker("Hit phase", Catppuccin.Mocha.Lavender.argb.withAlpha(0.5f))
 
     private val map: Object2IntOpenHashMap<Entity> = Object2IntOpenHashMap<Entity>().apply {
         defaultReturnValue(-1)
@@ -35,7 +34,7 @@ object EndermanPhaseColor : Module(
             if (slayerInfo.type != SlayerBoss.Voidgloom) return@on
             if (!slayerInfo.owned && !all) return@on
 
-            map[entity] = normal.rgb
+            map[entity] = normal
         }
 
         on<SlayerEvent.Boss.Death> {
@@ -57,7 +56,7 @@ object EndermanPhaseColor : Module(
                     continue
                 }
 
-                map[k] = if (k.attachedStripped.any { " Hits" in it }) hits.rgb else normal.rgb
+                map[k] = if (k.attachedStripped.any { " Hits" in it }) hits else normal
             }
         }
     }

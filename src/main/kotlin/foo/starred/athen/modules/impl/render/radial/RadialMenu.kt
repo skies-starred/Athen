@@ -28,7 +28,6 @@ import foo.starred.snowbird.api.lie
 import foo.starred.snowbird.api.repeat
 import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.*
-import java.awt.Color
 import kotlin.math.hypot
 
 @Load
@@ -46,8 +45,8 @@ object RadialMenu : Module(
     val radius2 by config.slider("Outer radius", 80f, 40f, 180f, "pixels")
     val thickness by config.slider("Sub thickness", 18f, 8f, 40f, "pixels")
 
-    val `color$normal` by config.colorPicker("Normal color", Color(Catppuccin.Mocha.Surface0.withAlpha(0.5f), true))
-    val `color$hover` by config.colorPicker("Hover color", Color(Catppuccin.Mocha.Lavender.withAlpha(0.5f), true))
+    val `color$normal` by config.colorPicker("Normal color", Catppuccin.Mocha.Surface0.withAlpha(0.5f))
+    val `color$hover` by config.colorPicker("Hover color", Catppuccin.Mocha.Lavender.withAlpha(0.5f))
 
     private val _unused0 by config.button("Open editor") {
         RadialEditor.open()

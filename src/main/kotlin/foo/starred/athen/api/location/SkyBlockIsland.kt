@@ -31,7 +31,6 @@
 package foo.starred.athen.api.location
 
 import foo.starred.snowbird.api.data.Observable
-import tech.thatgravyboat.skyblockapi.utils.extentions.toFormattedName
 
 enum class SkyBlockIsland(val id: String, displayName: String? = null) {
     PRIVATE_ISLAND("dynamic"),
@@ -64,9 +63,11 @@ enum class SkyBlockIsland(val id: String, displayName: String? = null) {
     val inIsland: Observable<Boolean>
         get() = LocationAPI.island.map { it == this }
 
-    val displayName = displayName ?: toFormattedName()
+    val displayName = displayName ?: name.lowercase().split("_").joinToString(" ") { a -> a.replaceFirstChar { b -> b.uppercase() } }
 
-    override fun toString() = displayName
+    override fun toString(): String {
+        return displayName
+    }
 
     companion object {
         fun getByKey(key: String) = entries.firstOrNull { it.id == key }

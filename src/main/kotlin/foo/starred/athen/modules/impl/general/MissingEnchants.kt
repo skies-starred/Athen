@@ -17,12 +17,9 @@ import foo.starred.athen.utils.enchants
 import foo.starred.snowbird.api.EMPTY_COMPONENT
 import foo.starred.snowbird.api.bound
 import foo.starred.snowbird.api.pressed
-import foo.starred.snowbird.utils.literal
+import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.stripped
 import net.minecraft.network.chat.Component
-import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.bold
-import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
-import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.italic
 
 @Load
 @OnlyIn(skyblock = true)
@@ -106,13 +103,13 @@ object MissingEnchants : Module(
                     if (!s.r()) continue
 
                     val ls = l.siblings.lastOrNull() ?: continue
-                    if ((ls.color == 11184810  || ls.color == 0) && !ls.bold) continue
+                    if ((ls.style.color?.value == 11184810  || ls.style.color?.value == 0) && !ls.style.isBold) continue
 
                     se = true
                     continue
                 }
 
-                if (!s.isBlank()) continue
+                if (s.isNotBlank()) continue
                 ii = i
                 break
             }
@@ -121,11 +118,11 @@ object MissingEnchants : Module(
 
             val nl = ArrayList<Component>(2 + missing.size)
             nl.add(EMPTY_COMPONENT)
-            nl.add("✦ Missing:".literal().withColor(Mocha.Mauve.argb).apply { italic = false })
+            nl.add("<${Mocha.Mauve.argb}>✦ Missing:".parse())
 
             for (i in missing.indices step 3) {
                 val chunk = missing.subList(i, minOf(i + 3, missing.size))
-                nl.add(" • ${chunk.joinToString(", ")}".literal().withColor(Mocha.Text.argb).apply { italic = false })
+                nl.add("<${Mocha.Text.argb}> • ${chunk.joinToString(", ")}".parse())
             }
 
             tooltip.addAll(ii, nl)

@@ -66,9 +66,9 @@ object NumbersSolver : ITerminalSolver(TerminalType.NUMBERS) {
     }
 
     private fun Int.get(): Int? = when (this) {
-        0 -> TerminalSolvers.`numbers$first`.rgb
-        1 -> TerminalSolvers.`numbers$second`.rgb
-        2 -> TerminalSolvers.`numbers$third`.rgb
+        0 -> TerminalSolvers.`numbers$first`
+        1 -> TerminalSolvers.`numbers$second`
+        2 -> TerminalSolvers.`numbers$third`
         else -> null
     }
 }

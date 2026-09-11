@@ -35,7 +35,6 @@ import foo.starred.snowbird.utils.toDuration
 import net.minecraft.world.entity.LivingEntity
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findThenNull
-import java.awt.Color
 import kotlin.math.abs
 import kotlin.math.round
 
@@ -69,10 +68,10 @@ object SlayerCarryTracker : Module(
 
     private val _highlights by config.group("Highlights")
     private val `highlight$boss` = _highlights.switch("Highlight boss", true).unique("highlightBoss")
-    private val `highlight$boss$color` by _highlights.colorPicker("Boss color", Color(255, 0, 0, 150))
+    private val `highlight$boss$color` by _highlights.colorPicker("Boss color", Mocha.Red.argb)
     private val `highlight$boss$width` by _highlights.slider("Boss line width", 2f, 0f, 10f)
     private val `highlight$player` = _highlights.switch("Highlight player", true).unique("highlightPlayer")
-    private val `highlight$player$color` by _highlights.colorPicker("Player color", Color(0, 255, 255, 150))
+    private val `highlight$player$color` by _highlights.colorPicker("Player color", Mocha.Blue.argb)
     private val `highlight$player$width` by _highlights.slider("Player line width", 2f, 0f, 10f)
 
     private val tradeCompleteRegex = Regex("^Trade completed with (?:\\[.*?] )?(?<player>\\w+)!$")
@@ -348,13 +347,13 @@ object SlayerCarryTracker : Module(
             val e = entity as? LivingEntity ?: return@on
             if (e.carry == null) return@on
 
-            extractFrameBox(e.renderBoundingBox, `highlight$boss$color`.rgb, `highlight$boss$width`)
+            extractFrameBox(e.renderBoundingBox, `highlight$boss$color`, `highlight$boss$width`)
         }.runWhen(`highlight$boss`.state)
 
         on<WorldRenderEvent.Extract> {
             for (p in tracked.value) {
                 val p = p.entity.value ?: continue
-                extractFrameBox(p.renderBoundingBox, `highlight$player$color`.rgb, `highlight$player$width`)
+                extractFrameBox(p.renderBoundingBox, `highlight$player$color`, `highlight$player$width`)
             }
         }.runWhen(`highlight$player`.state)
 

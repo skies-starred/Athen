@@ -7,11 +7,10 @@ import foo.starred.athen.annotations.OnlyIn
 import foo.starred.athen.config.Category
 import foo.starred.athen.events.SoundPlayEvent
 import foo.starred.athen.modules.Module
+import foo.starred.athen.utils.id
 import foo.starred.snowbird.api.held
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.item.BowItem
-import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
-import tech.thatgravyboat.skyblockapi.api.datatype.getData
 
 @Load
 @OnlyIn(skyblock = true)
@@ -31,7 +30,7 @@ object TerminatorSounds : Module(
 
             val i = held ?: return@on
             if (i.item !is BowItem) return@on
-            if (i.getData(DataTypes.SKYBLOCK_ID)?.skyblockId != "TERMINATOR") return@on
+            if (i.id() != "TERMINATOR") return@on
 
             cancel()
             sound0.play()

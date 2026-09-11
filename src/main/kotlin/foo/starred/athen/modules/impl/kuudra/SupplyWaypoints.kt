@@ -22,7 +22,6 @@ import foo.starred.snowbird.api.lie
 import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.toDurationFromMillis
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
-import java.awt.Color
 
 @Load
 @OnlyIn(islands = [SkyBlockIsland.KUUDRA])
@@ -32,16 +31,16 @@ object SupplyWaypoints : Module(
     Category.KUUDRA
 ) {
     private val dropOff by config.switch("Drop off", true)
-    private val dropOffColor by config.colorPicker("Drop off color", Color(Catppuccin.Mocha.Green.argb, true))
+    private val dropOffColor by config.colorPicker("Drop off color", Catppuccin.Mocha.Green.argb)
 
     private val pickup by config.switch("Pick up", true)
-    private val pickupColor by config.colorPicker("Pick up color", Color(Catppuccin.Mocha.Teal.argb, true))
+    private val pickupColor by config.colorPicker("Pick up color", Catppuccin.Mocha.Teal.argb)
 
     private val fuel by config.switch("Fuel", true)
-    private val fuelColor by config.colorPicker("Fuel color", Color(Catppuccin.Mocha.Blue.argb, true))
+    private val fuelColor by config.colorPicker("Fuel color", Catppuccin.Mocha.Blue.argb)
 
     private val changeColor by config.switch("Detect player proximity", true)
-    private val playerColor by config.colorPicker("Nearby color", Color(Catppuccin.Mocha.Peach.argb, true))
+    private val playerColor by config.colorPicker("Nearby color", Catppuccin.Mocha.Peach.argb)
 
     private val customMessages = config.switch("Custom supply messages", true)
     private val textStyle by config.input("Supply text style", "<gray>➤ <red>#user <r>recovered a supply in <red>#time <gray>(#cur/#max)")
@@ -75,14 +74,14 @@ object SupplyWaypoints : Module(
             when (phase) {
                 KuudraPhase.Supply if (dropOff || pickup) -> {
                     if (dropOff) {
-                        for (b in KuudraSupply.every) if (!b.active) extractFilledBox(b.buildAABB, dropOffColor.rgb, false)
+                        for (b in KuudraSupply.every) if (!b.active) extractFilledBox(b.buildAABB, dropOffColor, false)
                     }
 
                     if (pickup) {
                         for (s in KuudraAPI.supplies) {
                             val color = if (changeColor && s.nearby) playerColor else pickupColor
-                            extractFrameBox(s.blockPos.markerAABB(), color.rgb, depth = false)
-                            extractBeam(s.blockPos, color.rgb)
+                            extractFrameBox(s.blockPos.markerAABB(), color, depth = false)
+                            extractBeam(s.blockPos, color)
                         }
                     }
                 }
@@ -90,8 +89,8 @@ object SupplyWaypoints : Module(
                 KuudraPhase.Fuel if fuel -> {
                     for (s in KuudraAPI.fuels) {
                         val color = if (changeColor && s.nearby) playerColor else fuelColor
-                        extractFrameBox(s.blockPos.markerAABB(), color.rgb, depth = false)
-                        extractBeam(s.blockPos, color.rgb)
+                        extractFrameBox(s.blockPos.markerAABB(), color, depth = false)
+                        extractBeam(s.blockPos, color)
                     }
                 }
 

@@ -5,10 +5,9 @@ import foo.starred.athen.api.rendering.level.impl.extensions.impl.extractFrameBo
 import foo.starred.athen.config.Category
 import foo.starred.athen.events.WorldRenderEvent
 import foo.starred.athen.modules.Module
-import foo.starred.athen.ui.themes.Catppuccin.Mocha
+import foo.starred.athen.ui.themes.Catppuccin
 import foo.starred.athen.utils.render.renderBoundingBox
 import net.minecraft.client.renderer.entity.state.ArrowRenderState
-import java.awt.Color
 
 @Load
 object ArrowHitboxes : Module(
@@ -16,7 +15,7 @@ object ArrowHitboxes : Module(
     "Shows the hitboxes for arrows",
     Category.RENDER
 ) {
-    private val color by config.colorPicker("Color", Color(Mocha.Green.rgba))
+    private val color by config.colorPicker("Color", Catppuccin.Mocha.Green.rgba)
     private val thickness by config.slider("Thickness", 2f, 1f, 10f)
 
     init {
@@ -24,7 +23,7 @@ object ArrowHitboxes : Module(
             if (renderState !is ArrowRenderState) return@on
             val entity = entity ?: return@on
 
-            extractFrameBox(entity.renderBoundingBox, color.rgb, thickness)
+            extractFrameBox(entity.renderBoundingBox, color, thickness)
         }
     }
 }

@@ -5,6 +5,7 @@ package foo.starred.athen.modules.impl.general
 import com.google.gson.Gson
 import foo.starred.athen.annotations.Load
 import foo.starred.athen.annotations.OnlyIn
+import foo.starred.athen.api.messaging.enums.MessageColors
 import foo.starred.athen.api.messaging.enums.MessagePrefixType
 import foo.starred.athen.api.messaging.impl.MessagingAPI.mod
 import foo.starred.athen.api.network.http.WebAPI.request
@@ -17,16 +18,13 @@ import foo.starred.athen.utils.command
 import foo.starred.athen.utils.data
 import foo.starred.athen.utils.enchants
 import foo.starred.snowbird.api.EMPTY_COMPONENT
+import foo.starred.snowbird.api.client
 import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.compress
 import foo.starred.snowbird.utils.decompress
 import foo.starred.snowbird.utils.stripped
-import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.utils.extentions.parseRomanNumeral
-import tech.thatgravyboat.skyblockapi.utils.text.TextColor
-import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
 import tech.thatgravyboat.skyblockapi.utils.text.TextUtils.substring
-import java.awt.Color
 
 @Load
 @OnlyIn(skyblock = true)
@@ -40,23 +38,23 @@ object ColoredEnchants : Module(
     private val replaceRoman by config.switch("Replace roman", true)
 
     private val ultimate by config.group("Ultimate enchants")
-    private val `ultimate$color` by ultimate.colorPicker("Ultimate color", Color(Catppuccin.Mocha.Mauve.argb, true))
+    private val `ultimate$color` by ultimate.colorPicker("Ultimate color", Catppuccin.Mocha.Mauve.argb)
     private val `ultimate$style` by ultimate.multiSelector("Ultimate style", l, listOf(0))
 
     private val max by config.group("Maxed enchants")
-    private val `max$color` by max.colorPicker("Max color", Color(TextColor.RED))
+    private val `max$color` by max.colorPicker("Max color", MessageColors.RED.color)
     private val `max$style` by max.multiSelector("Max style", l)
 
     private val high by config.group("High-level enchants")
-    private val `high$color` by high.colorPicker("High color", Color(TextColor.RED))
+    private val `high$color` by high.colorPicker("High color", MessageColors.RED.color)
     private val `high$style` by high.multiSelector("High style", l)
 
     private val normal by config.group("Normal-level enchants")
-    private val `normal$color` by normal.colorPicker("Normal color", Color(TextColor.BLUE))
+    private val `normal$color` by normal.colorPicker("Normal color", MessageColors.BLUE.color)
     private val `normal$style` by normal.multiSelector("Normal style", l)
 
     private val bad by config.group("Bad-level enchants")
-    private val `bad$color` by bad.colorPicker("Bad color", Color(0xAA, 0xAA, 0xAA, 0xFF))
+    private val `bad$color` by bad.colorPicker("Bad color", 0xAAAAAAFF)
     private val `bad$style` by bad.multiSelector("Bad style", l)
 
     private val List<Int>.bold: Boolean
@@ -94,31 +92,31 @@ object ColoredEnchants : Module(
         command {
             "export" / "enchants" {
                 val data = mapOf(
-                    $$"ultimate$color" to `ultimate$color`.rgb,
+                    $$"ultimate$color" to `ultimate$color`,
                     $$"ultimate$style" to `ultimate$style`,
-                    $$"max$color" to `max$color`.rgb,
+                    $$"max$color" to `max$color`,
                     $$"max$style" to `max$style`,
-                    $$"high$color" to `high$color`.rgb,
+                    $$"high$color" to `high$color`,
                     $$"high$style" to `high$style`,
-                    $$"normal$color" to `normal$color`.rgb,
+                    $$"normal$color" to `normal$color`,
                     $$"normal$style" to `normal$style`,
-                    $$"bad$color" to `bad$color`.rgb,
+                    $$"bad$color" to `bad$color`,
                     $$"bad$style" to `bad$style`,
                     "replaceRoman" to replaceRoman
                 )
 
-                McClient.clipboard = Gson().toJson(data).compress()
+                client.keyboardHandler.clipboard = Gson().toJson(data).compress()
                 "Enchant config exported to clipboard!".mod()
             }
 
             "import" / "enchants" {
-                val clipboard = McClient.clipboard
+                val clipboard = client.keyboardHandler.clipboard
                 if (clipboard.isEmpty()) return@invoke "No data found in clipboard!".mod(MessagePrefixType.ERROR)
 
                 val map = Gson().fromJson<Map<String, Any>>(clipboard.decompress(), Map::class.java)
 
                 for ((k, v) in map) when (k) {
-                    $$"ultimate$color", $$"max$color", $$"high$color", $$"normal$color", $$"bad$color" -> update("$configKey.$k", Color((v as Double).toInt(), true))
+                    $$"ultimate$color", $$"max$color", $$"high$color", $$"normal$color", $$"bad$color" -> update("$configKey.$k", (v as Double).toInt())
                     $$"ultimate$style", $$"max$style", $$"high$style", $$"normal$style", $$"bad$style" -> update("$configKey.$k", (v as List<Double>).map { it.toInt() })
                     "replaceRoman" -> update(k, v as Boolean)
                 }
@@ -138,7 +136,7 @@ object ColoredEnchants : Module(
 
                 if (found && str.isEmpty()) break
                 if ("◆" in str) continue
-                if (l.siblings.firstOrNull()?.color == 0) continue
+                if (l.siblings.firstOrNull()?.style?.color?.value == 0) continue
 
                 val final = EMPTY_COMPONENT.copy()
                 var i = 0
@@ -199,7 +197,7 @@ object ColoredEnchants : Module(
                 if (s.italic) append("<italic>")
                 if (s.underline) append("<underline>")
                 if (s.strike) append("<strikethrough>")
-                append("<${c.rgb}>")
+                append("<$c>")
             }
         }
 

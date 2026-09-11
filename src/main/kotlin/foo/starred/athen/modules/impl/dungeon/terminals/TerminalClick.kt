@@ -17,7 +17,6 @@ import foo.starred.snowbird.api.data.Observable
 import foo.starred.snowbird.utils.mouseSX
 import foo.starred.snowbird.utils.mouseSY
 import org.joml.Matrix3x2f
-import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 @Load
@@ -32,8 +31,8 @@ object TerminalClick : Module(
 
     private val radius by config.slider("Radius", 4, 1, 10)
     private val thickness by config.slider("Thickness", 2, 1, 10)
-    private val `color$mouse$left` by config.colorPicker("Left mouse color", Color(Catppuccin.Mocha.Lavender.argb, true))
-    private val `color$mouse$right` by config.colorPicker("Right mouse color", Color(Catppuccin.Mocha.Peach.argb, true))
+    private val `color$mouse$left` by config.colorPicker("Left mouse color", Catppuccin.Mocha.Lavender.argb)
+    private val `color$mouse$right` by config.colorPicker("Right mouse color", Catppuccin.Mocha.Peach.argb)
 
     init {
         on<GuiEvent.Input.Mouse.Press> {
@@ -50,13 +49,13 @@ object TerminalClick : Module(
             for (i in 0 until cs.size - 1) {
                 val c1 = cs[i]
                 val c2 = cs[i + 1]
-                val color = (if (c1.button == 0) `color$mouse$left`.rgb else `color$mouse$right`.rgb)
+                val color = (if (c1.button == 0) `color$mouse$left` else `color$mouse$right`)
 
                 graphics.stroke(c1.x, c1.y, c2.x, c2.y, color, thickness.toFloat(), pose, scissor)
             }
 
             for (c in cs) {
-                val color = (if (c.button == 0) `color$mouse$left`.rgb else `color$mouse$right`.rgb)
+                val color = (if (c.button == 0) `color$mouse$left` else `color$mouse$right`)
                 graphics.circle(c.x, c.y, radius.toFloat(), color, pose, scissor)
             }
         }.runWhen(render)

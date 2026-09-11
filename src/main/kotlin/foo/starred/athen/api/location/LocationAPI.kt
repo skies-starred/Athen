@@ -37,15 +37,11 @@ import foo.starred.athen.api.location.area.base.ISkyBlockArea
 import foo.starred.athen.api.location.area.impl.CustomSkyBlockArea
 import foo.starred.athen.events.LocationEvent
 import foo.starred.athen.events.ScoreboardEvent
-import foo.starred.athen.events.TabListEvent
 import foo.starred.athen.events.core.on
 import foo.starred.athen.events.core.runWhen
 import foo.starred.snowbird.api.data.Observable
-import foo.starred.snowbird.utils.stripped
 import net.hypixel.data.type.GameType
-import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.anyMatch
-import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findGroup
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -75,26 +71,6 @@ object LocationAPI {
     var onAlpha: Boolean = false
         private set
 
-    var playerCount: Int = 0
-        get() = field.coerceAtLeast(McClient.players.size)
-        private set
-
-    val maxPlayerCount: Int?
-        get() = when {
-            serverId?.startsWith("mega") == true -> 60
-            else -> when (island.value) {
-                SkyBlockIsland.PRIVATE_ISLAND, SkyBlockIsland.GARDEN -> null
-                SkyBlockIsland.KUUDRA -> 4
-                SkyBlockIsland.MINESHAFT -> 4
-                SkyBlockIsland.THE_CATACOMBS -> 5
-                SkyBlockIsland.BACKWATER_BAYOU -> 16
-                SkyBlockIsland.HUB -> 26
-                SkyBlockIsland.JERRYS_WORKSHOP -> 27
-                SkyBlockIsland.DARK_AUCTION -> 30
-                else -> 24
-            }
-        }
-
     var lastServerChange: Instant = Instant.DISTANT_PAST
         private set
 
@@ -111,11 +87,6 @@ object LocationAPI {
             serverId = name
         }
 
-        on<TabListEvent.Change> {
-            val component = new.firstOrNull()?.firstOrNull() ?: return@on
-            playerCount = playerCountRegex.findGroup(component.stripped().lowercase(), "count")?.toIntOrNull() ?: 0
-        }.runWhen(isOnSkyBlock)
-
         on<ScoreboardEvent.UpdateTitle> {
             isGuest = new.contains("guest", ignoreCase = true)
         }.runWhen(isOnSkyBlock)
@@ -125,10 +96,6 @@ object LocationAPI {
                 val old = area.value
                 area.value = SkyBlockArea.getByKey(location) ?: CustomSkyBlockArea(location)
                 LocationEvent.Hypixel.Area(old, area.value).post()
-            }
-
-            guestRegex.anyMatch(added, "guests") { (current) ->
-                playerCount = current.toIntOrNull() ?: 0
             }
         }.runWhen(isOnSkyBlock)
 

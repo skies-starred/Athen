@@ -19,6 +19,7 @@ import foo.starred.athen.events.WorldRenderEvent
 import foo.starred.athen.events.core.runWhen
 import foo.starred.athen.modules.Module
 import foo.starred.athen.modules.impl.dungeon.carry.DungeonCarryStateTracker.tracked
+import foo.starred.athen.ui.themes.Catppuccin
 import foo.starred.athen.ui.themes.Catppuccin.Mocha
 import foo.starred.athen.utils.command
 import foo.starred.athen.utils.render.fcs
@@ -33,8 +34,6 @@ import foo.starred.snowbird.utils.literal
 import foo.starred.snowbird.utils.toDuration
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.helpers.McClient
-import tech.thatgravyboat.skyblockapi.utils.text.TextColor
-import java.awt.Color
 
 @Load
 @OnlyIn(skyblock = true)
@@ -54,7 +53,7 @@ object DungeonCarryTracker : Module(
 
     private val highlights by config.group("Highlights")
     private val highlightPlayer by highlights.switch("Highlight player", true)
-    private val playerColor by highlights.colorPicker("Player color", Color(0, 255, 255, 150))
+    private val playerColor by highlights.colorPicker("Player color", Catppuccin.Macchiato.Blue.argb)
     private val playerLineWidth by highlights.slider("Player line width", 2f, 0f, 10f)
 
     private val ex0 = listOf("§f§lDungeon Carries:", "§7> §bExample §8[§7M7§8]§f: §b3§f/§b10 §7(5m 30s | 12/hr)").fcs
@@ -145,7 +144,7 @@ object DungeonCarryTracker : Module(
                 val carry = tracked[teammate.name] ?: continue
                 if (carry.floor != floor) continue
 
-                if (showStartMessage) "Dungeon started for <${TextColor.AQUA}>${teammate.name}<${TextColor.GRAY}> [${floor.name}]".mod()
+                if (showStartMessage) "Dungeon started for <aqua>${teammate.name}<gray> [${floor.name}]".mod()
             }
         }
 
@@ -168,7 +167,7 @@ object DungeonCarryTracker : Module(
 
                 if (result.completed) {
                     val time = result.totalTime.toDuration()
-                    "<${Mocha.Green.argb}>Completed carries for <${TextColor.AQUA}>${teammate.name} <${TextColor.GRAY}>[${floor.name}] <r>in <${TextColor.YELLOW}>$time".mod()
+                    "<${Mocha.Green.argb}>Completed carries for <aqua>${teammate.name} <gray>[${floor.name}] <r>in <yellow>$time".mod()
 
                     if (webhook) {
                         webhookUrl.request(HttpRequest.POST) {
@@ -191,7 +190,7 @@ object DungeonCarryTracker : Module(
             for (teammate in DungeonAPI.teammates) {
                 if (teammate.name !in tracked) continue
                 val e = teammate.entity ?: continue
-                extractFrameBox(e.renderBoundingBox, playerColor.rgb, playerLineWidth, false)
+                extractFrameBox(e.renderBoundingBox, playerColor, playerLineWidth, false)
             }
         }.runWhen(SkyBlockIsland.THE_CATACOMBS.inIsland)
     }

@@ -8,12 +8,11 @@ import foo.starred.athen.api.network.http.WebAPI.request
 import foo.starred.athen.api.scheduling.Scheduler
 import foo.starred.athen.modules.impl.ModSettings
 import foo.starred.athen.utils.api
+import foo.starred.athen.utils.id
 import foo.starred.snowbird.api.scheduling.scheduler.data.tasks.base.SchedulerTask
 import foo.starred.snowbird.utils.asJsonObjectOrNull
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.minecraft.world.item.ItemStack
-import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
-import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import kotlin.time.Duration.Companion.minutes
 
 @Priority
@@ -34,7 +33,7 @@ object PriceAPI {
     }
 
     fun ItemStack.price(): Price? =
-        getData(DataTypes.SKYBLOCK_ID)?.skyblockId?.price()
+        id()?.price()
 
     fun String.price(): Price? {
         val hash = hashCode()

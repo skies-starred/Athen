@@ -33,8 +33,6 @@ import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.literal
 import foo.starred.snowbird.utils.toDuration
 import tech.thatgravyboat.skyblockapi.helpers.McClient
-import tech.thatgravyboat.skyblockapi.utils.text.TextColor
-import java.awt.Color
 
 @Load
 @OnlyIn(skyblock = true)
@@ -54,7 +52,7 @@ object KuudraCarryTracker : Module(
 
     private val highlights by config.group("Highlights")
     private val highlightPlayer by highlights.switch("Highlight player", true)
-    private val playerColor by highlights.colorPicker("Player color", Color(0, 255, 255, 150))
+    private val playerColor by highlights.colorPicker("Player color", Mocha.Blue.argb)
     private val playerLineWidth by highlights.slider("Player line width", 2f, 0f, 10f)
 
     private val ex0 = listOf("§f§lKuudra Carries:", "§7> §bExample §8[§7Infernal§8]§f: §b3§f/§b10 §7(5m 30s | 12/hr)").fcs
@@ -140,7 +138,7 @@ object KuudraCarryTracker : Module(
                 val carry = tracked[teammate.name] ?: continue
                 if (carry.tier != tier) continue
 
-                if (showStartMessage) "Kuudra started for <${TextColor.AQUA}>${teammate.name}<${TextColor.GRAY}> [${tier.str}]".mod()
+                if (showStartMessage) "Kuudra started for <aqua>${teammate.name}<gray> [${tier.str}]".mod()
             }
         }
 
@@ -163,7 +161,7 @@ object KuudraCarryTracker : Module(
 
                 if (result.completed) {
                     val time = result.totalTime.toDuration()
-                    "<${Mocha.Green.argb}>Completed carries for <${TextColor.AQUA}>${teammate.name} <${TextColor.GRAY}>[${tier.str}] <r>in <${TextColor.YELLOW}>$time".mod()
+                    "<${Mocha.Green.argb}>Completed carries for <aqua>${teammate.name} <gray>[${tier.str}] <r>in <yellow>$time".mod()
 
                     if (webhook) {
                         webhookUrl.request(HttpRequest.POST) {
@@ -187,7 +185,7 @@ object KuudraCarryTracker : Module(
             for (teammate in KuudraAPI.teammates) {
                 if (teammate.name !in tracked) continue
                 val e = teammate.entity ?: continue
-                extractFrameBox(e.renderBoundingBox, playerColor.rgb, playerLineWidth, false)
+                extractFrameBox(e.renderBoundingBox, playerColor, playerLineWidth, false)
             }
         }.runWhen(SkyBlockIsland.KUUDRA.inIsland)
     }

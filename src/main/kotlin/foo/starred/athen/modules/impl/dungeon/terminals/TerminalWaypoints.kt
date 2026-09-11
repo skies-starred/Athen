@@ -10,11 +10,11 @@ import foo.starred.athen.events.LocationEvent
 import foo.starred.athen.events.WorldRenderEvent
 import foo.starred.athen.events.core.runWhen
 import foo.starred.athen.modules.Module
+import foo.starred.athen.ui.themes.Catppuccin
 import foo.starred.athen.utils.markerAABB
 import foo.starred.snowbird.api.data.Observable
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.AABB
-import java.awt.Color
 
 //? if >= 26.2
 //import net.minecraft.world.phys.Vec3
@@ -71,8 +71,8 @@ object TerminalWaypoints : Module(
     private val showText by config.switch("Render text", true)
     private val depthTest by config.switch("Depth test", false)
     private val highlightStyle by config.selector("Highlight style", listOf("Outline", "Filled", "Both"))
-    private val terminalColor by config.colorPicker("Terminal color", Color(0, 255, 255, 200))
-    private val leverColor by config.colorPicker("Lever color", Color(255, 255, 0, 200))
+    private val terminalColor by config.colorPicker("Terminal color", Catppuccin.Mocha.Blue.argb)
+    private val leverColor by config.colorPicker("Lever color", Catppuccin.Mocha.Yellow.argb)
 
     private val section1 by config.group("Section 1")
     private val section2 by config.group("Section 2")
@@ -128,7 +128,7 @@ object TerminalWaypoints : Module(
                 val color = if (t is Node.Lever) leverColor else terminalColor
                 val aabb = t.aabb1
 
-                extractStyledBox(aabb, color.rgb, highlightStyle, 2f, depthTest)
+                extractStyledBox(aabb, color, highlightStyle, 2f, depthTest)
                 //~ if >= 26.2 't.positions.last().center' -> 'Vec3.atCenterOf(t.positions.last())'
                 if (showText) extractText(t.defaultClass.str(), t.positions.last().center, depth = depthTest)
             }

@@ -8,6 +8,7 @@ import foo.starred.snowbird.api.EMPTY_COMPONENT
 import foo.starred.snowbird.api.client
 import foo.starred.snowbird.api.mainThread
 import foo.starred.snowbird.utils.literal
+import foo.starred.snowbird.utils.open
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
@@ -24,7 +25,6 @@ import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import tech.thatgravyboat.skyblockapi.helpers.McClient
 import kotlin.time.Duration.Companion.milliseconds
 
 abstract class ITerminalSim(
@@ -51,7 +51,7 @@ abstract class ITerminalSim(
 
     open fun a() {
         mainThread {
-            McClient.setScreen(this@ITerminalSim)
+            this@ITerminalSim.open()
             TerminalSimulator.s.value = true
         }
     }

@@ -21,7 +21,11 @@ import foo.starred.cascade.primitives.base.impl.IPrimitiveElement
 import foo.starred.cascade.primitives.impl.ContainerPrimitive.Companion.container
 import foo.starred.cascade.primitives.impl.RectanglePrimitive.Companion.rectangle
 import foo.starred.cascade.primitives.impl.RoundedRectanglePrimitive
+import foo.starred.snowbird.utils.alpha
+import foo.starred.snowbird.utils.blue
 import foo.starred.snowbird.utils.brighten
+import foo.starred.snowbird.utils.green
+import foo.starred.snowbird.utils.red
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import org.joml.Matrix3x2f
 import java.awt.Color
@@ -29,7 +33,7 @@ import java.awt.Color
 class ConfigColorPickerElement(
     private val config: ConfigColorPickerElementData
 ) : RoundedRectanglePrimitive() {
-    private var value: Color = ConfigManager.get(config.key) as? Color ?: config.default
+    private var value: Int = (ConfigManager.get(config.key) as? Number)?.toInt() ?: config.default
     private var expanded = false
 
     private var drag: Int = 0
@@ -44,7 +48,7 @@ class ConfigColorPickerElement(
         position = FixedPositionConstraint(0f, 0f)
         size = FixedSizeConstraint(28f, 14f)
         radius = CascadeGeometricRadius(4f, 0f, 4f, 0f)
-        color = value.rgb
+        color = value
         interact = false
     }
 
@@ -65,7 +69,7 @@ class ConfigColorPickerElement(
             parse(it)?.let { c ->
                 this@ConfigColorPickerElement.value = c
                 color(c)
-                swatch.color = c.rgb
+                swatch.color = c
                 ConfigManager.update(config.key, c)
             }
 
@@ -171,7 +175,7 @@ class ConfigColorPickerElement(
                     position = FixedPositionConstraint(k * 31f, 0f)
                     size = FixedSizeConstraint(31f, 16f)
                     radius = if (k == 0) CascadeGeometricRadius(4f, 0f, 4f, 0f) else if (k == 3) CascadeGeometricRadius(0f, 4f, 0f, 4f) else CascadeGeometricRadius.ZERO
-                    color = color0.rgb
+                    color = color0
 
                     on<MouseEvent.Press> {
                         if (button != 0) return@on
@@ -179,17 +183,17 @@ class ConfigColorPickerElement(
                         cancel()
                         value = color0
                         color(color0)
-                        swatch.color = value.rgb
+                        swatch.color = value
                         hex.value = value.hex()
                         ConfigManager.update(config.key, value)
                     }
 
                     on<MouseEvent.Move.Enter> {
-                        animateColor(color0.rgb.brighten(1.2f), 0.15f)
+                        animateColor(color0.brighten(1.2f), 0.15f)
                     }
 
                     on<MouseEvent.Move.Exit> {
-                        animateColor(color0.rgb, 0.15f)
+                        animateColor(color0, 0.15f)
                     }
                 })
 
@@ -293,23 +297,20 @@ class ConfigColorPickerElement(
         commit()
     }
 
-    private fun color(color: Color) {
-        val hsb = Color.RGBtoHSB(color.red, color.green, color.blue, null)
+    private fun color(argb: Int) {
+        val hsb = Color.RGBtoHSB(argb.red, argb.green, argb.blue, null)
         hue = hsb[0]
         saturation = hsb[1]
         brightness = hsb[2]
-        alpha = color.alpha / 255f
+        alpha = argb.alpha / 255f
     }
 
     private fun commit() {
-        val rgb = Color.HSBtoRGB(hue, saturation, brightness)
-        val r = (rgb ushr 16) and 0xFF
-        val g = (rgb ushr 8) and 0xFF
-        val b = rgb and 0xFF
+        val rgb = Color.HSBtoRGB(hue, saturation, brightness) and 0x00FFFFFF
         val a = (alpha * 255f).toInt().coerceIn(0, 255)
-        value = Color(r, g, b, a)
+        value = (a shl 24) or rgb
 
-        swatch.color = value.rgb
+        swatch.color = value
         hex.value = value.hex()
         ConfigManager.update(config.key, value)
     }
@@ -343,8 +344,8 @@ class ConfigColorPickerElement(
 
         val x5 = x1 + 8f
         val y5 = y1 + 88f
-        val rgba = (value.rgb and 0x00FFFFFF) or (0xFF shl 24)
-        val rgb = value.rgb and 0x00FFFFFF
+        val rgb = value and 0x00FFFFFF
+        val rgba = rgb or (0xFF shl 24)
 
         graphics.rectangle(x5, y5, 124f, 8f, Catppuccin.Mocha.Surface0.argb, pose, scissor)
         graphics.gradientRectangle(x5, y5, 124f, 8f, rgb, rgba, rgb, rgba, pose, scissor)
@@ -356,10 +357,10 @@ class ConfigColorPickerElement(
 
     companion object {
         private val PRESETS = listOf(
-            Color(Catppuccin.Mocha.Red.argb, true),
-            Color(Catppuccin.Mocha.Green.argb, true),
-            Color(Catppuccin.Mocha.Lavender.argb, true),
-            Color(Catppuccin.Mocha.Peach.argb, true)
+            Catppuccin.Mocha.Red.argb,
+            Catppuccin.Mocha.Green.argb,
+            Catppuccin.Mocha.Lavender.argb,
+            Catppuccin.Mocha.Peach.argb
         )
 
         var active: ConfigColorPickerElement? = null
@@ -371,11 +372,11 @@ class ConfigColorPickerElement(
             }
         }
 
-        private fun Color.hex(): String {
+        private fun Int.hex(): String {
             return if (alpha == 255) String.format("#%02X%02X%02X", red, green, blue) else String.format("#%02X%02X%02X%02X", red, green, blue, alpha)
         }
 
-        private fun parse(hex: String): Color? {
+        private fun parse(hex: String): Int? {
             val s = hex.trim().removePrefix("#")
             return try {
                 when (s.length) {
@@ -383,15 +384,19 @@ class ConfigColorPickerElement(
                         val r = s.substring(0, 1).toInt(16) * 17
                         val g = s.substring(1, 2).toInt(16) * 17
                         val b = s.substring(2, 3).toInt(16) * 17
-                        Color(r, g, b, 255)
+                        (0xFF shl 24) or (r shl 16) or (g shl 8) or b
                     }
                     6 -> {
                         val rgb = s.toLong(16).toInt()
-                        Color((rgb shr 16) and 0xFF, (rgb shr 8) and 0xFF, rgb and 0xFF, 255)
+                        (0xFF shl 24) or (rgb and 0xFFFFFF)
                     }
                     8 -> {
                         val rgba = s.toLong(16).toInt()
-                        Color((rgba ushr 24) and 0xFF, (rgba ushr 16) and 0xFF, (rgba ushr 8) and 0xFF, rgba and 0xFF)
+                        val r = (rgba ushr 24) and 0xFF
+                        val g = (rgba ushr 16) and 0xFF
+                        val b = (rgba ushr 8) and 0xFF
+                        val a = rgba and 0xFF
+                        (a shl 24) or (r shl 16) or (g shl 8) or b
                     }
                     else -> null
                 }
