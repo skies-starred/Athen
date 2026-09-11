@@ -78,15 +78,17 @@ object ItemRarityBackground : Module(
             }
 
             3 -> {
-                circle(x.toFloat(), y.toFloat(), 16f, color)
+                circle(x + 8f, y + 8f, 8f, color.withAlpha(fill))
             }
 
             4 -> {
+                val x = x + 8f
+                val y = y + 8f
                 val pose = Matrix3x2f(pose())
                 val scissor = scissorStack.peek()
 
-                ring(x.toFloat(), y.toFloat(), 15f, 16f, color, pose, scissor)
-                circle(x.toFloat(), y.toFloat(), 16f, color, pose, scissor)
+                circle(x, y, 8f, color.withAlpha(fill), pose, scissor)
+                ring(x, y, 7f, 8f, color, pose, scissor)
             }
         }
     }
