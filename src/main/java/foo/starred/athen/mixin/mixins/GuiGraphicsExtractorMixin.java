@@ -1,6 +1,7 @@
 package foo.starred.athen.mixin.mixins;
 
 import foo.starred.athen.events.GuiEvent;
+import foo.starred.athen.modules.impl.general.ColoredEnchants;
 import foo.starred.athen.modules.impl.render.ContainerScale;
 import foo.starred.athen.modules.impl.render.tooltip.ScrollableTooltip;
 import foo.starred.athen.modules.impl.render.tooltip.custom.CustomTooltip;
@@ -10,6 +11,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -36,6 +39,12 @@ public class GuiGraphicsExtractorMixin {
     @Inject(method = "itemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("TAIL"))
     private void athen$renderItemDecorations(Font font, ItemStack itemStack, int x, int y, String countText, CallbackInfo ci) {
         new GuiEvent.Items.Render.Post(self(), itemStack, x, y).post();
+    }
+
+    // Shares this mixin's priority so coloring runs after other SHOW_TEXT argument modifiers.
+    @ModifyArg(method = "componentHoverEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;split(Lnet/minecraft/network/chat/FormattedText;I)Ljava/util/List;"), index = 0)
+    private FormattedText athen$colorChatTooltip(FormattedText tooltip) {
+        return ColoredEnchants.colorChatHover(tooltip);
     }
 
     @Inject(method = "tooltip", at = @At("HEAD"), cancellable = true)

@@ -97,12 +97,17 @@ object MissingEnchants : Module(
                 val s = l.string
 
                 if (!se) {
+                    // The title can end in a Roman numeral, but it is never an enchantment.
+                    if (i == 0) continue
                     if (':' in s) continue
                     if ("◆" in s) continue
                     if (!s.r()) continue
 
-                    val ls = l.siblings.lastOrNull() ?: continue
-                    if ((ls.style.color?.value == 11184810 || ls.style.color?.value == 0) && !ls.style.isBold) continue
+                    // Enchant text can live on the root instead of a child.
+                    val ls = l.siblings.lastOrNull() ?: l
+                    // A child can inherit its color from the root.
+                    val color = ls.style.color ?: l.style.color
+                    if ((color?.value == 11184810 || color?.value == 0) && !ls.style.isBold) continue
 
                     se = true
                     continue
