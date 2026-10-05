@@ -16,7 +16,7 @@ enum class SlayerTier(val int: Int, private val _xp: Int) {
         get() = if (MayorPerks.SLAYER_XP_BUFF.active) (_xp * 1.25).toInt() else _xp
 
     companion object {
-        private val tierRegex = Regex("""(?:^|\s)(?<level>[MDCLXVI]{1,7})\s""")
+        private val tierRegex = Regex("""(?:^|\s)(?<level>[MDCLXVI]{1,7})(?:\s|$)""")
         val CODEC: Codec<SlayerTier> = Codec.STRING.xmap({ valueOf(it) }, { it.name })
 
         fun find(string: String): SlayerTier? {

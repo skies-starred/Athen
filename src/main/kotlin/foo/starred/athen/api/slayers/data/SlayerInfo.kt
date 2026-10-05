@@ -2,37 +2,47 @@ package foo.starred.athen.api.slayers.data
 
 import foo.starred.athen.api.slayers.enums.tier.SlayerTier
 import foo.starred.athen.api.slayers.enums.type.base.ISlayerType
+import foo.starred.snowbird.api.client
 import foo.starred.snowbird.api.lazy.RefreshableLazy
-import foo.starred.snowbird.api.level
-import foo.starred.snowbird.api.name
 import foo.starred.snowbird.utils.stripped
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
 
 data class SlayerInfo(val entity: Entity) {
-    val owner by RefreshableLazy(::fn0, true)
-    val type by RefreshableLazy(::fn1, true)
-    val tier by RefreshableLazy(::fn2, true)
+    private val _type by RefreshableLazy(::fn1, true)
+    private val _tier by RefreshableLazy(::fn2, true)
 
-    val string: String
+    val serializable: String
         get() = "${type}_T${tier?.int}"
 
     val owned: Boolean
-        get() = owner == name
+        get() = owner == client.user.name
 
-    private fun fn0(): String? {
-        return level?.getEntity(entity.id + 3)?.customName?.stripped()?.takeIf { it.contains("Spawned by:") }?.substringAfterLast(":")?.trim()
+    var type: ISlayerType? = null
+        get() = field ?: _type
+
+    var tier: SlayerTier? = null
+        get() = field ?: _tier
+
+    var phase: Int = 1
+
+    var owner: String? = null
+
+    override fun toString(): String {
+        return "SlayerInfo(owned=$owned, type=$type, tier=$tier, age=${entity.tickCount / 20}s)"
     }
 
     private fun fn1(): ISlayerType? {
-        val name = level?.getEntity(entity.id + 1)?.customName?.stripped() ?: return null
+        val name = name() ?: return null
         return ISlayerType.Companion.Names.map.entries.find { (a, _) -> name.contains(a) }?.value
     }
 
     private fun fn2(): SlayerTier? {
-        return SlayerTier.find(level?.getEntity(entity.id + 1)?.customName?.stripped() ?: return null)
+        val name = name() ?: return null
+        return SlayerTier.find(name)
     }
 
-    override fun toString(): String {
-        return "SlayerInfo(owner=$owner, isOwnedByPlayer=$owned, type=$type, tier=$tier, age=${entity.tickCount / 20}s)"
+    private fun name(): String? {
+        return (client.level?.getEntity(entity.id + 1) as? ArmorStand)?.customName?.stripped()
     }
 }

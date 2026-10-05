@@ -19,7 +19,6 @@ import foo.starred.athen.utils.command
 import foo.starred.snowbird.api.lie
 import foo.starred.snowbird.api.repeat
 import foo.starred.snowbird.api.text.parser.impl.parse
-import foo.starred.snowbird.utils.stripped
 import foo.starred.snowbird.utils.toDuration
 
 @Load
@@ -64,10 +63,6 @@ object SlayerTimers : Module(
         on<SlayerEvent.Boss.Spawn> {
             if (!slayerInfo.owned) return@on
 
-            val a = slayerInfo.type == SlayerBoss.Tarantula && slayerInfo.tier == SlayerTier.Five
-            if (bool && a) return@on ::bool.set(false)
-            if (a) bool = true
-
             start1 = Scheduler.ticks.server
             if (start0 <= 0) return@on
 
@@ -82,7 +77,7 @@ object SlayerTimers : Module(
             val str0 = time.toDuration(secondsDecimals = 1)
             val time0 = Scheduler.ticks.server - start1
             val str1 = (time0 / 20.0).toDuration(secondsDecimals = 1)
-            val key = slayerInfo.string + if (entity.customName?.stripped()?.contains("Conjoined Brood") == true) "_P2" else ""
+            val key = slayerInfo.serializable + if (slayerInfo.phase != 1) "_P${slayerInfo.phase}" else ""
             val pb = kills.value[key]
 
             if (pb == null || time < pb) {
@@ -109,7 +104,7 @@ object SlayerTimers : Module(
             }
 
             val a = slayerInfo.type == SlayerBoss.Tarantula && slayerInfo.tier == SlayerTier.Five
-            val p = if (a && bool) " <dark_gray>[P1]<r>" else if (a) " <dark_gray>[P2]<r>" else ""
+            val p = if (a) " <dark_gray>[P${slayerInfo.phase}]<r>" else ""
             val string = style1.replace("#special", p).replace("#color", c).replace("#time", str0).replace("#pb", s).replace("#ticks", "$time0")
             "<hover:<red>$time0 ticks.>$string".mod()
         }
@@ -158,7 +153,6 @@ object SlayerTimers : Module(
     }
 
     private fun reset() {
-        bool = false
         start0 = 0
     }
 }

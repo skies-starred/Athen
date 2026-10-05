@@ -32,7 +32,7 @@ object MinibossAlert : Module(
     private val bigBoiText by config.input("Special text", "<red>Big boi spawned!")
 
     private val bigBoys = SlayerMini.entries.filter { it.special }.map { it.name }
-    private val regex = Regex("^SLAYER MINI-BOSS (?<name>.+?) has spawned!$")
+    private val regex = Regex("^SLAYER MINI-BOSS! The (?<name>.+?) spawned!$")
 
     init {
         on<MessageEvent.Chat.Receive> {

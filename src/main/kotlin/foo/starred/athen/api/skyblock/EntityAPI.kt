@@ -109,11 +109,11 @@ object EntityAPI {
             }
         }
 
-        val b = a ?: return
+        val b = a?.rootVehicle ?: return
 
         val acc = (ent as? EntityDuck) ?: return
         val c = acc.`athen$attach`()
-        if (c != null && (c == a || c == a2)) return
+        if (c != null && (c == a || c == a2 || c == b)) return
 
         val list = (b as? EntityDuck)?.`athen$attachments`() ?: return
 
