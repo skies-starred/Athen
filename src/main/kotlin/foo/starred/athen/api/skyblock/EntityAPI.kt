@@ -109,7 +109,7 @@ object EntityAPI {
             }
         }
 
-        val b = a?.rootVehicle ?: return
+        val b = a?.rootVehicle?.takeIf { it.isAlive } ?: return
 
         val acc = (ent as? EntityDuck) ?: return
         val c = acc.`athen$attach`()

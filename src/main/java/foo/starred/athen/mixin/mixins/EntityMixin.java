@@ -152,6 +152,7 @@ public abstract class EntityMixin implements EntityDuck {
 
         if (!(entity instanceof ArmorStand stand)) return;
         if (!stand.hasCustomName()) return;
+        if (athen$attachedTo != null) return;
 
         EntityAPI.attach(entity);
     }

@@ -77,6 +77,7 @@ object GenericSlayerBossResolver {
     fun get(info: SlayerInfo) {
         if (info.type !is SlayerBoss) return
         if (info.owner != null) return
+        if (info.phase == 2 && info.entity.tickCount > 15) return
 
         val living = info.entity as? LivingEntity ?: return
         val looked = living.looking() ?: return
@@ -100,7 +101,7 @@ object GenericSlayerBossResolver {
         val level = client.level ?: return null
         val player = client.player ?: return null
         val distance = distance * distance
-        val active = SlayerAPI.bosses.values.filter { it.entity.isAlive }.mapNotNull { it.owner }
+        val active = SlayerAPI.bosses.values.filter { it.entity.isAlive && (it.type != SlayerBoss.Tarantula || it.phase != 1) }.mapNotNull { it.owner }
         val players = level.players().filter { it != player && it.uuid.version() == 4 && it.gameProfile.name() !in active && it.distanceToSqr(this) <= distance }.takeIf { it.isNotEmpty() } ?: return null
 
         return players.minByOrNull {

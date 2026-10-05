@@ -3,6 +3,7 @@ package foo.starred.athen.api.slayers
 import foo.starred.athen.annotations.Priority
 import foo.starred.athen.api.messaging.impl.MessagingAPI.dev
 import foo.starred.athen.api.slayers.data.SlayerInfo
+import foo.starred.athen.api.slayers.enums.tier.SlayerTier
 import foo.starred.athen.api.slayers.enums.type.base.ISlayerType
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerBoss
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerDemon
@@ -61,6 +62,12 @@ object SlayerAPI {
                 if (stripped.check()) bosses.computeIfAbsent(entity, ::SlayerInfo)
                 else bosses[entity] ?: return@on
 
+            if (stripped.contains("Conjoined Brood")) {
+                slayerInfo.type = SlayerBoss.Tarantula
+                slayerInfo.tier = SlayerTier.Five
+                slayerInfo.phase = 2
+            }
+
             if (slayerInfo.type is SlayerBoss && slayerInfo.owner == null) {
                 GenericSlayerBossResolver.get(slayerInfo)
                 if (slayerInfo.owner == null) return@on
@@ -84,7 +91,7 @@ object SlayerAPI {
         }
 
         on<EntityEvent.Death> {
-            val slayerInfo = bosses.remove(entity) ?: bosses.remove(entity.rootVehicle) ?: return@on
+            val slayerInfo = bosses.remove(entity) ?: return@on
             logged.remove(entity.id)
 
             when (slayerInfo.type) {
