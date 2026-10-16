@@ -23,7 +23,11 @@ import foo.starred.snowbird.api.text.parser.impl.parse
 import foo.starred.snowbird.utils.compress
 import foo.starred.snowbird.utils.decompress
 import foo.starred.snowbird.utils.stripped
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentUtils
+import net.minecraft.network.chat.FormattedText
 import tech.thatgravyboat.skyblockapi.utils.extentions.parseRomanNumeral
+import tech.thatgravyboat.skyblockapi.utils.text.TextUtils.splitLines
 import tech.thatgravyboat.skyblockapi.utils.text.TextUtils.substring
 
 @Load
@@ -129,46 +133,61 @@ object ColoredEnchants : Module(
             if (enchants.isEmpty()) return@on
             if (item.enchants().isEmpty()) return@on
 
-            var found = false
-            for (idx in tooltip.indices) {
-                val l = tooltip[idx]
-                val str = l.stripped()
+            color(tooltip)
+        }
+    }
 
-                if (found && str.isEmpty()) break
-                if ("◆" in str) continue
-                if (l.siblings.firstOrNull()?.style?.color?.value == null) continue
+    @JvmStatic
+    fun colorChatHover(text: FormattedText): FormattedText {
+        if (!enabled || enchants.isEmpty()) return text
+        val component = text as? Component ?: return text
+        val tooltip = component.splitLines().toMutableList()
 
-                val final = EMPTY_COMPONENT.copy()
-                var i = 0
+        return if (color(tooltip)) ComponentUtils.formatList(tooltip, Component.literal("\n")) else text
+    }
 
-                for (match in enchantRegex.findAll(str)) {
-                    val s = match.range.first
-                    val f = match.range.last + 1
+    private fun color(tooltip: MutableList<Component>): Boolean {
+        var found = false
+        for (idx in tooltip.indices) {
+            val l = tooltip[idx]
+            val str = l.stripped()
 
-                    if (s > i) final.append(l.substring(i, s))
+            if (found && str.isEmpty()) break
+            if ("◆" in str) continue
+            if ((l.siblings.firstOrNull() ?: l).style.color?.value == null) continue
 
-                    val name = match.groups["enchant"]?.value?.lowercase() ?: continue
-                    val lv0 = match.groups["level"]?.value ?: continue
-                    val lv1 = lv0.parseRomanNumeral()
+            val final = EMPTY_COMPONENT.copy()
+            var i = 0
 
-                    val ec = enchants[name] ?: run {
-                        final.append(l.substring(s, f))
-                        i = f
-                        continue
-                    }
+            for (match in enchantRegex.findAll(str)) {
+                val s = match.range.first
+                val f = match.range.last + 1
 
-                    var str0 = ""
-                    if (f < str.length && str[f] == ',') str0 = str[f].toString()
+                if (s > i) final.append(l.substring(i, s))
 
-                    final.append("${ec.style(lv1)}${ec.name} ${if (replaceRoman) lv1 else lv0}$str0".parse())
-                    i = f + str0.length
-                    found = true
+                val name = match.groups["enchant"]?.value?.lowercase() ?: continue
+                val lv0 = match.groups["level"]?.value ?: continue
+                val lv1 = lv0.parseRomanNumeral()
+
+                val ec = enchants[name] ?: run {
+                    final.append(l.substring(s, f))
+                    i = f
+                    continue
                 }
 
-                if (i < str.length) final.append(l.substring(i, str.length))
-                tooltip[idx] = final
+                var str0 = ""
+                if (f < str.length && str[f] == ',') str0 = str[f].toString()
+
+                final.append("${ec.style(lv1)}${ec.name} ${if (replaceRoman) lv1 else lv0}$str0".parse())
+                i = f + str0.length
+                found = true
             }
+
+            if (i < str.length) final.append(l.substring(i, str.length))
+            tooltip[idx] = final
         }
+
+        return found
     }
 
     private data class Enchant(
