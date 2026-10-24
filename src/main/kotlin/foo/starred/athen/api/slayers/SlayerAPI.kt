@@ -8,7 +8,6 @@ import foo.starred.athen.api.slayers.enums.type.base.ISlayerType
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerBoss
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerDemon
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerMini
-import foo.starred.athen.api.slayers.resolver.base.GenericSlayerBossResolver
 import foo.starred.athen.ducks.entity.EntityDuck.Companion.parent
 import foo.starred.athen.events.*
 import foo.starred.athen.events.core.on
@@ -25,6 +24,7 @@ object SlayerAPI {
     val bosses: WeakHashMap<Entity, SlayerInfo> = WeakHashMap()
 
     var slayer: SlayerInfo? = null
+        private set
 
     init {
         on<MessageEvent.Chat.Receive> {
@@ -64,16 +64,19 @@ object SlayerAPI {
                 slayerInfo.phase = 2
             }
 
-            if (slayerInfo.type is SlayerBoss && slayerInfo.owner == null) {
-                GenericSlayerBossResolver.get(slayerInfo)
-                if (slayerInfo.owner == null) return@on
-            }
-
-            if (!logged.add(entity.id)) {
-                return@on
-            }
+            if (slayerInfo.type is SlayerBoss && slayerInfo.owner == null) return@on
+            if (!logged.add(entity.id)) return@on
 
             when (slayerInfo.type) {
+                is SlayerBoss -> {
+                    if (slayerInfo.owned) {
+                        slayer = slayerInfo
+                    }
+
+                    SlayerEvent.Boss.Spawn(entity, slayerInfo).post()
+                    "SlayerAPI: Slayer spawned (owner=${slayerInfo.owner}, tier=${slayerInfo.tier}, tickAge=${entity.tickCount / 20.0}s)".dev()
+                }
+
                 is SlayerMini -> {
                     SlayerEvent.Miniboss.Spawn(entity, slayerInfo).post()
                     "SlayerAPI: Miniboss spawned (tickAge=${entity.tickCount / 20.0}s)".dev()
@@ -135,7 +138,7 @@ object SlayerAPI {
     }
 
     private fun String.check(): Boolean {
-        if (!endsWith("❤") && !endsWith("❤ ✯") && !endsWith(" Hits")) return false
+        if (!endsWith("❤") && !endsWith("❤ \uE01A") && !endsWith(" Hits")) return false
 
         for (name in ISlayerType.Companion.Names.all) {
             if (!contains(name)) continue

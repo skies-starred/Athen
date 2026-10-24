@@ -22,7 +22,7 @@ object WebSocketLocationResolver : IWebSocket {
     val users: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
     init {
-        ModSettings.shareSlayer.state.observe {
+        ModSettings.location.state.observe {
             if (it) {
                 fn(LocationAPI.id ?: return@observe)
                 return@observe
@@ -61,7 +61,7 @@ object WebSocketLocationResolver : IWebSocket {
 
     private fun fn(id: String) {
         if (!auth) return
-        if (!ModSettings.shareSlayer.value) return
+        if (!ModSettings.location.value) return
 
         val now = System.currentTimeMillis()
         if (now - last >= 10_000) {

@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
 
 data class SlayerInfo(val entity: Entity) {
+    private val _owner by RefreshableLazy(::fn0, true)
     private val _type by RefreshableLazy(::fn1, true)
     private val _tier by RefreshableLazy(::fn2, true)
 
@@ -18,18 +19,39 @@ data class SlayerInfo(val entity: Entity) {
     val owned: Boolean
         get() = owner == client.user.name
 
+    var owner: String? = null
+        get() {
+            if (field != null) return field
+
+            field = _owner
+            return field
+        }
+
     var type: ISlayerType? = null
-        get() = field ?: _type
+        get() {
+            if (field != null) return field
+
+            field = _type
+            return field
+        }
 
     var tier: SlayerTier? = null
-        get() = field ?: _tier
+        get() {
+            if (field != null) return field
+
+            field = _tier
+            return field
+        }
 
     var phase: Int = 1
 
-    var owner: String? = null
-
     override fun toString(): String {
         return "SlayerInfo(owned=$owned, type=$type, tier=$tier, age=${entity.tickCount / 20}s)"
+    }
+
+    private fun fn0(): String? {
+        val stand = client.level?.getEntity(entity.id + 3) as? ArmorStand ?: return null
+        return stand.customName?.stripped()?.takeIf { it.contains("'s SLAYER BOSS") }?.substringBefore("'")?.trim()
     }
 
     private fun fn1(): ISlayerType? {
