@@ -32,7 +32,7 @@ object SlayerDisplay : Module(
 
         for (l in lines) {
             val s = l.stripped()
-            if ("Spawned by:" in s) continue
+            if (s.endsWith("'s SLAYER BOSS")) continue
 
             colon = colon ?: l.takeIf { ":" in s }
             name = name ?: l.takeIf { SlayerBoss.NAMES.any { it in s } }

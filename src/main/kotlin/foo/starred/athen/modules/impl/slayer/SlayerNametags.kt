@@ -91,7 +91,7 @@ object SlayerNametags : Module(
 
                 val voidgloom = info.slayer.type == SlayerBoss.Voidgloom
                 for (line in entity.attachedStripped) {
-                    if (line == "SLAYER BOSS") {
+                    if (line.endsWith("'s SLAYER BOSS")) {
                         continue
                     }
 
