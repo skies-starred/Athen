@@ -10,7 +10,6 @@ import foo.starred.athen.api.slayers.SlayerAPI
 import foo.starred.athen.config.dsl.impl.category.ConfigCategory
 import foo.starred.athen.ducks.entity.generic.EntityDuck.Companion.attachedNames
 import foo.starred.athen.modules.Module
-import foo.starred.kontext.abstraction.client.extension.client
 import foo.starred.kontext.abstraction.text.measurer.MinecraftFontMeasurer
 import foo.starred.kontext.abstraction.text.renderer.MinecraftFontRenderer
 import foo.starred.kontext.api.format.extension.component.formattedText

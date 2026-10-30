@@ -108,7 +108,6 @@ public abstract class EntityDuckImpl implements EntityDuck {
 
         if (!(entity instanceof ArmorStand stand)) return;
         if (!stand.hasCustomName()) return;
-        if (athen$attachedTo != null) return;
 
         EntityAPI.INSTANCE.attach(entity);
     }
