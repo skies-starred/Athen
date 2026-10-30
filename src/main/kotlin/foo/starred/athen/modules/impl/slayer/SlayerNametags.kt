@@ -52,6 +52,7 @@ object SlayerNametags : Module(
     private val `styles$timer$unused` by `styles$timer`.variables("#time", "#laser")
 
     private val `styles$health` by config.group("Health styles")
+    private val `styles$health$effects` by config.switch("Show effects", true)
     private val `styles$health$normal` by `styles$health`.input("Normal", "<aqua>#health")
     private val `styles$health$hits` by `styles$health`.input("Hits", "<aqua>#hits Hits <dark_gray>[<gray>#health<dark_gray>]")
     private val `styles$health$unused` by `styles$health`.variables("#hits", "#health")
@@ -96,7 +97,7 @@ object SlayerNametags : Module(
                     }
 
                     val hits0 = line.endsWith(" Hits")
-                    if (line.endsWith('❤') || hits0) {
+                    if (`styles$health$effects` && (line.endsWith('❤') || hits0)) {
                         effects = effects.effect(line, '\uE01A', "<aqua>\uE01A")
                         effects = effects.effect(line, 'ᛤ', "<dark_purple>ᛤ")
                     }
