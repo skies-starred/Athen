@@ -46,7 +46,7 @@ object RadialEditor : CascadeScreen("Radial Menu Editor [Athen]", CascadeGeometr
 
     val names: List<String>
         get() {
-            return RadialMenu.configs.keys.toList()
+            return RadialMenu.store.profiles.keys.toList()
         }
 
     val max: Int
@@ -169,13 +169,13 @@ object RadialEditor : CascadeScreen("Radial Menu Editor [Athen]", CascadeGeometr
 
     fun rename() {
         val n = head.title.value.trim()
-        if (n.isBlank() || n == RadialMenu.active || n in names) {
+        if (n.isBlank() || n == RadialMenu.store.active || n in names) {
             editing = false
             head.fn()
             return
         }
 
-        RadialMenu.rename(RadialMenu.active, n)
+        RadialMenu.rename(RadialMenu.store.active, n)
         editing = false
         head.fn()
     }

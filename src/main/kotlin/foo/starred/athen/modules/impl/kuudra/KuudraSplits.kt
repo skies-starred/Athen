@@ -26,6 +26,7 @@ import foo.starred.kontext.abstraction.text.renderer.MinecraftFontRenderer
 import foo.starred.kontext.api.format.extension.component.formattedText
 import foo.starred.kontext.api.format.extension.time.parseDuration
 import foo.starred.kontext.api.scheduling.scheduler.extensions.clientTicks
+import foo.starred.kontext.api.storage.impl.generic.extension.mutableMap
 import foo.starred.kontext.api.text.parser.impl.parse
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence

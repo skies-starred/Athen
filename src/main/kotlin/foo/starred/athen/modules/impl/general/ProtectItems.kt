@@ -24,6 +24,7 @@ import foo.starred.kontext.api.format.extension.string.stripped
 import foo.starred.kontext.api.item.extension.get
 import foo.starred.kontext.api.item.resolver.impl.GenericKontextItemDataResolver
 import foo.starred.kontext.api.item.resolver.impl.LoreKontextItemDataResolver
+import foo.starred.kontext.api.storage.impl.generic.extension.mutableSet
 import foo.starred.kontext.api.text.parser.impl.parse
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.core.registries.BuiltInRegistries

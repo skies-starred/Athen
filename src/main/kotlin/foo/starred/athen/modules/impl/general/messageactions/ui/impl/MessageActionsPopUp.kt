@@ -430,7 +430,7 @@ class MessageActionsPopUp(
 
         title.text = (if (entry == null) "Create Action" else "Edit Action").literal()
 
-        categories = MessageActions.categories.map { it.name }
+        categories = MessageActions.store.data.categories.map { it.name }
         `checkbox$category`.items = listOf("Uncategorized") + categories
         `checkbox$category`.text = category.ifEmpty { "Uncategorized" }
         `checkbox$match`.text = match.displayName

@@ -2,12 +2,15 @@
 
 package foo.starred.athen.modules.impl.render.radial
 
+import com.google.gson.Gson
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import com.mojang.blaze3d.platform.InputConstants
 import foo.starred.athen.Athen
+import foo.starred.athen.Athen.GSON
 import foo.starred.athen.annotations.impl.LoadableAthenModule
 import foo.starred.athen.api.messaging.impl.MessagingAPI.mod
-import foo.starred.athen.api.storage.JsonStore
 import foo.starred.athen.config.dsl.impl.category.ConfigCategory
 import foo.starred.athen.config.theme.impl.catppuccin.MochaColorScheme
 import foo.starred.athen.events.GameEvent
@@ -30,9 +33,10 @@ import foo.starred.kontext.abstraction.text.measurer.MinecraftFontMeasurer
 import foo.starred.kontext.abstraction.text.renderer.MinecraftFontRenderer
 import foo.starred.kontext.api.data.Observable
 import foo.starred.kontext.api.format.extension.component.literal
-import foo.starred.kontext.util.compress
+import foo.starred.kontext.api.storage.impl.profile.data.ProfileContainer
+import foo.starred.kontext.api.storage.impl.profile.impl.ProfileJsonStore
 import foo.starred.kontext.util.decompress
-import foo.starred.kontext.util.safely
+import java.lang.reflect.Type
 import kotlin.math.hypot
 
 @LoadableAthenModule
@@ -58,11 +62,40 @@ object RadialMenu : Module(
 
     private val _unused1 by config.information("Command: <red>/athen radial help")
 
-    private val json = JsonStore("features/radialMenu")
-    private val stack = ArrayDeque<List<RadialSlot>>()
+    private val gsonType: Type = object : TypeToken<List<RadialSlot>>() {}.type
+    private val gson: Gson = GSON.newBuilder()
+        .registerTypeAdapter(
+            TypeToken.getParameterized(ProfileContainer::class.java, gsonType).type,
+            JsonDeserializer { json, _, context ->
+                val root = json.asJsonObject
+                val data = root.getAsJsonObject("@${Athen.Data.id}:data") ?: root
+                val profiles = mutableMapOf<String, List<RadialSlot>>()
+                val element = data.get("profiles") ?: data.get("configs")
 
+                val container = when {
+                    element == null -> null
+                    element.isJsonObject -> element.asJsonObject
+                    element.isJsonPrimitive && element.asJsonPrimitive.isString -> runCatching { JsonParser.parseString(element.asString).asJsonObject }.getOrNull()
+                    else -> null
+                }
+
+                container?.entrySet()?.forEach { (name, value) ->
+                    val list = context.deserialize<List<RadialSlot>>(value, gsonType) ?: return@forEach
+                    profiles[name] = list
+                }
+
+                if (profiles.isEmpty()) {
+                    profiles["Default"] = emptyList()
+                }
+
+                ProfileContainer(data.get("active")?.asString ?: "Default", profiles)
+            }
+        )
+        .create()
+
+    private val stack = ArrayDeque<List<RadialSlot>>()
+    val store = ProfileJsonStore<List<RadialSlot>>(Athen.Data.id, "features/radialMenu", gsonType, ::emptyList, gson)
     val slots = mutableListOf<RadialSlot>()
-    val configs = mutableMapOf<String, List<RadialSlot>>()
 
     val current: List<RadialSlot>
         get() = stack.lastOrNull() ?: slots
@@ -85,13 +118,9 @@ object RadialMenu : Module(
     var i2 = -1
         private set
 
-    var active: String by json.string("active", "Default")
-        private set
-
-    var saved: String by json.string("configs")
-        private set
-
     init {
+        fill(store.active)
+
         command {
             "radial" {
                 help()
@@ -109,37 +138,33 @@ object RadialMenu : Module(
                 val clipboard = MinecraftClient.clipboard
                 if (clipboard.isEmpty()) return@invoke "No data found in clipboard!".mod()
 
-                val map: Map<String, Any> = Athen.GSON.fromJson(clipboard.decompress(), object : TypeToken<Map<String, Any>>() {}.type)
-                val name = map["name"] as? String ?: return@invoke "Invalid config data!".mod()
-                val data: List<RadialSlot> = Athen.GSON.fromJson(Athen.GSON.toJson(map["slots"]), object : TypeToken<List<RadialSlot>>() {}.type)
+                val imported = store.import(clipboard) ?: runCatching {
+                    val json = clipboard.decompress()
+                    val map = GSON.fromJson(json, object : TypeToken<Map<String, Any>>() {}.type) as Map<String, Any>
+                    val name = map["name"] as? String ?: return@runCatching null
+                    val raw = GSON.toJson(map["slots"] ?: map["data"])
+                    val data = GSON.fromJson<List<RadialSlot>>(raw, gsonType) ?: return@runCatching null
 
-                var n = name
-                var i = 1
-                while (n in configs) n = "$name ${++i}"
+                    var target = name
+                    var index = 1
+                    while (target in store.profiles) {
+                        target = "$name ${++index}"
+                    }
 
-                configs[n] = data
-                load(n)
+                    store.add(target, data)
+                    target
+                }.getOrNull() ?: return@invoke "Invalid config data!".mod()
+
+                load(imported)
                 disk()
-                "Imported config '$n' with ${data.size} slots!".mod()
+                "Imported config '$imported' with ${slots.size} slots!".mod()
             }
 
             "export" / "radial" {
                 save()
-                MinecraftClient.clipboard = Athen.GSON.toJson(mapOf("name" to active, "slots" to slots)).compress()
-                "Exported config '$active' to clipboard!".mod()
-            }
-        }
-
-        on<GameEvent.Start> {
-            safely {
-                saved.takeIf { it.isNotBlank() }?.let { raw ->
-                    val map: Map<String, List<RadialSlot>> = Athen.GSON.fromJson(raw, object : TypeToken<Map<String, List<RadialSlot>>>() {}.type)
-                    configs.clear()
-                    configs.putAll(map)
-                }
-
-                if (configs.isEmpty()) configs["Default"] = emptyList()
-                fill(active)
+                disk()
+                MinecraftClient.clipboard = store.export()
+                "Exported config '${store.active}' to clipboard!".mod()
             }
         }
 
@@ -277,9 +302,9 @@ object RadialMenu : Module(
 
             val mini = if (type == 1 && i2 in current.indices) current[i2].sub else emptyList()
             val ring = layout()
-            val ringI = if (type == 2 && i1 != -1) ring.getOrNull(i1)?.first ?: -1 else -1
+            val ringIndex = if (type == 2 && i1 != -1) ring.getOrNull(i1)?.first ?: -1 else -1
 
-            graphics.guiRenderState.addGuiElement(RadialRenderState(graphics, x, y, size, mini, ring, i3 = ringI))
+            graphics.guiRenderState.addGuiElement(RadialRenderState(graphics, x, y, size, mini, ring, i3 = ringIndex))
             graphics.guiRenderState.nextStratum()
 
             for (i in current.indices) {
@@ -288,16 +313,16 @@ object RadialMenu : Module(
             }
 
             if (type == 1 && i2 in current.indices) {
-                for (j in current[i2].sub.indices) {
-                    val (x, y) = RadialRenderState.nested(x, y, size, radius2, i2, j, thickness)
-                    graphics.item(current[i2].sub[j].item, x - 8, y - 8)
+                for (i in current[i2].sub.indices) {
+                    val (x, y) = RadialRenderState.nested(x, y, size, radius2, i2, i, thickness)
+                    graphics.item(current[i2].sub[i].item, x - 8, y - 8)
                 }
             }
 
             if (type == 2) {
-                for ((i, s) in ring) {
+                for ((i, value) in ring) {
                     val (x, y) = RadialRenderState.ring(x, y, size, radius2, i, thickness)
-                    graphics.item(s.item, x - 8, y - 8)
+                    graphics.item(value.item, x - 8, y - 8)
                 }
             }
 
@@ -325,41 +350,47 @@ object RadialMenu : Module(
     }
 
     fun disk() {
-        saved = Athen.GSON.toJson(configs, object : TypeToken<Map<String, List<RadialSlot>>>() {}.type)
+        save()
+        store.save()
     }
 
     fun save() {
-        configs[active] = slots.toList()
+        store.profiles[store.active] = slots.map { it.clone() }
     }
 
     fun load(name: String) {
         save()
-        active = name
+        store.select(name)
         fill(name)
     }
 
     fun add(name: String) {
-        configs[name] = emptyList()
-        load(name)
+        save()
+        store.add(name, emptyList())
+        fill(name)
     }
 
     fun delete(name: String) {
-        if (configs.size <= 1) return
-        configs.remove(name)
-        if (active != name) return
-        active = configs.keys.first()
-        fill(active)
+        if (store.profiles.size <= 1) return
+
+        store.delete(name)
+        fill(store.active)
     }
 
     fun rename(old: String, new: String) {
-        val data = configs.remove(old) ?: return
-        configs[new] = data
-        if (active == old) active = new
+        if (old == new) return
+        if (new.isBlank()) return
+        if (store.profiles.containsKey(new)) return
+
+        store.rename(old, new)
     }
 
     private fun fill(name: String) {
         slots.clear()
-        configs[name]?.map { it.clone() }?.let { slots.addAll(it) }
+
+        store.profiles[name]?.map { it.clone() }?.let {
+            slots.addAll(it)
+        }
     }
 
     private fun dist(x1: Int, y1: Int): Double {
@@ -379,9 +410,17 @@ object RadialMenu : Module(
         }
     }
 
-    private fun react(v: Boolean, bool: Boolean) {
-        open.value = v
-        if (v) client.mouseHandler.releaseMouse() else if (bool) client.mouseHandler.grabMouse()
+    private fun react(visible: Boolean, bool: Boolean) {
+        open.value = visible
+
+        if (visible) {
+            client.mouseHandler.releaseMouse()
+            return
+        }
+
+        if (bool) {
+            client.mouseHandler.grabMouse()
+        }
     }
 
     private fun help() {
@@ -402,12 +441,12 @@ object RadialMenu : Module(
         if (i2 !in current.indices) return emptyList()
 
         val sub = current[i2].sub
-        val n = sub.size
-        val m = maxOf(1, current.size)
-        val p = i2
+        val count = sub.size
+        val total = maxOf(1, current.size)
+        val parent = i2
 
-        return List(n) { i ->
-            ((p - n / 2 + i + m * 2) % m) to sub[i]
+        return List(count) { index0 ->
+            ((parent - count / 2 + index0 + total * 2) % total) to sub[index0]
         }
     }
 }

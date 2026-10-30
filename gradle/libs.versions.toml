@@ -13,10 +13,10 @@ hypixel-modapi-fabric = "1.0.2+build.1+mc26.1"
 kbus = "2026.09.3"
 kommand = "2026.09.2"
 klassgraph = "2026.10.1"
-kontext = "2026.10.8"
+kontext = "2026.10.9"
 cascade = "2026.10.1"
 parallax = "2026.10.2"
-updater = "2026.10.2"
+updater = "2026.10.3"
 
 [libraries]
 fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }

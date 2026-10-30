@@ -9,6 +9,7 @@ import foo.starred.athen.api.storage.JsonStore
 import foo.starred.athen.config.data.feature.ConfigFeatureData
 import foo.starred.athen.config.dsl.impl.category.ConfigCategory
 import foo.starred.kontext.api.data.Observable
+import foo.starred.kontext.api.storage.impl.generic.extension.jsonObject
 import java.awt.Color
 
 @LoadableAthenModule

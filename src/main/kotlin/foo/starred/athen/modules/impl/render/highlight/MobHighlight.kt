@@ -24,6 +24,7 @@ import foo.starred.kontext.abstraction.chat.message.MinecraftMessages
 import foo.starred.kontext.abstraction.client.extension.client
 import foo.starred.kontext.api.entity.extension.renderAABB
 import foo.starred.kontext.api.entity.extension.serverMaxHealth
+import foo.starred.kontext.api.storage.impl.generic.extension.mutableList
 import foo.starred.kontext.api.text.parser.impl.parse
 import foo.starred.parallax.api.primitives.ParallaxBox
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap

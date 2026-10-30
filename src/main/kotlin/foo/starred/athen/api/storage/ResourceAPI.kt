@@ -1,6 +1,6 @@
 package foo.starred.athen.api.storage
 
 import foo.starred.athen.Athen
-import foo.starred.kontext.api.storage.AbstractResourceful
+import foo.starred.kontext.abstraction.identifier.MinecraftIdentifier
 
-object ResourceAPI : AbstractResourceful(Athen.Data.id)
+object ResourceAPI : MinecraftIdentifier(Athen.Data.id)

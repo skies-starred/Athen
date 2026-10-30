@@ -1,11 +1,12 @@
 @file:Suppress("ObjectPrivatePropertyName")
 
-package foo.starred.athen.modules.impl.general.slotbinds
+package foo.starred.athen.modules.impl.general.slotbinds.gui
 
 import com.mojang.blaze3d.platform.InputConstants
 import foo.starred.athen.api.rendering.ui.components.impl.TextFieldComponent
 import foo.starred.athen.api.rendering.ui.components.impl.TextFieldComponent.Companion.textField
 import foo.starred.athen.config.theme.impl.catppuccin.MochaColorScheme
+import foo.starred.athen.modules.impl.general.slotbinds.impl.SlotBinds
 import foo.starred.cascade.constraints.impl.data.PositionAlignment
 import foo.starred.cascade.constraints.impl.position.AlignPositionConstraint
 import foo.starred.cascade.constraints.impl.position.CenterPositionConstraint
@@ -156,13 +157,13 @@ object SlotBindsGUI : CascadeScreen("Slot Binds Editor [Athen]") {
                 if (button != InputConstants.MOUSE_BUTTON_LEFT) return@on
 
                 deleting = null
-                renaming = SlotBinds.active
+                renaming = SlotBinds.store.active
                 visible = false
 
                 `profile$new`.visible = false
                 `profile$delete`.visible = false
-                `profile$field`.value = SlotBinds.active
-                `profile$field`.block = SlotBinds.active.length
+                `profile$field`.value = SlotBinds.store.active
+                `profile$field`.block = SlotBinds.store.active.length
                 `profile$field`.visible = true
                 scene.focused = `profile$field`
 
@@ -191,14 +192,14 @@ object SlotBindsGUI : CascadeScreen("Slot Binds Editor [Athen]") {
             on<MouseEvent.Press> {
                 if (button != InputConstants.MOUSE_BUTTON_LEFT) return@on
 
-                val active = SlotBinds.active
+                val active = SlotBinds.store.active
                 if (deleting != active) {
                     deleting = active
                     buttons()
                     return@on
                 }
 
-                if (SlotBinds.map0.size > 1) {
+                if (SlotBinds.store.profiles.size > 1) {
                     SlotBinds.save()
                     SlotBinds.delete(active)
                 }
@@ -234,12 +235,12 @@ object SlotBindsGUI : CascadeScreen("Slot Binds Editor [Athen]") {
                     val r = renaming
 
                     if (r != null) {
-                        if (v.isNotEmpty() && v != r && !SlotBinds.map0.containsKey(v)) {
+                        if (v.isNotEmpty() && v != r && !SlotBinds.store.profiles.containsKey(v)) {
                             SlotBinds.rename(r, v)
                         }
                         renaming = null
                     } else {
-                        if (v.isNotEmpty() && !SlotBinds.map0.containsKey(v)) {
+                        if (v.isNotEmpty() && !SlotBinds.store.profiles.containsKey(v)) {
                             SlotBinds.save()
                             SlotBinds.disk()
                             SlotBinds.add(v)
@@ -373,8 +374,8 @@ object SlotBindsGUI : CascadeScreen("Slot Binds Editor [Athen]") {
         rows.clear()
 
         var cy = 4
-        for (name in SlotBinds.map0.keys) {
-            val b0 = name == SlotBinds.active
+        for (name in SlotBinds.store.profiles.keys) {
+            val b0 = name == SlotBinds.store.active
 
             val row = rectangle {
                 size = MixedSizeConstraint(PercentSizeConstraint(95f, 0f), FixedSizeConstraint(0, 20))
@@ -384,7 +385,7 @@ object SlotBindsGUI : CascadeScreen("Slot Binds Editor [Athen]") {
 
                 on<MouseEvent.Press> {
                     if (button != InputConstants.MOUSE_BUTTON_LEFT) return@on
-                    if (name == SlotBinds.active) return@on
+                    if (name == SlotBinds.store.active) return@on
 
                     SlotBinds.save()
                     SlotBinds.disk()
@@ -398,11 +399,11 @@ object SlotBindsGUI : CascadeScreen("Slot Binds Editor [Athen]") {
                 }
 
                 on<MouseEvent.Move.Enter> {
-                    if (name != SlotBinds.active) color = CascadeGeometricColor(MochaColorScheme.Surface0.alpha(0.5f))
+                    if (name != SlotBinds.store.active) color = CascadeGeometricColor(MochaColorScheme.Surface0.alpha(0.5f))
                 }
 
                 on<MouseEvent.Move.Exit> {
-                    if (name != SlotBinds.active) color = CascadeGeometricColor(MochaColorScheme.Base.argb)
+                    if (name != SlotBinds.store.active) color = CascadeGeometricColor(MochaColorScheme.Base.argb)
                 }
 
                 attach(left)
@@ -437,8 +438,8 @@ object SlotBindsGUI : CascadeScreen("Slot Binds Editor [Athen]") {
     }
 
     private fun buttons() {
-        val b0 = deleting == SlotBinds.active
-        val b1 = SlotBinds.map0.size > 1
+        val b0 = deleting == SlotBinds.store.active
+        val b1 = SlotBinds.store.profiles.size > 1
 
         `profile$rename`.color = CascadeGeometricColor(MochaColorScheme.Lavender.argb.brighten(0.8f))
         `profile$rename`.effect<OutlineEffect>()?.color = CascadeGeometricColor(MochaColorScheme.Lavender.argb.brighten(0.5f))

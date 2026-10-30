@@ -64,7 +64,7 @@ class RadialHeader(side: IPrimitiveElement<*>) {
 
                 RadialEditor.save()
                 val list0 = RadialEditor.names
-                RadialEditor.switch(list0[(list0.indexOf(RadialMenu.active) - 1 + list0.size) % list0.size])
+                RadialEditor.switch(list0[(list0.indexOf(RadialMenu.store.active) - 1 + list0.size) % list0.size])
                 cancel()
             }
 
@@ -91,7 +91,7 @@ class RadialHeader(side: IPrimitiveElement<*>) {
             position = FixedPositionConstraint(0, 0)
             textSize = 8.5f
             color0 = MochaColorScheme.Lavender.argb
-            value = RadialMenu.active
+            value = RadialMenu.store.active
 
             commit {
                 RadialEditor.rename()
@@ -123,7 +123,7 @@ class RadialHeader(side: IPrimitiveElement<*>) {
 
                 RadialEditor.save()
                 val list0 = RadialEditor.names
-                RadialEditor.switch(list0[(list0.indexOf(RadialMenu.active) + 1) % list0.size])
+                RadialEditor.switch(list0[(list0.indexOf(RadialMenu.store.active) + 1) % list0.size])
                 cancel()
             }
 
@@ -193,7 +193,7 @@ class RadialHeader(side: IPrimitiveElement<*>) {
                 RadialEditor.commit()
                 RadialMenu.slots.clear()
                 RadialMenu.slots.addAll(RadialEditor.working)
-                RadialMenu.delete(RadialMenu.active)
+                RadialMenu.delete(RadialMenu.store.active)
                 RadialEditor.working.clear()
                 RadialEditor.working.addAll(RadialMenu.slots)
                 RadialEditor.reload(0, -1)
@@ -213,6 +213,6 @@ class RadialHeader(side: IPrimitiveElement<*>) {
 
     fun fn() {
         if (title.editing) return
-        title.value = RadialMenu.active
+        title.value = RadialMenu.store.active
     }
 }

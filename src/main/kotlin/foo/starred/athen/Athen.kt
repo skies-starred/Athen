@@ -21,6 +21,8 @@ import foo.starred.kontext.abstraction.chat.message.MinecraftMessages
 import foo.starred.kontext.abstraction.gui.MinecraftGui
 import foo.starred.kontext.api.EMPTY_COMPONENT
 import foo.starred.kontext.api.scheduling.scheduler.extensions.clientTicks
+import foo.starred.kontext.api.storage.impl.generic.extension.boolean
+import foo.starred.kontext.api.storage.impl.generic.extension.string
 import foo.starred.kontext.api.text.parser.impl.parse
 import foo.starred.updater.logic.source.impl.ModrinthUpdateSource
 import kotlinx.coroutines.CoroutineName

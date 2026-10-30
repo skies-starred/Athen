@@ -203,11 +203,11 @@ object MessageActionsGUI : CascadeScreen("Message Actions [Athen]", CascadeGeome
                 val name = category ?: return@on
 
                 MessageActions.toggle(name)
-                rows0[name]?.label?.color = CascadeGeometricColor(if (MessageActions.categories.find { it.name == name }?.enabled != true) MochaColorScheme.Overlay0.argb else MochaColorScheme.Lavender.argb)
+                rows0[name]?.label?.color = CascadeGeometricColor(if (MessageActions.store.data.categories.find { it.name == name }?.enabled != true) MochaColorScheme.Overlay0.argb else MochaColorScheme.Lavender.argb)
                 buttons()
                 cancel()
 
-                for ((index, action) in MessageActions.actions.withIndex()) {
+                for ((index, action) in MessageActions.store.data.actions.withIndex()) {
                     if (action.category == name) entry(index)
                 }
             }
@@ -344,7 +344,7 @@ object MessageActionsGUI : CascadeScreen("Message Actions [Athen]", CascadeGeome
             on<MouseEvent.Press> {
                 if (button != InputConstants.MOUSE_BUTTON_LEFT) return@on
                 val current = entry ?: return@on
-                val actionEntry = MessageActions.actions.getOrNull(current) ?: return@on
+                val actionEntry = MessageActions.store.data.actions.getOrNull(current) ?: return@on
 
                 popup.visible = true
                 popup.open(MessageActionsPopUp.ActionEntryData(current, actionEntry), category)
@@ -419,12 +419,12 @@ object MessageActionsGUI : CascadeScreen("Message Actions [Athen]", CascadeGeome
         left.children.clear()
         rows0.clear()
 
-        val kv = sequenceOf(null to "Global") + MessageActions.categories.map { it.name to it.name }
+        val kv = sequenceOf(null to "Global") + MessageActions.store.data.categories.map { it.name to it.name }
         var cy = 4
 
         for ((k, v) in kv) {
             val b0 = category == k
-            val b1 = k == null || MessageActions.categories.find { it.name == k }?.enabled == true
+            val b1 = k == null || MessageActions.store.data.categories.find { it.name == k }?.enabled == true
 
             val row = rectangle {
                 size = MixedSizeConstraint(PercentSizeConstraint(95f, 0f), FixedSizeConstraint(0, 20))
@@ -476,7 +476,7 @@ object MessageActionsGUI : CascadeScreen("Message Actions [Athen]", CascadeGeome
         right.children.clear()
         rows1.clear()
 
-        val all = MessageActions.actions.mapIndexed { i, a -> i to a }
+        val all = MessageActions.store.data.actions.mapIndexed { i, a -> i to a }
         val filtered = if (category != null) all.filter { it.second.category == category } else all
 
         if (filtered.isEmpty()) {
@@ -492,7 +492,7 @@ object MessageActionsGUI : CascadeScreen("Message Actions [Athen]", CascadeGeome
 
         var cy = 0
         for ((index, action) in filtered) {
-            val b0 = action.enabled && (action.category.isEmpty() || MessageActions.categories.find { it.name == action.category }?.enabled != false)
+            val b0 = action.enabled && (action.category.isEmpty() || MessageActions.store.data.categories.find { it.name == action.category }?.enabled != false)
             val b1 = entry == index
 
             val row = rectangle {
@@ -534,7 +534,7 @@ object MessageActionsGUI : CascadeScreen("Message Actions [Athen]", CascadeGeome
 
                 on<MouseEvent.Press> {
                     if (button != InputConstants.MOUSE_BUTTON_LEFT) return@on
-                    val current = MessageActions.actions.getOrNull(index) ?: return@on
+                    val current = MessageActions.store.data.actions.getOrNull(index) ?: return@on
 
                     MessageActions.update(index, current.copy(enabled = !current.enabled))
                     rows1[index]?.toggle?.visible = !current.enabled
@@ -611,7 +611,7 @@ object MessageActionsGUI : CascadeScreen("Message Actions [Athen]", CascadeGeome
     private fun category(name: String?) {
         val entry = rows0[name] ?: return
         val b0 = category == name
-        val b1 = name == null || MessageActions.categories.find { it.name == name }?.enabled == true
+        val b1 = name == null || MessageActions.store.data.categories.find { it.name == name }?.enabled == true
 
         entry.row.color = CascadeGeometricColor(if (b0) MochaColorScheme.Surface0.argb else MochaColorScheme.Base.argb)
         entry.label.color = CascadeGeometricColor(if (!b1) MochaColorScheme.Overlay0.argb else if (b0) MochaColorScheme.Lavender.argb else MochaColorScheme.Subtext0.argb)
@@ -619,7 +619,7 @@ object MessageActionsGUI : CascadeScreen("Message Actions [Athen]", CascadeGeome
 
     private fun buttons() {
         val b0 = category != null
-        val b1 = b0 && MessageActions.categories.find { it.name == category }?.enabled == true
+        val b1 = b0 && MessageActions.store.data.categories.find { it.name == category }?.enabled == true
         val b2 = b0 && deleting == category
 
         `category$toggle`.color = CascadeGeometricColor(if (!b0) MochaColorScheme.Surface1.argb else if (b1) MochaColorScheme.Lavender.argb.brighten(0.8f) else MochaColorScheme.Surface1.argb)
@@ -634,8 +634,8 @@ object MessageActionsGUI : CascadeScreen("Message Actions [Athen]", CascadeGeome
 
     private fun entry(index: Int) {
         val row = rows1[index] ?: return
-        val actionEntry = MessageActions.actions.getOrNull(index) ?: return
-        val b0 = actionEntry.enabled && (actionEntry.category.isEmpty() || MessageActions.categories.find { it.name == actionEntry.category }?.enabled != false)
+        val action = MessageActions.store.data.actions.getOrNull(index) ?: return
+        val b0 = action.enabled && (action.category.isEmpty() || MessageActions.store.data.categories.find { it.name == action.category }?.enabled != false)
         val b1 = entry == index
 
         row.row.color = CascadeGeometricColor(if (b1) MochaColorScheme.Surface1.argb else if (!b0) MochaColorScheme.Red.alpha(0.15f) else MochaColorScheme.Surface0.argb)

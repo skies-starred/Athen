@@ -18,6 +18,7 @@ import foo.starred.kontext.abstraction.chat.message.MinecraftMessages
 import foo.starred.kontext.abstraction.client.extension.client
 import foo.starred.kontext.api.EMPTY_COMPONENT
 import foo.starred.kontext.api.format.extension.component.literal
+import foo.starred.kontext.api.storage.impl.generic.extension.map
 import foo.starred.kontext.api.text.parser.impl.parse
 import foo.starred.kontext.api.text.replacer.AbstractTextReplacer
 import net.minecraft.network.chat.Component

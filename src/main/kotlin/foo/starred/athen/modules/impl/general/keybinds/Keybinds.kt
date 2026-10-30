@@ -12,6 +12,7 @@ import foo.starred.athen.modules.impl.general.keybinds.ui.KeybindsGUI
 import foo.starred.athen.utils.command
 import foo.starred.kontext.abstraction.chat.command.MinecraftCommands
 import foo.starred.kontext.abstraction.chat.message.MinecraftMessages
+import foo.starred.kontext.api.storage.impl.generic.extension.mutableList
 
 @LoadableAthenModule
 object Keybinds : Module(

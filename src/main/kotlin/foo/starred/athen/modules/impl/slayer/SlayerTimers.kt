@@ -19,6 +19,7 @@ import foo.starred.kontext.abstraction.chat.color.MinecraftColors
 import foo.starred.kontext.abstraction.chat.generic.MinecraftChat
 import foo.starred.kontext.abstraction.chat.message.MinecraftMessages
 import foo.starred.kontext.api.format.extension.time.parseDuration
+import foo.starred.kontext.api.storage.impl.generic.extension.mutableMap
 import foo.starred.kontext.api.text.parser.impl.parse
 
 @LoadableAthenModule
