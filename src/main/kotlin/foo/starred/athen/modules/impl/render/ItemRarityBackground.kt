@@ -103,7 +103,7 @@ object ItemRarityBackground : Module(
         SkyBlockItemRarity.EPIC -> `color$epic`
         SkyBlockItemRarity.LEGENDARY -> `color$leg`
         SkyBlockItemRarity.MYTHIC -> `color$mythic`
-        SkyBlockItemRarity.SUPREME -> `color$divine`
+        SkyBlockItemRarity.DIVINE -> `color$divine`
         else -> `color$special`
     }
 }
