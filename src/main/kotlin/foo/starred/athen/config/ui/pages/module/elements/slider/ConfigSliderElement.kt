@@ -59,6 +59,8 @@ open class ConfigSliderElement : RoundedRectanglePrimitive() {
         }
 
     init {
+        fn()
+
         color = CascadeGeometricColor(MochaColorScheme.Surface0.argb)
         radius = CascadeGeometricRadius(4f)
         unfocus = false

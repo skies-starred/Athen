@@ -1,12 +1,14 @@
+@file:Suppress("PropertyName")
+
 package foo.starred.athen.modules.impl.general
 
 import foo.starred.athen.annotations.impl.LoadableAthenModule
 import foo.starred.athen.config.dsl.impl.category.ConfigCategory
 import foo.starred.athen.events.InputEvent
 import foo.starred.athen.events.TickEvent
-import foo.starred.athen.mixin.accessors.KeyMappingAccessor
 import foo.starred.athen.modules.Module
 import foo.starred.kbus.extensions.override
+import foo.starred.kontext.abstraction.client.extension.boundKey
 import foo.starred.kontext.abstraction.client.extension.client
 import foo.starred.kontext.abstraction.gui.MinecraftGui
 import net.minecraft.client.KeyMapping
@@ -21,20 +23,19 @@ object SnapTap : Module(
     private val pairs = ArrayList<Pair>(4)
 
     private data class Pair(
-        val curr: KeyMapping,
-        val oppo: KeyMapping
+        val _current: KeyMapping,
+        val _opposite: KeyMapping
     ) {
-        val key: Int
-            get() = (curr as KeyMappingAccessor).boundKey.value
+        val current: Int
+            get() = _current.boundKey().value
 
-        val opp: Int
-            get() = (oppo as KeyMappingAccessor).boundKey.value
+        val value: Int
+            get() = _opposite.boundKey().value
     }
 
     init {
         on<InputEvent.Keyboard.Press> {
-            //~ if >= 26.2 'client.screen' -> 'client.gui.screen()'
-            if (client.screen != null) return@on
+            if (MinecraftGui.screen != null) return@on
 
             val key = keyEvent.key()
             if (active.add(key)) key.pair(false)
@@ -60,10 +61,10 @@ object SnapTap : Module(
 
     private fun Int.pair(bool: Boolean) {
         for (pair in pairs) {
-            if (pair.key != this) continue
-            if (pair.opp !in active) return
+            if (pair.current != this) continue
+            if (pair.value !in active) return
 
-            pair.oppo.isDown = bool
+            pair._opposite.isDown = bool
             return
         }
     }
