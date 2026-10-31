@@ -237,9 +237,11 @@ open class TextFieldComponent : IPrimitiveElement<TextFieldComponent>() {
             val x0 = x + 3 - scroll
 
             if (selected && b) {
-                val (s, e) = range
-                val s1 = MinecraftFontMeasurer.width(value.substring(0, s))
-                val s2 = MinecraftFontMeasurer.width(value.substring(0, e))
+                val start = range.first.coerceIn(0, value.length)
+                val end = range.second.coerceIn(0, value.length)
+
+                val s1 = MinecraftFontMeasurer.width(value.substring(0, start))
+                val s2 = MinecraftFontMeasurer.width(value.substring(0, end))
                 graphics.rectangle(x0 + s1, y + 2, (s2 - s1).toFloat(), height - 4, MochaColorScheme.Lavender.alpha(0.5f))
             }
 
