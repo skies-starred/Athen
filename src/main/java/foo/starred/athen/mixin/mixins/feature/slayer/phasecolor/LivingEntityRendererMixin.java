@@ -19,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 //~ if >= 26.3 'blaze3d' -> 'renderpearl.api'
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+//~ if >= 26.3 'blaze3d' -> 'renderpearl.api'
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 //? if <= 26.1
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -38,6 +40,7 @@ public abstract class LivingEntityRendererMixin {
                                     .withVertexBinding(0, DefaultVertexFormat.ENTITY)
                                     //~ if >= 26.3 'blaze3d' -> 'renderpearl.api.pipeline'
                                     .withPrimitiveTopology(com.mojang.blaze3d.PrimitiveTopology.QUADS)
+                                    .withColorTargetState(ColorTargetState.DEFAULT)
                                     *///?} else {
                                     .withSampler("Sampler0")
                                     .withSampler("Sampler1")
