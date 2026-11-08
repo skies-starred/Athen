@@ -17,7 +17,7 @@ import foo.starred.athen.modules.impl.general.keybinds.Keybinds.update
 import foo.starred.athen.modules.impl.general.keybinds.data.BindingEntry
 import foo.starred.athen.modules.impl.general.keybinds.data.KeybindCondition
 import foo.starred.athen.modules.impl.general.keybinds.data.KeybindWorkIn
-import foo.starred.athen.modules.impl.general.keybinds.ui.KeybindsGUI.str
+import foo.starred.athen.modules.impl.general.keybinds.ui.KeybindsGUI.string
 import foo.starred.cascade.constraints.impl.data.PositionAlignment
 import foo.starred.cascade.constraints.impl.data.PositionAnchor
 import foo.starred.cascade.constraints.impl.position.*
@@ -36,6 +36,8 @@ import foo.starred.cascade.primitives.impl.RectanglePrimitive.Companion.rectangl
 import foo.starred.cascade.primitives.impl.TextPrimitive
 import foo.starred.cascade.primitives.impl.TextPrimitive.Companion.text
 import foo.starred.cascade.screen.CascadeScreen
+import foo.starred.kontext.abstraction.input.impl.KeyboardInputState
+import foo.starred.kontext.abstraction.input.impl.MouseInputState
 import foo.starred.kontext.abstraction.text.measurer.MinecraftFontMeasurer
 import foo.starred.kontext.api.format.extension.component.literal
 
@@ -44,9 +46,9 @@ class KeybindsPopUp(
     private val onClose: () -> Unit
 ) : ContainerPrimitive() {
     private var entry: BindingEntry? = null
-    private var binding = mutableListOf<Int>()
+    private var binding = mutableListOf<InputConstants.Key>()
     private var capturing = false
-    private val captured = mutableSetOf<Int>()
+    private val captured = mutableSetOf<InputConstants.Key>()
     private var condition = KeybindCondition()
     private var category = ""
     private var categories: List<String> = emptyList()
@@ -92,7 +94,7 @@ class KeybindsPopUp(
                     captured.clear()
                 }
 
-                key > 0 -> captured.add(key)
+                key > 0 -> captured.add(KeyboardInputState.vanilla(key))
             }
 
             keys()
@@ -102,7 +104,7 @@ class KeybindsPopUp(
         on<MouseEvent.Press> {
             if (!capturing) return@on
 
-            captured.add(button)
+            captured.add(MouseInputState.vanilla(button))
             keys()
             cancel()
         }
@@ -494,9 +496,9 @@ class KeybindsPopUp(
         `keys$hint`.visible = capturing
 
         `keys$boxText`.text = when {
-            capturing -> if (captured.isEmpty()) "Press keys..." else captured.toList().str()
+            capturing -> if (captured.isEmpty()) "Press keys..." else captured.toList().string()
             binding.isEmpty() -> "Click to bind"
-            else -> binding.str()
+            else -> binding.string()
         }.literal()
     }
 }

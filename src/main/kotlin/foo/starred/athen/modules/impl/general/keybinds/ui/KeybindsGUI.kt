@@ -32,7 +32,6 @@ import foo.starred.cascade.primitives.impl.TextPrimitive
 import foo.starred.cascade.primitives.impl.TextPrimitive.Companion.text
 import foo.starred.cascade.screen.CascadeScreen
 import foo.starred.kontext.abstraction.input.impl.GenericInputState
-import foo.starred.kontext.abstraction.input.impl.KeyboardInputState
 import foo.starred.kontext.abstraction.text.measurer.MinecraftFontMeasurer
 import foo.starred.kontext.api.format.extension.color.brighten
 import foo.starred.kontext.api.format.extension.component.literal
@@ -558,7 +557,7 @@ object KeybindsGUI : CascadeScreen("Keybinds Manager [Athen]", CascadeGeometricR
             }
 
             rectangle {
-                val str = entry.binding.keys.str()
+                val str = entry.binding.keys.string()
 
                 size = FixedSizeConstraint(MinecraftFontMeasurer.width(str) + 8, 16)
                 position = AlignPositionConstraint(PositionAlignment.START, PositionAlignment.CENTER)
@@ -636,8 +635,8 @@ object KeybindsGUI : CascadeScreen("Keybinds Manager [Athen]", CascadeGeometricR
         `keybind$delete$text`.color = CascadeGeometricColor(if (b) MochaColorScheme.Base.argb else MochaColorScheme.Overlay0.argb)
     }
 
-    fun Iterable<Int>.str(): String {
+    fun Iterable<InputConstants.Key>.string(): String {
         if (!iterator().hasNext()) return "None"
-        return joinToString(" + ") { GenericInputState.name(KeyboardInputState.vanilla(it)) }
+        return joinToString(" + ") { GenericInputState.name(it) }
     }
 }
