@@ -49,12 +49,12 @@ class ConfigSoundOption(
 
     operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): ReadOnlyProperty<Any?, ConfigSoundOption> {
         val handle = group.provideDelegate(thisRef, property).getValue(thisRef, property)
-        val key = handle.key
+        val key = builder.key
 
-        handle.switch("Enabled", enabled0).unique("${property.name}.enabled")
-        handle.input("Sound ID", sound0).unique("${property.name}.sound")
-        handle.slider("Pitch", pitch0.toDouble(), 0.0, 2.0, double = true).unique("${property.name}.pitch")
-        handle.slider("Volume", volume0.toDouble(), 0.0, 1.0, double = true).unique("${property.name}.volume")
+        handle.switch("Enabled", enabled0).unique("enabled")
+        handle.input("Sound ID", sound0).unique("sound")
+        handle.slider("Pitch", pitch0.toDouble(), 0.0, 2.0, double = true).unique("pitch")
+        handle.slider("Volume", volume0.toDouble(), 0.0, 1.0, double = true).unique("volume")
 
         ConfigManager.observe("$key.enabled") {
             enabled = it as? Boolean ?: enabled0

@@ -1,11 +1,9 @@
 package foo.starred.athen.config.dsl.impl.builders.group
 
-import foo.starred.athen.config.ConfigManager
 import foo.starred.athen.config.data.impl.ConfigGroupElementData
 import foo.starred.athen.config.dsl.base.ConfigScope
 import foo.starred.athen.config.dsl.base.ElementBuilder
 import foo.starred.athen.config.dsl.impl.builders.config.ConfigMainBuilder
-import foo.starred.kontext.api.data.Observable
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -15,8 +13,6 @@ class ConfigGroupBuilder(
     private val collapsed: Boolean = true,
     parent0: String? = null
 ) : ElementBuilder<ConfigGroupBuilder>(parent0), ConfigScope, ReadOnlyProperty<Any?, ConfigGroupBuilder> {
-    private val state = Observable(!collapsed)
-
     override val parent: String
         get() = key
 
@@ -24,12 +20,9 @@ class ConfigGroupBuilder(
         private set
 
     operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): ReadOnlyProperty<Any?, ConfigGroupBuilder> {
-        key = "${builder.key}.expandable_${property.name}"
+        key = "${builder.key}.${property.name}"
+        builder.feature.option(ConfigGroupElementData(name, key, collapsed, super<ElementBuilder>.parent, description))
 
-        val data = ConfigGroupElementData(name, key, collapsed, super<ElementBuilder>.parent, description)
-        builder.feature.option(data)
-
-        ConfigManager.observe(key) { state.value = it as? Boolean ?: !collapsed }
         return this
     }
 
