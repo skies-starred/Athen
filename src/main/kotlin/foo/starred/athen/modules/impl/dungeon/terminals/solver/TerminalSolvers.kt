@@ -94,7 +94,9 @@ object TerminalSolvers : Module(
     init {
         on<PacketEvent.Receive, ClientboundSoundPacket> {
             if (!clicks.enabled) return@on
-            if (sound.value() != SoundEvents.EXPERIENCE_ORB_PICKUP) return@on
+            if (sound.value() != SoundEvents.NOTE_BLOCK_PLING.value()) return@on
+            if (volume != 8f) return@on
+            if (pitch != 4.047619f) return@on
 
             it.cancel()
             clicks.play()
