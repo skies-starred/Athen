@@ -14,8 +14,8 @@ class TitleAction(val text: String, val stay: Int = 70) : IMessageAction {
     private val parsed = text.parse()
     private val empty = text.isEmpty()
 
-    override val id: Int = int
-    override val name: String = str
+    override val id: Int = id0
+    override val name: String = name0
     override val serializable: Map<String, String> = mapOf("text" to text, "stay" to stay.toString())
 
     override fun run() {
@@ -35,19 +35,13 @@ class TitleAction(val text: String, val stay: Int = 70) : IMessageAction {
     }
 
     companion object {
-        const val int = 4
-        const val str = "Title"
+        const val id0 = 4
+        const val name0 = "Title"
 
         init {
-            IMessageAction.register(
-                MessageActionType(
-                    int,
-                    str,
-                    fields = listOf(MessageActionField("text", "Title", "Title text"), MessageActionField("stay", "Duration (ticks)", "70", "70", true))
-                ) {
-                    TitleAction(it["text"] ?: "", it["stay"]?.toIntOrNull() ?: 70)
-                }
-            )
+            IMessageAction.register(MessageActionType(id0, name0, listOf(MessageActionField("text", "Title", "Title text"), MessageActionField("stay", "Duration (ticks)", "70", "70", true))) {
+                TitleAction(it["text"] ?: "", it["stay"]?.toIntOrNull() ?: 70)
+            })
         }
     }
 }

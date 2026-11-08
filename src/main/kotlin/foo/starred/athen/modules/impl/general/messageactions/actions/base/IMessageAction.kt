@@ -14,8 +14,8 @@ interface IMessageAction {
     companion object {
         private val registry = mutableMapOf<Int, MessageActionType>()
 
-        fun register(a: MessageActionType) {
-            registry[a.id] = a
+        fun register(action: MessageActionType) {
+            registry[action.id] = action
         }
 
         fun get(id: Int): MessageActionType? =
