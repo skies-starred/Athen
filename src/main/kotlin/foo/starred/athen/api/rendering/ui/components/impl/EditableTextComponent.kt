@@ -12,6 +12,7 @@ import foo.starred.cascade.graphics.extensions.scissor.scissor
 import foo.starred.cascade.graphics.font.CascadeFonts
 import foo.starred.cascade.graphics.geometry.CascadeGeometricColor
 import foo.starred.cascade.primitives.base.impl.IPrimitiveElement
+import foo.starred.cascade.primitives.base.interfaces.IPrimitiveTypable
 import foo.starred.kontext.abstraction.client.impl.MinecraftClient
 import foo.starred.kontext.abstraction.input.impl.KeyboardInputState
 import foo.starred.kontext.api.ZERO_PAIR
@@ -21,7 +22,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-open class EditableTextComponent : IPrimitiveElement<EditableTextComponent>() {
+open class EditableTextComponent : IPrimitiveElement<EditableTextComponent>(), IPrimitiveTypable {
     private var initial: String = ""
     private var _cursor: Float = 0f
     private var _selection0: Float = 0f

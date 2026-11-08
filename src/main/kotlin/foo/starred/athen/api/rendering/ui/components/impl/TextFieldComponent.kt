@@ -9,6 +9,7 @@ import foo.starred.cascade.graphics.extensions.rectangle.solid.rectangle
 import foo.starred.cascade.graphics.extensions.scissor.scissor
 import foo.starred.cascade.graphics.geometry.CascadeGeometricColor
 import foo.starred.cascade.primitives.base.impl.IPrimitiveElement
+import foo.starred.cascade.primitives.base.interfaces.IPrimitiveTypable
 import foo.starred.kontext.abstraction.client.impl.MinecraftClient
 import foo.starred.kontext.abstraction.input.impl.KeyboardInputState
 import foo.starred.kontext.abstraction.text.measurer.MinecraftFontMeasurer
@@ -19,7 +20,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-open class TextFieldComponent : IPrimitiveElement<TextFieldComponent>() {
+open class TextFieldComponent : IPrimitiveElement<TextFieldComponent>(), IPrimitiveTypable {
     override var x: Float = 0f
     override var y: Float = 0f
     override var width: Float = 0f
