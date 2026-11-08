@@ -43,9 +43,8 @@ class ConfigInformationElement(
 
         val text0 = config.description.takeIf { !it.isNullOrEmpty() }
         if (text0 != null) {
-            on<MouseEvent.Move.Any> {
-                if (!hovered) return@on
-                ConfigUI.show(text0, x, y)
+            on<MouseEvent.Move.Enter> {
+                ConfigUI.show(text0)
             }
 
             on<MouseEvent.Move.Exit> {

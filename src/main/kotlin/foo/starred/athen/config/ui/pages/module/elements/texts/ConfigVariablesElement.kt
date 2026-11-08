@@ -73,15 +73,7 @@ class ConfigVariablesElement(
                     val token = config.tokens.getOrNull(page * 3 + i) ?: return@on
                     copied = token
                     MinecraftClient.clipboard = token
-                    ConfigUI.show("<#A6E3A1>Copied $token to clipboard!", x, y)
-                }
-
-                on<MouseEvent.Move.Any> {
-                    if (!hovered) return@on
-
-                    val token = config.tokens.getOrNull(page * 3 + i) ?: return@on
-                    val text = if (copied == token) "<#A6E3A1>Copied $token to clipboard!" else "Click to copy <#CBA6F7>$token"
-                    ConfigUI.show(text, x, y)
+                    ConfigUI.show("<#A6E3A1>Copied $token to clipboard!")
                 }
 
                 on<MouseEvent.Move.Exit> {

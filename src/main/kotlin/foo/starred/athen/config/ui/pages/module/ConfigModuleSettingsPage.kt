@@ -273,6 +273,8 @@ object ConfigModuleSettingsPage {
             }.also { label = it })
 
             on<MouseEvent.Move.Enter> {
+                ConfigUI.show(string)
+
                 animate(120.milliseconds) {
                     effect<OutlineEffect> {
                         ::color to CascadeGeometricColor(MochaColorScheme.Lavender.alpha(0.80f))
@@ -284,12 +286,9 @@ object ConfigModuleSettingsPage {
                 }
             }
 
-            on<MouseEvent.Move.Any> {
-                if (!hovered) return@on
-                ConfigUI.show(string, x, y)
-            }
-
             on<MouseEvent.Move.Exit> {
+                ConfigUI.hide()
+
                 animate(120.milliseconds) {
                     effect<OutlineEffect> {
                         ::color to CascadeGeometricColor(MochaColorScheme.Surface1.alpha(0.50f))

@@ -11,7 +11,6 @@ import foo.starred.athen.config.ui.pages.module.elements.input.ConfigInputElemen
 import foo.starred.athen.config.ui.pages.module.elements.input.ConfigInputElement.Companion.configInputElement
 import foo.starred.athen.modules.impl.ModSettings
 import foo.starred.athen.utils.command
-import foo.starred.cascade.constraints.base.IPositionConstraint
 import foo.starred.cascade.constraints.base.ISizeConstraint
 import foo.starred.cascade.constraints.impl.data.PositionAlignment
 import foo.starred.cascade.constraints.impl.position.AlignPositionConstraint
@@ -27,6 +26,7 @@ import foo.starred.cascade.graphics.geometry.CascadeGeometricRadius
 import foo.starred.cascade.graphics.geometry.CascadeGeometricResolution
 import foo.starred.cascade.primitives.base.impl.IPrimitiveElement
 import foo.starred.cascade.primitives.impl.ContainerPrimitive.Companion.container
+import foo.starred.cascade.primitives.impl.OverlayPrimitive.Companion.overlay
 import foo.starred.cascade.primitives.impl.RectanglePrimitive
 import foo.starred.cascade.primitives.impl.RectanglePrimitive.Companion.rectangle
 import foo.starred.cascade.primitives.impl.RoundedRectanglePrimitive
@@ -53,28 +53,33 @@ object ConfigUI : CascadeScreen("Config UI [Athen]", CascadeGeometricResolution.
         offset = CascadeGeometricOffset(4f, 4f)
     }
 
-    private val tooltip = object : RoundedRectanglePrimitive() {
-        override fun draw(graphics: GuiGraphicsExtractor) {
-            graphics.nextStratum()
-            super.draw(graphics)
-        }
-    }.apply {
-        color = CascadeGeometricColor(MochaColorScheme.Base.argb)
-        radius = CascadeGeometricRadius(4f)
+    private val tooltip = overlay {
         visible = false
-        interact = false
+        follow = true
+        clamp = true
 
-        size = object : ISizeConstraint {
-            override fun _width(element: IPrimitiveElement<*>, parent: IPrimitiveElement<*>): Float = CascadeFonts.sans.width(text.text, 10f) + 8f
-            override fun _height(element: IPrimitiveElement<*>, parent: IPrimitiveElement<*>): Float = (CascadeFonts.sans.regular.height * 10f) + 8f
-        }
+        adopt(roundedRectangle {
+            color = CascadeGeometricColor(MochaColorScheme.Base.argb)
+            radius = CascadeGeometricRadius(4f)
+            position = FixedPositionConstraint(5f, 5f)
 
-        effect(OutlineEffect {
-            color = CascadeGeometricColor(MochaColorScheme.Surface1.argb)
-            inset = false
+            size = object : ISizeConstraint {
+                override fun _width(element: IPrimitiveElement<*>, parent: IPrimitiveElement<*>): Float {
+                    return CascadeFonts.sans.width(text.text, 10f) + 8f
+                }
+
+                override fun _height(element: IPrimitiveElement<*>, parent: IPrimitiveElement<*>): Float {
+                    return (CascadeFonts.sans.regular.height * 10f) + 8f
+                }
+            }
+
+            effect(OutlineEffect {
+                color = CascadeGeometricColor(MochaColorScheme.Surface1.argb)
+                inset = false
+            })
+
+            adopt(text)
         })
-
-        adopt(text)
     }
 
     lateinit var search: ConfigInputElement
@@ -250,23 +255,9 @@ object ConfigUI : CascadeScreen("Config UI [Athen]", CascadeGeometricResolution.
         tooltip.attach(scene)
     }
 
-    fun show(text0: String, x: Double, y: Double) {
+    fun show(text0: String) {
         text.text = text0.parse()
         tooltip.visible = true
-
-        tooltip.position = object : IPositionConstraint {
-            override fun _x(element: IPrimitiveElement<*>, parent: IPrimitiveElement<*>): Float {
-                val i0 = x.toFloat() + 5f
-                val i1 = element.width
-                return if (i0 + i1 > scene.width) (scene.width - i1 - 4f).coerceAtLeast(0f) else i0
-            }
-
-            override fun _y(element: IPrimitiveElement<*>, parent: IPrimitiveElement<*>): Float {
-                val i0 = y.toFloat() + 5f
-                val i1 = element.height
-                return if (i0 + i1 > scene.height) (y.toFloat() - i1 - 2f).coerceAtLeast(0f) else i0
-            }
-        }
     }
 
     fun hide() {

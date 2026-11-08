@@ -171,13 +171,6 @@ object ConfigModules {
                     }
                 })
 
-                on<MouseEvent.Move.Any> {
-                    if (!hovered) return@on
-                    if (v.description.isEmpty()) return@on
-
-                    ConfigUI.show(v.description, x, y)
-                }
-
                 on<MouseEvent.Press> {
                     if (button != InputConstants.MOUSE_BUTTON_LEFT) return@on
 
@@ -194,12 +187,20 @@ object ConfigModules {
                 }
 
                 on<MouseEvent.Move.Enter> {
+                    if (v.description.isNotEmpty()) {
+                        ConfigUI.show(v.description)
+                    }
+
                     animate(150.milliseconds) {
                         ::color to CascadeGeometricColor(MochaColorScheme.Base.alpha(0.60f))
                     }
                 }
 
                 on<MouseEvent.Move.Exit> {
+                    if (v.description.isNotEmpty()) {
+                        ConfigUI.hide()
+                    }
+
                     animate(150.milliseconds) {
                         ::color to CascadeGeometricColor(MochaColorScheme.Crust.alpha(0.55f))
                     }
