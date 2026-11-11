@@ -2,15 +2,7 @@
 
 package foo.starred.athen.modules.impl.general.messageactions
 
-import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
+import com.google.gson.*
 import foo.starred.athen.Athen
 import foo.starred.athen.Athen.GSON
 import foo.starred.athen.annotations.impl.LoadableAthenModule

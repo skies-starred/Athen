@@ -33,7 +33,6 @@ import foo.starred.kontext.util.decompress
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import org.joml.Matrix3x2f
-import kotlin.collections.iterator
 
 @LoadableAthenModule
 object SlotBinds : Module(
