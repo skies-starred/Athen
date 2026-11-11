@@ -10,14 +10,16 @@ import foo.starred.athen.ducks.entity.generic.EntityDuck.Companion.parent
 import foo.starred.athen.events.*
 import foo.starred.athen.modules.Module
 import foo.starred.kontext.abstraction.chat.color.MinecraftColors
+import foo.starred.kontext.abstraction.client.extension.client
 import foo.starred.kontext.api.entity.extension.renderAABB
 import foo.starred.parallax.api.primitives.ParallaxBox
+import foo.starred.parallax.api.primitives.ParallaxLine
 import net.minecraft.world.entity.Entity
 import java.util.concurrent.ConcurrentHashMap
 
 @LoadableAthenModule
 @AthenModuleScope(skyblock = true)
-object SlayerHighlight : Module(
+object SlayerHighlights : Module(
     "Slayer highlights",
     "Highlights the slayer bosses.",
     ConfigCategory.SLAYER
@@ -29,6 +31,7 @@ object SlayerHighlight : Module(
 
     private val _boss by config.group("Boss highlight")
     private val boss by _boss.switch("Highlight boss")
+    private val `boss$tracer` by _boss.switch("Tracer to boss", true)
     private val `boss$mine` by _boss.switch("Only for mine", true)
     private val `boss$color` by _boss.colorPicker("Color", MochaColorScheme.Red.argb)
     private val `boss$width` by _boss.slider("Line width", 2f, 0f, 10f)
@@ -50,13 +53,21 @@ object SlayerHighlight : Module(
     private val `blaze$crystal` by _blaze.colorPicker("Crystal", MinecraftColors.AQUA.color)
     private val `blaze$spirit` by _blaze.colorPicker("Spirit", MinecraftColors.WHITE.color)
 
+    private val tracers = ConcurrentHashMap<Entity, Boolean>()
     private val slayers = ConcurrentHashMap<Entity, Int>()
     private val demons = ConcurrentHashMap<Entity, Int>()
-    private val minibosses = mutableMapOf<Entity, Int>()
+    private val minibosses = ConcurrentHashMap<Entity, Int>()
 
     init {
         on<TickEvent.Client.End> {
             if (ticks % 5 != 0) return@on
+
+            val player = client.player
+            if (player != null) {
+                for (slayer in tracers.keys) {
+                    tracers[slayer] = player.hasLineOfSight(slayer)
+                }
+            }
 
             slayers.keys.removeIf { !it.isAlive }
             demons.keys.removeIf { !it.isAlive }
@@ -83,6 +94,7 @@ object SlayerHighlight : Module(
             if (`boss$mine` && !slayerInfo.owned) return@on
 
             slayers[entity] = `boss$color`
+            if (`boss$tracer` && slayerInfo.owned) tracers[entity] = false
         }
 
         on<SlayerEvent.Miniboss.Spawn> {
@@ -116,6 +128,13 @@ object SlayerHighlight : Module(
         }
 
         on<WorldRenderEvent.Extract> {
+            for ((k, v) in tracers) {
+                if (!k.isAlive) continue
+                if (!v) continue
+
+                ParallaxLine.tracer(k.renderAABB().center.toVector3f(), `boss$color`, `boss$width`)
+            }
+
             slayers.fn(`boss$width`)
             minibosses.fn(`mini$width`)
             demons.fn(`demon$width`)

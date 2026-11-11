@@ -15,7 +15,7 @@ kommand = "2026.09.2"
 klassgraph = "2026.10.1"
 kontext = "2026.11.2"
 cascade = "2026.11.3"
-parallax = "2026.10.2"
+parallax = "2026.11.1"
 updater = "2026.10.3"
 
 [libraries]
