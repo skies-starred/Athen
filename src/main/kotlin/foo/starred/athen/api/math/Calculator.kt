@@ -3,28 +3,18 @@ package foo.starred.athen.api.math
 import foo.starred.athen.annotations.impl.LoadableAthenModule
 import foo.starred.athen.api.messaging.impl.MessagingAPI.mod
 import foo.starred.athen.modules.impl.ModSettings
-import foo.starred.athen.utils.command
-import foo.starred.kommand.IKommand
-import foo.starred.kommand.scopes.KommandCommandScope
+import foo.starred.athen.utils.AthenCommandSource
 import foo.starred.kontext.api.format.extension.number.format
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import java.math.BigDecimal
 import kotlin.math.pow
 
 @LoadableAthenModule
-object Calculator : IKommand<FabricClientCommandSource> {
-    override val loader: KommandCommandScope<FabricClientCommandSource> = KommandCommandScope()
-
+object Calculator {
     private val tokenRegex = Regex("""\d+(\.\d+)?[kKmMbBtT]?|[+\-*/x^()]""")
     private val priority = mapOf("+" to 1, "-" to 1, "*" to 2, "x" to 2, "/" to 2, "^" to 3)
 
     init {
-        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-            loader.register(dispatcher)
-        }
-
-        command {
+        AthenCommandSource.command("calc") {
             "calc" / greedyString("operation") {
                 render(string("operation")).mod()
             }
@@ -33,7 +23,7 @@ object Calculator : IKommand<FabricClientCommandSource> {
         run {
             if (!ModSettings.calculator) return@run
 
-            command("calc") {
+            AthenCommandSource.command("calc") {
                 greedyString("operation") {
                     render(string("operation")).mod()
                 }
