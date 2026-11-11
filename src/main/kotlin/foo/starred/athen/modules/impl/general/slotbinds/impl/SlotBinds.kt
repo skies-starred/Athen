@@ -23,10 +23,10 @@ import foo.starred.cascade.graphics.extensions.rectangle.hollow.hollowRectangle
 import foo.starred.cascade.graphics.extensions.stroke.stroke
 import foo.starred.cascade.graphics.geometry.CascadeGeometricColor
 import foo.starred.kbus.extensions.runWhen
-import foo.starred.kontext.abstraction.client.extension.client
 import foo.starred.kontext.abstraction.client.impl.MinecraftClient
 import foo.starred.kontext.abstraction.gui.MinecraftGui
 import foo.starred.kontext.abstraction.input.impl.GenericInputState
+import foo.starred.kontext.abstraction.inventory.MinecraftInventory
 import foo.starred.kontext.api.storage.impl.profile.data.ProfileContainer
 import foo.starred.kontext.api.storage.impl.profile.impl.ProfileJsonStore
 import foo.starred.kontext.util.decompress
@@ -262,7 +262,7 @@ object SlotBinds : Module(
         }
 
         on<PlayerEvent.Drop> {
-            val slot = client.player?.inventory?.selectedSlot?.plus(36) ?: return@on
+            val slot = MinecraftInventory.selected + 36
             if (bound(slot) == -1) return@on
 
             cancel()
