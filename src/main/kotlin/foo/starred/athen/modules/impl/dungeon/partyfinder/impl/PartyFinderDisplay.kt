@@ -28,7 +28,7 @@ import foo.starred.kontext.api.format.extension.string.contains
 import foo.starred.kontext.api.format.extension.string.stripped
 import foo.starred.kontext.api.format.extension.time.formatTime
 import foo.starred.kontext.api.item.extension.get
-import foo.starred.kontext.api.item.resolver.impl.LoreKontextItemDataResolver
+import foo.starred.kontext.api.item.resolver.impl.GenericKontextItemDataResolver
 import foo.starred.kontext.api.text.parser.impl.parse
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.minecraft.core.component.DataComponents
@@ -140,7 +140,7 @@ object PartyFinderDisplay : Module(
                 if (i >= 54) break
                 if (it.item != Items.PLAYER_HEAD) continue
 
-                val lore = it.get<LoreKontextItemDataResolver, List<Component>>()?.takeIf { it.size >= 4 } ?: continue
+                val lore = it.get<GenericKontextItemDataResolver.LORE, List<Component>>()?.takeIf { it.size >= 4 } ?: continue
                 val lore0 = lore.map { it.stripped() }
 
                 val members = mutableSetOf<Pair<String, PartyFinderClassType>>()

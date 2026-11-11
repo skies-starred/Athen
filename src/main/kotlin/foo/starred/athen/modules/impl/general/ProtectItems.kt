@@ -23,7 +23,6 @@ import foo.starred.kontext.abstraction.text.renderer.MinecraftFontRenderer
 import foo.starred.kontext.api.format.extension.string.stripped
 import foo.starred.kontext.api.item.extension.get
 import foo.starred.kontext.api.item.resolver.impl.GenericKontextItemDataResolver
-import foo.starred.kontext.api.item.resolver.impl.LoreKontextItemDataResolver
 import foo.starred.kontext.api.storage.impl.generic.extension.mutableSet
 import foo.starred.kontext.api.text.parser.impl.parse
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
@@ -185,7 +184,7 @@ object ProtectItems : Module(
 
         val t0 = s.menu.slots.getOrNull(49)?.item
         if (t0?.item == Items.HOPPER && t0.hoverName.stripped() == "Sell Item") return true
-        if (t0?.get<LoreKontextItemDataResolver, List<Component>>()?.lastOrNull()?.stripped() == "Click to buyback!") return true
+        if (t0?.get<GenericKontextItemDataResolver.LORE, List<Component>>()?.lastOrNull()?.stripped() == "Click to buyback!") return true
 
         return false
     }

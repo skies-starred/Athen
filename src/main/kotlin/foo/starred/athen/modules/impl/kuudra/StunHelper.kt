@@ -16,7 +16,7 @@ import foo.starred.kontext.abstraction.client.extension.client
 import foo.starred.kontext.abstraction.input.impl.GenericInputState
 import foo.starred.kontext.api.entity.extension.renderVec3
 import foo.starred.kontext.api.item.extension.get
-import foo.starred.kontext.api.item.resolver.impl.LoreKontextItemDataResolver
+import foo.starred.kontext.api.item.resolver.impl.GenericKontextItemDataResolver
 import foo.starred.parallax.api.primitives.ParallaxBox
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
@@ -57,7 +57,7 @@ object StunHelper : Module(
             if (!KuudraAPI.inRun) return@on
 
             val item = client.player?.getItemInHand(InteractionHand.MAIN_HAND) ?: return@on
-            if (item.get<LoreKontextItemDataResolver, List<Component>>()?.any { "Ability: Pickobulus" in it.string } != true) return@on
+            if (item.get<GenericKontextItemDataResolver.LORE, List<Component>>()?.any { "Ability: Pickobulus" in it.string } != true) return@on
             if (GenericInputState.pressed(blockOverride)) return@on
 
             val tier = KuudraAPI.tier?.int ?: return@on

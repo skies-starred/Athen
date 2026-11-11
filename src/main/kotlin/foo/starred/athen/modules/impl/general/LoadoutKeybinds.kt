@@ -16,7 +16,7 @@ import foo.starred.kontext.abstraction.input.impl.KeyboardInputState
 import foo.starred.kontext.abstraction.input.impl.MouseInputState
 import foo.starred.kontext.api.format.extension.string.stripped
 import foo.starred.kontext.api.item.extension.get
-import foo.starred.kontext.api.item.resolver.impl.LoreKontextItemDataResolver
+import foo.starred.kontext.api.item.resolver.impl.GenericKontextItemDataResolver
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.Slot
 
@@ -173,7 +173,7 @@ object LoadoutKeybinds : Module(
 
         val equipped: Boolean
             get() {
-                val a = slot?.item?.get<LoreKontextItemDataResolver, List<Component>>() ?: return false
+                val a = slot?.item?.get<GenericKontextItemDataResolver.LORE, List<Component>>() ?: return false
                 return a.getOrNull(a.lastIndex - 1)?.stripped()?.isEmpty() ?: false
             }
     }
