@@ -211,7 +211,7 @@ object SlotBinds : Module(
                 return@on
             }
 
-            if (mouseButton != InputConstants.MOUSE_BUTTON_LEFT) return@on
+            if (mouseButton != 0) return@on
             val target1 = target0.takeIf { it != -1 } ?: reverse0
             if (target1 == -1) return@on
 
