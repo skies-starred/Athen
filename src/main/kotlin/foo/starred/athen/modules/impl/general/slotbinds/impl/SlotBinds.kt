@@ -9,6 +9,8 @@ import com.google.gson.reflect.TypeToken
 import com.mojang.blaze3d.platform.InputConstants
 import foo.starred.athen.Athen
 import foo.starred.athen.Athen.GSON
+import foo.starred.athen.accessors.left
+import foo.starred.athen.accessors.top
 import foo.starred.athen.annotations.impl.LoadableAthenModule
 import foo.starred.athen.api.messaging.impl.MessagingAPI.mod
 import foo.starred.athen.config.theme.impl.catppuccin.MochaColorScheme
@@ -26,6 +28,7 @@ import foo.starred.kbus.extensions.runWhen
 import foo.starred.kontext.abstraction.client.impl.MinecraftClient
 import foo.starred.kontext.abstraction.gui.MinecraftGui
 import foo.starred.kontext.abstraction.input.impl.GenericInputState
+import foo.starred.kontext.abstraction.input.impl.MouseInputState
 import foo.starred.kontext.abstraction.inventory.MinecraftInventory
 import foo.starred.kontext.api.storage.impl.profile.data.ProfileContainer
 import foo.starred.kontext.api.storage.impl.profile.impl.ProfileJsonStore
@@ -43,6 +46,7 @@ object SlotBinds : Module(
     private val bind by config.keybind("Bind keybind", InputConstants.KEY_B)
     private val swap by config.keybind("Swap keybind", InputConstants.KEY_LSHIFT)
     private val lock = config.switch("Lock bound slots").unique("lock")
+    private val draw by config.selector("Render mode", listOf("Always", "Hovered", "Never"))
     private val _unused0 by config.button("Open editor") { SlotBindsGUI.open() }
     private val _unused1 by config.information("Share command: <red>/athen [import|export] slotbinds")
     private val _unused2 by config.information("Swap command: <red>/athen slotbinds profile swap [profile]")
@@ -235,30 +239,45 @@ object SlotBinds : Module(
         on<GuiEvent.Slots.Render.Menu.End> {
             val screen = MinecraftGui.screen as? InventoryScreen ?: return@on
             val slots = screen.menu.slots
+            val top = screen.top
+            val left = screen.left
 
             val pose = Matrix3x2f(graphics.pose())
             val scissor = graphics.scissorStack.peek()
 
-            for (entry in m0.int2IntEntrySet()) {
-                val slot0 = slots.getOrNull(entry.intKey) ?: continue
-                val slot1 = slots.getOrNull(entry.intValue) ?: continue
-                val color0 = m2.get(entry.intKey)
+            val mouseX = MouseInputState.Position.Scaled.x
+            val mouseY = MouseInputState.Position.Scaled.y
 
-                val x0 = slot0.x.toFloat()
-                val y0 = slot0.y.toFloat()
-                val x1 = slot1.x.toFloat()
-                val y1 = slot1.y.toFloat()
+            if (draw != 2) {
+                for (entry in m0.int2IntEntrySet()) {
+                    val slot0 = slots.getOrNull(entry.intKey) ?: continue
+                    val slot1 = slots.getOrNull(entry.intValue) ?: continue
+                    val color0 = m2.get(entry.intKey)
 
-                graphics.stroke(x0 + 8f, y0 + 8f, x1 + 8f, y1 + 8f, color0, 1f, false, pose, scissor)
+                    val x0 = slot0.x.toFloat()
+                    val y0 = slot0.y.toFloat()
+                    val x1 = slot1.x.toFloat()
+                    val y1 = slot1.y.toFloat()
 
-                graphics.hollowRectangle(x0, y0, 16f, 16f, 1f, color0, pose = pose, scissor = scissor)
-                graphics.hollowRectangle(x1, y1, 16f, 16f, 1f, color0, pose = pose, scissor = scissor)
+                    val x2 = x0 + left
+                    val y2 = y0 + top
+                    val x3 = x1 + left
+                    val y3 = y1 + top
+
+                    val hover0 = mouseX in x2..(x2 + 16f) && mouseY in y2..(y2 + 16f)
+                    val hover1 = mouseX in x3..(x3 + 16f) && mouseY in y3..(y3 + 16f)
+
+                    if (draw == 1 && !hover0 && !hover1) continue
+
+                    graphics.stroke(x0 + 8f, y0 + 8f, x1 + 8f, y1 + 8f, color0, 1f, false, pose, scissor)
+
+                    graphics.hollowRectangle(x0, y0, 16f, 16f, 1f, color0, pose = pose, scissor = scissor)
+                    graphics.hollowRectangle(x1, y1, 16f, 16f, 1f, color0, pose = pose, scissor = scissor)
+                }
             }
 
-            val selected = last0 ?: return@on
-            val selectedSlot = slots.getOrNull(selected) ?: return@on
-
-            graphics.hollowRectangle(selectedSlot.x.toFloat(), selectedSlot.y.toFloat(), 16f, 16f, 1f, CascadeGeometricColor.WHITE)
+            val selected = slots.getOrNull(last0 ?: return@on) ?: return@on
+            graphics.hollowRectangle(selected.x.toFloat(), selected.y.toFloat(), 16f, 16f, 1f, CascadeGeometricColor.WHITE, pose = pose, scissor = scissor)
         }
 
         on<PlayerEvent.Drop> {
