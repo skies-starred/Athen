@@ -15,13 +15,13 @@ import foo.starred.athen.events.InternalEvent
 import foo.starred.athen.events.core.on
 import foo.starred.athen.utils.command
 import foo.starred.kontext.abstraction.client.extension.client
+import foo.starred.kontext.abstraction.player.MinecraftPlayer
 import foo.starred.kontext.api.scheduling.scheduler.data.tasks.base.SchedulerTask
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import java.net.URI
 import java.net.http.HttpClient
-import java.util.*
 import java.util.concurrent.CompletionStage
 import kotlin.time.Duration.Companion.seconds
 import java.net.http.WebSocket as JavaWebSocket
@@ -84,15 +84,8 @@ object WebSocket {
         manual = false
         auth = false
 
-        val server = UUID.randomUUID().toString()
-
-        try {
-            client.services().sessionService().joinServer(client.user.profileId, client.user.accessToken, server)
-        } catch (e: Exception) {
-            Athen.LOGGER.error("Failed to authenticate with Mojang!", e)
-            "Failed to authenticate with Mojang! This shouldn't happen, please message @skies.starred on discord with a copy of your logs.".mod(MessagePrefixType.ERROR)
-            return
-        }
+        val auth = MinecraftPlayer.authenticate()
+        if (!auth.first) return
 
         http.newWebSocketBuilder()
             .buildAsync(URI.create(AthenAPI.websocket()), object : JavaWebSocket.Listener {
@@ -100,7 +93,7 @@ object WebSocket {
                     webSocket.sendText(JsonObject().apply {
                         addProperty("t", SocketPacket.WebSocket.ServerBound.Auth.id)
                         addProperty("n", client.user.name)
-                        addProperty("s", server)
+                        addProperty("s", auth.second)
                     }.toString(), true)
                     webSocket.request(1)
                 }
