@@ -39,7 +39,9 @@ object SlayerNametags : Module(
 ) {
     private val hideOriginal = config.switch("Hide original", true).unique("hideOriginal")
     private val killTime by config.switch("Show kill time", true)
-    private val increase by config.switch("Dynamic text size", true)
+    private val sizing by config.selector("Text size", listOf("Manual", "Dynamic"))
+    private val scale by config.slider("Text scale", 1f, 0.5f, 10f, double = true)
+    private val position by config.selector("Position", listOf("Bottom", "Middle", "Top"))
 
     private val `styles$name` by config.input("Name style", "<dark_red>#name_short #tier")
     private val `styles$name$unused` by config.variables("#name_short", "#name_long", "#tier")
@@ -154,14 +156,17 @@ object SlayerNametags : Module(
             //~ if >= 26.2 'mainCamera' -> 'mainCamera()'
             val camera = client.gameRenderer.mainCamera.position()
 
+            val bottom = position == 0
+            val middle = position == 1
+            val dynamic = sizing == 1
             val entities = entities.toMap()
             for ((k, v) in entities) {
                 val text = v.renderable
-                val spacing = if (increase) 0.25 * camera.distanceTo(k.renderVec3()) / 3f else 0.25
-                val position = k.renderVec3().add(0.0, 0.5 + (text.size - 1) * spacing / 2, 0.0)
+                val spacing = if (dynamic) 0.25 * camera.distanceTo(k.renderVec3()) / 3f else 0.25 * scale
+                val position = k.renderVec3().add(0.0, if (bottom) 0.5 else if (middle) k.bbHeight / 2.0 else k.eyeHeight.toDouble() + (text.size - 1) * spacing / 2, 0.0)
 
                 for (i in text.indices) {
-                    ParallaxText.component(text[i], position.add(0.0, -i * spacing, 0.0), depth = !v.visible, increase = increase)
+                    ParallaxText.component(text[i], position.add(0.0, -i * spacing, 0.0), scale = if (!dynamic) scale else 1f, depth = !v.visible, increase = dynamic)
                 }
             }
         }
