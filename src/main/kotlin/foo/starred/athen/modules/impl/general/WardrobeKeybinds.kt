@@ -15,6 +15,7 @@ import foo.starred.kontext.abstraction.client.extension.client
 import foo.starred.kontext.abstraction.gui.MinecraftGui
 import foo.starred.kontext.abstraction.input.impl.GenericInputState
 import foo.starred.kontext.abstraction.input.impl.KeyboardInputState
+import foo.starred.kontext.abstraction.input.impl.MouseInputState
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Items
 
@@ -90,7 +91,7 @@ object WardrobeKeybinds : Module(
 
         on<GuiEvent.Input.Mouse.Press> {
             if (!open) return@on
-            fn(KeyboardInputState.vanilla(keyEvent.button()))
+            fn(MouseInputState.vanilla(keyEvent.button()))
         }
 
         on<GuiEvent.Render.Screen.Pre> {
