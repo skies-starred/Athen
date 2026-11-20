@@ -13,7 +13,6 @@ import foo.starred.athen.api.slayers.enums.type.impl.SlayerBoss
 import foo.starred.athen.api.storage.JsonStore
 import foo.starred.athen.config.dsl.impl.category.ConfigCategory
 import foo.starred.athen.config.theme.impl.catppuccin.MochaColorScheme
-import foo.starred.athen.ducks.entity.generic.EntityDuck.Companion.carry
 import foo.starred.athen.events.LocationEvent
 import foo.starred.athen.events.MessageEvent
 import foo.starred.athen.events.SlayerEvent
@@ -21,6 +20,7 @@ import foo.starred.athen.events.WorldRenderEvent
 import foo.starred.athen.modules.Module
 import foo.starred.athen.modules.impl.slayer.carry.data.SlayerCarryHistory
 import foo.starred.athen.modules.impl.slayer.carry.data.SlayerCarryPlayer
+import foo.starred.athen.modules.impl.slayer.carry.resolver.SlayerCarryEntityDataResolver
 import foo.starred.athen.modules.impl.slayer.carry.ui.SlayerCarryGUI
 import foo.starred.athen.utils.command
 import foo.starred.kbus.extensions.runWhen
@@ -30,7 +30,9 @@ import foo.starred.kontext.abstraction.chat.message.MinecraftMessages
 import foo.starred.kontext.abstraction.tablist.MinecraftTabList
 import foo.starred.kontext.abstraction.text.measurer.MinecraftFontMeasurer
 import foo.starred.kontext.abstraction.text.renderer.MinecraftFontRenderer
+import foo.starred.kontext.api.entity.extension.get
 import foo.starred.kontext.api.entity.extension.renderAABB
+import foo.starred.kontext.api.entity.extension.set
 import foo.starred.kontext.api.format.extension.component.formattedText
 import foo.starred.kontext.api.format.extension.component.literal
 import foo.starred.kontext.api.format.extension.time.parseDuration
@@ -167,7 +169,7 @@ object SlayerCarryTracker : Module(
             if (carry.tier != null && carry.tier != slayerInfo.tier) return@on
             if (!carry.spawn(entity)) return@on
 
-            entity.carry = carry
+            entity.set<SlayerCarryEntityDataResolver, SlayerCarryPlayer>(carry)
 
             if (!`announce$spawn`) return@on
             "Boss spawned for <aqua>$owner <gray>[${type.short}${if (carry.tier == null) " Any" else " T${slayerInfo.tier?.int}"}]".mod()
@@ -178,7 +180,7 @@ object SlayerCarryTracker : Module(
             if (list.isEmpty()) return@on
 
             val type = slayerInfo.type as? SlayerBoss ?: return@on
-            val name = entity.carry?.name ?: return@on
+            val name = entity.get<SlayerCarryEntityDataResolver, SlayerCarryPlayer>()?.name ?: return@on
             val carry = list.find { it.name == name } ?: return@on
             if (carry.type != type) return@on
             if (carry.tier != null && carry.tier != slayerInfo.tier) return@on
@@ -216,7 +218,7 @@ object SlayerCarryTracker : Module(
 
         on<WorldRenderEvent.Entity> {
             val e = entity as? LivingEntity ?: return@on
-            if (e.carry == null) return@on
+            if (e.get<SlayerCarryEntityDataResolver, SlayerCarryPlayer>() == null) return@on
 
             ParallaxBox.frame(e.renderAABB(), `highlight$boss$color`, `highlight$boss$width`)
         }.runWhen(`highlight$boss`.state)

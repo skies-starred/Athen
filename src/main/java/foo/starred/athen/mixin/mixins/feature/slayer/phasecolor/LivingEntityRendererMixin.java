@@ -2,8 +2,8 @@ package foo.starred.athen.mixin.mixins.feature.slayer.phasecolor;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import foo.starred.athen.api.storage.ResourceAPI;
-import foo.starred.athen.ducks.entity.render.EntityRenderStateDuck;
 import foo.starred.athen.modules.impl.slayer.EndermanPhaseColor;
+import foo.starred.kontext.api.entity.duck.EntityRenderStateDuck;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.EndermanRenderState;
@@ -62,7 +62,7 @@ public abstract class LivingEntityRendererMixin {
         if (!(state instanceof EndermanRenderState)) return;
         if (!EndermanPhaseColor.INSTANCE.getEnabled()) return;
 
-        Entity entity = ((EntityRenderStateDuck) state).athen$entity();
+        Entity entity = EntityRenderStateDuck.Companion.get(state);
         if (entity == null) return;
 
         Integer color = EndermanPhaseColor.get(entity);
@@ -76,7 +76,7 @@ public abstract class LivingEntityRendererMixin {
         if (!(state instanceof EndermanRenderState)) return;
         if (!EndermanPhaseColor.INSTANCE.getEnabled()) return;
 
-        Entity entity = ((EntityRenderStateDuck) state).athen$entity();
+        Entity entity = EntityRenderStateDuck.Companion.get(state);
         if (entity == null) return;
 
         Integer color = EndermanPhaseColor.get(entity);

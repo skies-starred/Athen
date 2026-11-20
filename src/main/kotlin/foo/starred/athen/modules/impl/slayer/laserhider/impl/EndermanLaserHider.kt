@@ -1,14 +1,15 @@
-package foo.starred.athen.modules.impl.slayer
+package foo.starred.athen.modules.impl.slayer.laserhider.impl
 
 import foo.starred.athen.annotations.impl.AthenModuleScope
 import foo.starred.athen.annotations.impl.LoadableAthenModule
 import foo.starred.athen.api.location.island.impl.PresetSkyBlockIsland
-import foo.starred.athen.config.dsl.impl.category.ConfigCategory
-import foo.starred.athen.ducks.entity.generic.EntityDuck.Companion.carry
 import foo.starred.athen.events.LocationEvent
 import foo.starred.athen.events.SlayerEvent
 import foo.starred.athen.events.TickEvent
 import foo.starred.athen.modules.Module
+import foo.starred.athen.modules.impl.slayer.carry.data.SlayerCarryPlayer
+import foo.starred.athen.modules.impl.slayer.carry.resolver.SlayerCarryEntityDataResolver
+import foo.starred.kontext.api.entity.extension.get
 import net.minecraft.world.entity.monster.Guardian
 import kotlin.math.abs
 
@@ -20,7 +21,7 @@ import net.minecraft.world.entity.monster.EnderMan
 object EndermanLaserHider : Module(
     "Enderman laser hider",
     "Hides the lasers for voidgloom bosses!",
-    ConfigCategory.SLAYER
+    SLAYER
 ) {
     private val carry by config.switch("Show for carries", true)
     //~ if >= 26.3 'EnderMan' -> 'Enderman'
@@ -31,7 +32,7 @@ object EndermanLaserHider : Module(
             //~ if >= 26.3 'EnderMan' -> 'Enderman'
             if (entity !is EnderMan) return@on
             if (slayerInfo.owned) return@on
-            if (!carry && entity.carry != null) return@on
+            if (!carry && entity.get<SlayerCarryEntityDataResolver, SlayerCarryPlayer>() != null) return@on
 
             set.add(entity)
         }

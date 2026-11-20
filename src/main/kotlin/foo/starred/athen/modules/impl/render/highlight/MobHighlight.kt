@@ -7,11 +7,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import foo.starred.athen.annotations.impl.AthenModuleScope
 import foo.starred.athen.annotations.impl.LoadableAthenModule
 import foo.starred.athen.api.messaging.impl.MessagingAPI.mod
-import foo.starred.athen.api.skyblock.EntityAPI
+import foo.starred.athen.api.skyblock.entity.duck.EntityDuck.Companion.parent
+import foo.starred.athen.api.skyblock.entity.impl.EntityAPI
 import foo.starred.athen.api.storage.JsonStore
 import foo.starred.athen.config.dsl.impl.category.ConfigCategory
 import foo.starred.athen.config.theme.impl.catppuccin.MochaColorScheme
-import foo.starred.athen.ducks.entity.generic.EntityDuck.Companion.parent
 import foo.starred.athen.events.InputEvent
 import foo.starred.athen.events.LocationEvent
 import foo.starred.athen.events.TickEvent

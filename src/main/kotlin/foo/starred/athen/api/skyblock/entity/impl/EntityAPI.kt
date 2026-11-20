@@ -34,11 +34,11 @@
  */
 @file:Suppress("ConstPropertyName", "LocalVariableName")
 
-package foo.starred.athen.api.skyblock
+package foo.starred.athen.api.skyblock.entity.impl
 
 import foo.starred.athen.annotations.impl.LoadableAthenModule
 import foo.starred.athen.api.scheduling.Scheduler
-import foo.starred.athen.ducks.entity.generic.EntityDuck
+import foo.starred.athen.api.skyblock.entity.duck.EntityDuck
 import foo.starred.athen.events.EntityEvent
 import foo.starred.athen.events.core.on
 import foo.starred.kontext.abstraction.client.extension.client
@@ -46,7 +46,6 @@ import foo.starred.kontext.api.format.extension.string.stripped
 import foo.starred.kontext.api.scheduling.scheduler.extensions.clientTicks
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.Creeper
@@ -150,7 +149,7 @@ object EntityAPI {
 
     private fun Entity.armor(): Boolean {
         val living = this as? LivingEntity ?: return false
-        return !living.getItemBySlot(EquipmentSlot.HEAD).isEmpty || !living.getItemBySlot(EquipmentSlot.CHEST).isEmpty || !living.getItemBySlot(EquipmentSlot.LEGS).isEmpty || !living.getItemBySlot(EquipmentSlot.FEET).isEmpty
+        return !living.getItemBySlot(HEAD).isEmpty || !living.getItemBySlot(CHEST).isEmpty || !living.getItemBySlot(LEGS).isEmpty || !living.getItemBySlot(FEET).isEmpty
     }
 
     private fun load(entity: ArmorStand) {

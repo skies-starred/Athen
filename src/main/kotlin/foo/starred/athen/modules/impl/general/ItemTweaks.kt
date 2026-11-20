@@ -4,7 +4,7 @@ package foo.starred.athen.modules.impl.general
 
 import foo.starred.athen.annotations.impl.AthenModuleScope
 import foo.starred.athen.annotations.impl.LoadableAthenModule
-import foo.starred.athen.api.items.ItemAPI.`watch$tooltip`
+import foo.starred.athen.api.item.tooltip.impl.ItemTooltipAPI.`watch$tooltip`
 import foo.starred.athen.config.dsl.impl.category.ConfigCategory
 import foo.starred.athen.events.GuiEvent
 import foo.starred.athen.modules.Module

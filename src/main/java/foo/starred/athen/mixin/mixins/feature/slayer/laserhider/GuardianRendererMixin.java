@@ -1,9 +1,9 @@
 package foo.starred.athen.mixin.mixins.feature.slayer.laserhider;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import foo.starred.athen.ducks.entity.guardian.GuardianDuck;
-import foo.starred.athen.ducks.entity.render.EntityRenderStateDuck;
-import foo.starred.athen.modules.impl.slayer.EndermanLaserHider;
+import foo.starred.athen.modules.impl.slayer.laserhider.impl.EndermanLaserHider;
+import foo.starred.athen.modules.impl.slayer.laserhider.resolver.EndermanLaserEntityDataResolver;
+import foo.starred.kontext.api.entity.duck.EntityRenderStateDuck;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.GuardianRenderer;
 import net.minecraft.client.renderer.entity.state.GuardianRenderState;
@@ -20,11 +20,9 @@ public class GuardianRendererMixin {
     private void athen$submit(GuardianRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera, CallbackInfo ci) {
         if (!EndermanLaserHider.INSTANCE.getEnabled()) return;
 
-        final Guardian a = (Guardian) ((EntityRenderStateDuck) state).athen$entity();
-        if (a == null) return;
-
-        final int b = ((GuardianDuck) a).athen$hide();
-        if (b != 1) return;
+        Guardian guardian = (Guardian) EntityRenderStateDuck.Companion.get(state);
+        if (guardian == null) return;
+        if (!Boolean.TRUE.equals(EndermanLaserEntityDataResolver.INSTANCE.get(guardian))) return;
 
         ci.cancel();
     }

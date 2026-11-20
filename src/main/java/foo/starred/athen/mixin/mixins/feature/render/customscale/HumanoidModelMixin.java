@@ -1,7 +1,7 @@
 package foo.starred.athen.mixin.mixins.feature.render.customscale;
 
-import foo.starred.athen.ducks.entity.render.EntityRenderStateDuck;
 import foo.starred.athen.modules.impl.render.CustomScale;
+import foo.starred.kontext.api.entity.duck.EntityRenderStateDuck;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
@@ -22,7 +22,7 @@ public abstract class HumanoidModelMixin {
         final int style = CustomScale.INSTANCE.getChibi();
         if (style == 0) return;
 
-        Entity entity = ((EntityRenderStateDuck) avatarState).athen$entity();
+        final Entity entity = EntityRenderStateDuck.Companion.get(avatarState);
         if (entity == null) return;
         if (!CustomScale.fn(entity)) return;
 

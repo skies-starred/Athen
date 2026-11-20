@@ -4,7 +4,7 @@ import com.google.gson.JsonObject
 import com.mojang.blaze3d.platform.InputConstants
 import foo.starred.athen.annotations.impl.AthenModuleScope
 import foo.starred.athen.annotations.impl.LoadableAthenModule
-import foo.starred.athen.api.items.ItemAPI.`watch$tooltip`
+import foo.starred.athen.api.item.tooltip.impl.ItemTooltipAPI.`watch$tooltip`
 import foo.starred.athen.api.network.http.AthenAPI
 import foo.starred.athen.api.network.http.WebAPI.request
 import foo.starred.athen.config.dsl.impl.category.ConfigCategory

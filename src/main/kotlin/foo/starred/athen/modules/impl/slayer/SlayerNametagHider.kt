@@ -4,12 +4,12 @@ package foo.starred.athen.modules.impl.slayer
 
 import foo.starred.athen.annotations.impl.AthenModuleScope
 import foo.starred.athen.annotations.impl.LoadableAthenModule
+import foo.starred.athen.api.skyblock.entity.duck.EntityDuck.Companion.parent
 import foo.starred.athen.api.slayers.SlayerAPI
 import foo.starred.athen.api.slayers.data.SlayerInfo
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerBoss
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerMini
 import foo.starred.athen.config.dsl.impl.category.ConfigCategory
-import foo.starred.athen.ducks.entity.generic.EntityDuck.Companion.parent
 import foo.starred.athen.events.WorldRenderEvent
 import foo.starred.athen.modules.Module
 import net.minecraft.world.entity.LivingEntity

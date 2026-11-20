@@ -1,6 +1,6 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package foo.starred.athen.api.skyblock
+package foo.starred.athen.api.skyblock.price.impl
 
 import com.google.gson.JsonObject
 import foo.starred.athen.annotations.impl.LoadableAthenModule

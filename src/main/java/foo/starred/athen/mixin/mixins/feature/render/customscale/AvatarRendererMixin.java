@@ -1,8 +1,8 @@
 package foo.starred.athen.mixin.mixins.feature.render.customscale;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import foo.starred.athen.ducks.entity.render.EntityRenderStateDuck;
 import foo.starred.athen.modules.impl.render.CustomScale;
+import foo.starred.kontext.api.entity.duck.EntityRenderStateDuck;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Entity;
@@ -17,7 +17,7 @@ public class AvatarRendererMixin {
     private void athen$scale(AvatarRenderState state, PoseStack poseStack, CallbackInfo ci) {
         if (!CustomScale.INSTANCE.getEnabled()) return;
 
-        Entity entity = ((EntityRenderStateDuck) state).athen$entity();
+        final Entity entity = EntityRenderStateDuck.Companion.get(state);
         if (entity == null) return;
         if (!CustomScale.fn(entity)) return;
 

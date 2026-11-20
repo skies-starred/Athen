@@ -2,13 +2,13 @@ package foo.starred.athen.api.slayers
 
 import foo.starred.athen.annotations.impl.LoadableAthenModule
 import foo.starred.athen.api.messaging.impl.MessagingAPI.dev
+import foo.starred.athen.api.skyblock.entity.duck.EntityDuck.Companion.parent
 import foo.starred.athen.api.slayers.data.SlayerInfo
 import foo.starred.athen.api.slayers.enums.tier.SlayerTier
 import foo.starred.athen.api.slayers.enums.type.base.ISlayerType
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerBoss
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerDemon
 import foo.starred.athen.api.slayers.enums.type.impl.SlayerMini
-import foo.starred.athen.ducks.entity.generic.EntityDuck.Companion.parent
 import foo.starred.athen.events.*
 import foo.starred.athen.events.core.on
 import net.minecraft.world.entity.Entity

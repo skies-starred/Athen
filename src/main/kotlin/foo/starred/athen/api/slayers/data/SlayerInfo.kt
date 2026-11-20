@@ -3,7 +3,8 @@ package foo.starred.athen.api.slayers.data
 import foo.starred.athen.api.slayers.enums.tier.SlayerTier
 import foo.starred.athen.api.slayers.enums.type.base.ISlayerType
 import foo.starred.kontext.abstraction.client.extension.client
-import foo.starred.kontext.api.format.extension.string.stripped
+import foo.starred.kontext.api.entity.extension.get
+import foo.starred.kontext.api.entity.resolver.impl.GenericKontextEntityDataResolver
 import foo.starred.kontext.api.lazy.RefreshableLazy
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -37,16 +38,16 @@ data class SlayerInfo(val entity: Entity) {
 
     private fun fn0(): String? {
         val stand = stand(3) ?: stand(4) ?: return fallback()
-        return stand.customName?.stripped()?.takeIf { spawnerRegex in it }?.substringBefore("'")?.trim()
+        return stand.get<GenericKontextEntityDataResolver.CUSTOM_NAME, String>()?.takeIf { spawnerRegex in it }?.substringBefore("'")?.trim()
     }
 
     private fun fn1(): ISlayerType? {
-        val name = stand(1)?.customName?.stripped() ?: return null
+        val name = stand(1)?.get<GenericKontextEntityDataResolver.CUSTOM_NAME, String>() ?: return null
         return ISlayerType.Companion.Names.map.entries.find { (a, _) -> name.contains(a) }?.value
     }
 
     private fun fn2(): SlayerTier? {
-        val name = stand(1)?.customName?.stripped() ?: return null
+        val name = stand(1)?.get<GenericKontextEntityDataResolver.CUSTOM_NAME, String>() ?: return null
         return SlayerTier.find(name)
     }
 
@@ -62,7 +63,7 @@ data class SlayerInfo(val entity: Entity) {
         for (stand in entities) {
             if (stand !is ArmorStand) continue
 
-            val current = stand.customName?.stripped()?.takeIf { spawnerRegex in it } ?: continue
+            val current = stand.get<GenericKontextEntityDataResolver.CUSTOM_NAME, String>()?.takeIf { spawnerRegex in it } ?: continue
             if (best != null && compareValuesBy(stand, best, { entity.distanceToSqr(it) }, { abs(entity.tickCount - it.tickCount) }) >= 0) continue
 
             best = stand

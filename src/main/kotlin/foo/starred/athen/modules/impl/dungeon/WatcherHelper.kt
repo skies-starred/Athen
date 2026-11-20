@@ -21,8 +21,9 @@ import foo.starred.kontext.abstraction.sound.MinecraftSound
 import foo.starred.kontext.abstraction.text.measurer.MinecraftFontMeasurer
 import foo.starred.kontext.abstraction.text.renderer.MinecraftFontRenderer
 import foo.starred.kontext.abstraction.title.MinecraftTitle
+import foo.starred.kontext.api.entity.extension.get
+import foo.starred.kontext.api.entity.resolver.impl.GenericKontextEntityDataResolver
 import foo.starred.kontext.api.format.extension.component.formattedText
-import foo.starred.kontext.api.format.extension.string.stripped
 import foo.starred.kontext.api.format.extension.time.parseDuration
 import foo.starred.kontext.api.text.parser.impl.parse
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
@@ -215,7 +216,7 @@ object WatcherHelper : Module(
             if (System.currentTimeMillis() - `blood$speak` < 2500) return@on
 
             val l = client.level ?: return@on
-            val e = getEntity(l)?.takeIf { it.customName?.stripped()?.contains("The Watcher") == true } ?: return@on
+            val e = getEntity(l)?.takeIf { it.get<GenericKontextEntityDataResolver.CUSTOM_NAME, String>()?.contains("The Watcher") == true } ?: return@on
             val x = `blood$watcher$x` ?: e.x.also { `blood$watcher$x` = it }
             val z = `blood$watcher$z` ?: e.z.also { `blood$watcher$z` = it }
 

@@ -33,11 +33,10 @@
  * The original MIT license applies to the portions derived from SkyblockAPI.
  */
 
-package foo.starred.athen.mixin.mixins.duck.entity.generic;
+package foo.starred.athen.mixin.mixins.api.skyblock.entity;
 
-import foo.starred.athen.api.skyblock.EntityAPI;
-import foo.starred.athen.ducks.entity.generic.EntityDuck;
-import foo.starred.athen.modules.impl.slayer.carry.data.SlayerCarryPlayer;
+import foo.starred.athen.api.skyblock.entity.duck.EntityDuck;
+import foo.starred.athen.api.skyblock.entity.impl.EntityAPI;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import org.jetbrains.annotations.NotNull;
@@ -61,9 +60,6 @@ public abstract class EntityDuckImpl implements EntityDuck {
     private Entity athen$attachedTo;
 
     @Unique
-    private SlayerCarryPlayer athen$feat$carry;
-
-    @Unique
     private int athen$ticks = 20;
 
     @Override
@@ -80,16 +76,6 @@ public abstract class EntityDuckImpl implements EntityDuck {
     @Override
     public void athen$attach(@NotNull Entity entity) {
         this.athen$attachedTo = entity;
-    }
-
-    @Override
-    public SlayerCarryPlayer athen$feat$carry$boss() {
-        return athen$feat$carry;
-    }
-
-    @Override
-    public void athen$feat$carry$boss(SlayerCarryPlayer a) {
-        athen$feat$carry = a;
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
