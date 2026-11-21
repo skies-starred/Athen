@@ -66,18 +66,21 @@ void main() {
     }
 
     vec3 color = vec3(0.0);
+    float total = 0.0;
     float ign = noise(gl_FragCoord.xy);
 
     for (int i = 0; i < 12; i++) {
         float fi = float(i);
         float jitter = fract(ign + fi * 0.6180339887);
         float step = (fi - 6.0 + jitter) / 12.0;
+        float weight = 0.8 + 0.2 * cos(6.2831853 * step);
 
         vec2 uv = clamp(texCoord + velocity * step, vec2(0.0), vec2(1.0));
         vec3 sample0 = texture(InSampler, uv).rgb;
 
-        color += sample0 * sample0;
+        color += sample0 * sample0 * weight;
+        total += weight;
     }
 
-    fragColor = vec4(sqrt(color / 12.0), 1.0);
+    fragColor = vec4(sqrt(color / total), 1.0);
 }

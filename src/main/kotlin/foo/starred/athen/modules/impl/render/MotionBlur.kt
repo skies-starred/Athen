@@ -127,9 +127,12 @@ object MotionBlur : Module(
             return
         }
 
+        val ticks = client.deltaTracker.realtimeDeltaTicks.takeIf { it > 0.001f } ?: 0.33333334f
+        val multiplier = (0.33333334f / ticks).coerceIn(1.0f, 5.0f)
+
         val surface = surface(width, height)
         val buffer = buffer()
-        val data = pack(camera, rotation1, position1, rotation0, position0)
+        val data = pack(camera, rotation1, position1, rotation0, position0, multiplier)
 
         val color = render.colorTextureView ?: return
         val depth = render.depthTextureView ?: return
@@ -169,14 +172,14 @@ object MotionBlur : Module(
         return created
     }
 
-    private fun pack(camera: CameraRenderState, rotation1: Matrix4f, position1: Vec3, rotation0: Matrix4f, position0: Vec3): ByteBuffer {
-        val bool = client.options.cameraType.isFirstPerson
-        val view = `view$enabled` && (bool || `view$f3`)
-        val move = `movement$enabled` && (bool || `movement$f3`)
+    private fun pack(camera: CameraRenderState, rotation1: Matrix4f, position1: Vec3, rotation0: Matrix4f, position0: Vec3, multiplier: Float): ByteBuffer {
+        val first = client.options.cameraType.isFirstPerson
+        val view = `view$enabled` && (first || `view$f3`)
+        val move = `movement$enabled` && (first || `movement$f3`)
 
         val last = Matrix4f(rotation0).mul(Matrix4f(rotation1).transpose())
         val delta = if (move && position1.distanceTo(position0) < 20.0) position0.subtract(position1) else Vec3.ZERO
-        val movement = Vector3f(delta.x.toFloat(), delta.y.toFloat(), delta.z.toFloat())
+        val movement = Vector3f((delta.x * multiplier).toFloat(), (delta.y * multiplier).toFloat(), (delta.z * multiplier).toFloat())
         rotation1.transformDirection(movement)
 
         val inverted = Matrix4f(camera.projectionMatrix).invert()
@@ -184,7 +187,7 @@ object MotionBlur : Module(
 
         last.get(data)
         data.position(64)
-        data.putFloat(if (view) `view$blur` else 0f)
+        data.putFloat(if (view) `view$blur` * multiplier else 0f)
         data.putFloat(if (view) `view$max` else 0f)
         data.putFloat(1f / abs(camera.projectionMatrix.m00()))
         data.putFloat(1f / abs(camera.projectionMatrix.m11()))
