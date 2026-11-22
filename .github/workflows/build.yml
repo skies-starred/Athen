@@ -35,7 +35,6 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}
           path: build/libs/
-          archive: false
 
       - name: Notify Discord
         env:
