@@ -13,9 +13,10 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           jq -n \
+            --arg thread "1574026964036227172" \
             --arg repo "$REPO" \
             --argjson commits "$COMMITS" \
-            '{repo: $repo, commits: $commits}' \
+            '{thread: $thread, repo: $repo, commits: $commits}' \
           | curl -X POST "https://data.starred.foo/builds/notify?type=commit" \
             -H "Content-Type: application/json" \
             -H "Authorization: $NOTIFY_TOKEN" \

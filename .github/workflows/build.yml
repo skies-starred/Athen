@@ -54,6 +54,7 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: $NOTIFY_TOKEN" \
             -d "{
+              \"thread\": \"1574057368214310912\",
               \"repo\": \"${{ github.repository }}\",
               \"branch\": \"${{ github.ref_name }}\",
               \"run_id\": \"${{ github.run_id }}\",
