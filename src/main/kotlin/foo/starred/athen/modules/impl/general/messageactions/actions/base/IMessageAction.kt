@@ -18,13 +18,16 @@ interface IMessageAction {
             registry[action.id] = action
         }
 
-        fun get(id: Int): MessageActionType? =
-            registry[id]
+        fun get(id: Int): MessageActionType? {
+            return registry[id]
+        }
 
-        fun create(id: Int, data: Map<String, String>): IMessageAction =
-            registry[id]?.create?.invoke(data) ?: NoAction
+        fun create(id: Int, data: Map<String, String>): IMessageAction {
+            return registry[id]?.create?.invoke(data) ?: NoAction
+        }
 
-        fun all(): List<MessageActionType> =
-            registry.values.sortedBy { it.id }
+        fun all(): List<MessageActionType> {
+            return registry.values.sortedBy { it.id }
+        }
     }
 }

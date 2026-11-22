@@ -8,7 +8,7 @@ import foo.starred.athen.modules.impl.general.messageactions.actions.data.Messag
 import foo.starred.athen.modules.impl.general.messageactions.actions.data.MessageActionType
 import foo.starred.kontext.abstraction.chat.command.MinecraftCommands
 
-@LoadableAthenModule
+@LoadableAthenModule(-1)
 class CommandAction(val command: String) : IMessageAction {
     private val empty = command.isEmpty()
 

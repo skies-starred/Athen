@@ -9,7 +9,7 @@ import foo.starred.athen.modules.impl.general.messageactions.actions.data.Messag
 import foo.starred.kontext.abstraction.title.MinecraftTitle
 import foo.starred.kontext.api.text.parser.impl.parse
 
-@LoadableAthenModule
+@LoadableAthenModule(-1)
 class TitleAction(val text: String, val stay: Int = 70) : IMessageAction {
     private val parsed = text.parse()
     private val empty = text.isEmpty()
