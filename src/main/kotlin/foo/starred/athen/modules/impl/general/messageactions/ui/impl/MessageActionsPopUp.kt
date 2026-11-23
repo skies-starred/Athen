@@ -3,6 +3,8 @@
 package foo.starred.athen.modules.impl.general.messageactions.ui.impl
 
 import com.mojang.blaze3d.platform.InputConstants
+import foo.starred.athen.api.dungeon.data.DungeonClass
+import foo.starred.athen.api.dungeon.data.DungeonFloor
 import foo.starred.athen.api.rendering.ui.components.impl.MultiCheckboxComponent
 import foo.starred.athen.api.rendering.ui.components.impl.MultiCheckboxComponent.Companion.multiCheckbox
 import foo.starred.athen.api.rendering.ui.components.impl.TextFieldComponent
@@ -44,6 +46,8 @@ class MessageActionsPopUp(
     private var category = ""
     private var match = MessageMatchType.CONTAINS
     private var categories: List<String> = emptyList()
+    private var floors = mutableSetOf<DungeonFloor>()
+    private var classes = mutableSetOf<DungeonClass>()
 
     private var title: TextPrimitive = TextPrimitive.NONE
     private var pattern: TextFieldComponent
@@ -51,6 +55,8 @@ class MessageActionsPopUp(
     private var panel: ContainerPrimitive
     private var `checkbox$match`: MultiCheckboxComponent
     private var `checkbox$category`: MultiCheckboxComponent
+    private var `checkbox$floors`: MultiCheckboxComponent
+    private var `checkbox$classes`: MultiCheckboxComponent
     private var `cancel$box`: RectanglePrimitive
     private lateinit var `cancel$text`: TextPrimitive
 
@@ -83,7 +89,7 @@ class MessageActionsPopUp(
         }
 
         val box = rectangle {
-            size = FixedSizeConstraint(380, 260)
+            size = FixedSizeConstraint(380, 294)
             position = CenterPositionConstraint()
             color = CascadeGeometricColor(MochaColorScheme.Base.argb)
 
@@ -272,10 +278,78 @@ class MessageActionsPopUp(
             attach(box)
         }
 
+        val `floors$label` = text {
+            text = "Dungeon Floors".literal()
+            color = CascadeGeometricColor(MochaColorScheme.Subtext0.argb)
+            position = AnchorPositionConstraint({ `checkbox$category` }, PositionAnchor.BELOW)
+            offset = CascadeGeometricOffset(0f, 8f)
+            attach(box)
+        }
+
+        `checkbox$floors` = multiCheckbox {
+            size = FixedSizeConstraint(170, 16)
+            position = AnchorPositionConstraint({ `floors$label` }, PositionAnchor.BELOW)
+            offset = CascadeGeometricOffset(0f, 2f)
+            items = listOf("Any") + DungeonFloor.entries.map { it.name }
+
+            selected {
+                if (it == 0) floors.isEmpty()
+                else floors.contains(DungeonFloor.entries[it - 1])
+            }
+
+            select {
+                if (it == 0) {
+                    floors.clear()
+                } else {
+                    val f = DungeonFloor.entries[it - 1]
+                    if (floors.contains(f)) floors.remove(f) else floors.add(f)
+                }
+
+                `checkbox$floors`.text = if (floors.isEmpty()) "Any" else "${floors.size} Floors"
+            }
+
+            attach(box)
+        }
+
+        val `classes$label` = text {
+            text = "Dungeon Classes".literal()
+            color = CascadeGeometricColor(MochaColorScheme.Subtext0.argb)
+            position = AnchorPositionConstraint({ `checkbox$category` }, PositionAnchor.BELOW)
+            offset = CascadeGeometricOffset(184f, 8f)
+            attach(box)
+        }
+
+        `checkbox$classes` = multiCheckbox {
+            val all = DungeonClass.entries
+
+            size = FixedSizeConstraint(170, 16)
+            position = AnchorPositionConstraint({ `classes$label` }, PositionAnchor.BELOW)
+            offset = CascadeGeometricOffset(0f, 2f)
+            items = listOf("Any") + all.map { it.displayName }
+
+            selected {
+                if (it == 0) classes.isEmpty()
+                else classes.contains(all[it - 1])
+            }
+
+            select {
+                if (it == 0) {
+                    classes.clear()
+                } else {
+                    val c = all[it - 1]
+                    if (classes.contains(c)) classes.remove(c) else classes.add(c)
+                }
+
+                `checkbox$classes`.text = if (classes.isEmpty()) "Any" else "${classes.size} Classes"
+            }
+
+            attach(box)
+        }
+
         val `cancel$label` = text {
             text = "Cancel message".literal()
             color = CascadeGeometricColor(MochaColorScheme.Subtext0.argb)
-            position = AnchorPositionConstraint({ `checkbox$category` }, PositionAnchor.BELOW)
+            position = AnchorPositionConstraint({ `checkbox$floors` }, PositionAnchor.BELOW)
             offset = CascadeGeometricOffset(0f, 8f)
             attach(box)
         }
@@ -311,7 +385,7 @@ class MessageActionsPopUp(
 
         panel = container {
             size = FixedSizeConstraint(354, 70)
-            position = AnchorPositionConstraint({ `checkbox$category` }, PositionAnchor.BELOW)
+            position = AnchorPositionConstraint({ `checkbox$floors` }, PositionAnchor.BELOW)
             offset = CascadeGeometricOffset(0f, 8f)
             interact = false
 
@@ -321,13 +395,13 @@ class MessageActionsPopUp(
         text {
             text = $$"Regex: use $0 for full message, $1, $2... for groups".literal()
             color = CascadeGeometricColor(MochaColorScheme.Overlay0.argb)
-            position = FixedPositionConstraint(16, 208)
+            position = FixedPositionConstraint(16, 242)
             attach(box)
         }
 
         val bottom = rectangle {
             size = MixedSizeConstraint(PercentSizeConstraint(100f, 0f), FixedSizeConstraint(0, 1))
-            position = FixedPositionConstraint(0, 220)
+            position = FixedPositionConstraint(0, 254)
             color = CascadeGeometricColor(MochaColorScheme.Surface0.argb)
             attach(box)
         }
@@ -343,7 +417,7 @@ class MessageActionsPopUp(
             })
 
             on<MouseEvent.Press> {
-                if (button != InputConstants.MOUSE_BUTTON_LEFT) return@on
+                if (button == InputConstants.MOUSE_BUTTON_LEFT) return@on
 
                 cancel()
                 onClose()
@@ -390,10 +464,10 @@ class MessageActionsPopUp(
                 }
 
                 val action = IMessageAction.create(action, data)
-                val new = MessageActionEntry(pattern, match, action, entry?.entry?.enabled ?: true, category, cancel, delay)
+                val new = MessageActionEntry(pattern, match, action, entry?.entry?.enabled ?: true, category, cancel, delay, floors.toMutableSet(), classes.toMutableSet())
 
                 if (entry != null) MessageActions.update(entry!!.index, new)
-                else MessageActions.add(new.pattern, new.match, new.action, new.category, new.cancel, new.delay)
+                else MessageActions.add(new.pattern, new.match, new.action, new.category, new.cancel, new.delay, new.floors, new.classes)
 
                 onClose()
                 cancel()
@@ -425,6 +499,8 @@ class MessageActionsPopUp(
         action = entry?.entry?.action?.id ?: 0
         cancel = entry?.entry?.cancel ?: false
         category = entry?.entry?.category ?: selectedCategory ?: ""
+        floors = entry?.entry?.floors?.toMutableSet() ?: mutableSetOf()
+        classes = entry?.entry?.classes?.toMutableSet() ?: mutableSetOf()
         delay.value = entry?.entry?.delay?.takeIf { it > 0.0 }?.toString() ?: ""
         delay.block = delay.value.length
 
@@ -434,6 +510,8 @@ class MessageActionsPopUp(
         `checkbox$category`.items = listOf("Uncategorized") + categories
         `checkbox$category`.text = category.ifEmpty { "Uncategorized" }
         `checkbox$match`.text = match.displayName
+        `checkbox$floors`.text = if (floors.isEmpty()) "Any" else "${floors.size} Floors"
+        `checkbox$classes`.text = if (classes.isEmpty()) "Any" else "${classes.size} Classes"
 
         actions()
         values(entry?.entry?.action?.serializable)
