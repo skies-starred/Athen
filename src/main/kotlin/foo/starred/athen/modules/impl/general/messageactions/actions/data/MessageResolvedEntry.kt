@@ -1,6 +1,8 @@
 package foo.starred.athen.modules.impl.general.messageactions.actions.data
 
+import foo.starred.athen.api.dungeon.DungeonAPI
 import foo.starred.athen.modules.impl.general.messageactions.actions.base.IMessageAction
+import foo.starred.athen.modules.impl.general.messageactions.actions.data.MessageMatchType.*
 import kotlin.time.Duration.Companion.seconds
 
 class MessageResolvedEntry(src: MessageActionEntry) {
@@ -16,6 +18,8 @@ class MessageResolvedEntry(src: MessageActionEntry) {
     fun matches(text: String, set: Set<String>): Boolean {
         if (!source.enabled) return false
         if (source.category.isNotEmpty() && source.category in set) return false
+        if (source.floors.isNotEmpty() && DungeonAPI.floor.value !in source.floors) return false
+        if (source.classes.isNotEmpty() && DungeonAPI.dungeonClass !in source.classes) return false
 
         return when (source.match) {
             CONTAINS -> text.contains(source.pattern, ignoreCase = true)

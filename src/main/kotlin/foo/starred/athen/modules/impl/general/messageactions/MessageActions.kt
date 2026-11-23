@@ -2,6 +2,8 @@
 
 package foo.starred.athen.modules.impl.general.messageactions
 
+import foo.starred.athen.api.dungeon.data.DungeonClass
+import foo.starred.athen.api.dungeon.data.DungeonFloor
 import com.google.gson.*
 import foo.starred.athen.Athen
 import foo.starred.athen.Athen.GSON
@@ -45,6 +47,8 @@ object MessageActions : Module(
                 }
 
                 return JsonObject().apply {
+                    add("floors", JsonArray().apply { src.floors.forEach { add(it.name) } })
+                    add("classes", JsonArray().apply { src.classes.forEach { add(it.name) } })
                     addProperty("pattern", src.pattern)
                     addProperty("match", src.match.name)
                     add("action", action)
@@ -63,15 +67,13 @@ object MessageActions : Module(
                 val category = obj.get("category")?.asString ?: ""
                 val cancel = obj.get("cancel")?.asBoolean ?: false
                 val delay = obj.get("delay")?.asDouble ?: 0.0
+                val floors = obj.getAsJsonArray("floors")?.mapNotNull { DungeonFloor.getByName(it.asString) }?.toMutableSet() ?: mutableSetOf()
+                val classes = obj.getAsJsonArray("classes")?.mapNotNull { DungeonClass.get(it.asString) }?.toMutableSet() ?: mutableSetOf()
                 val action0 = obj.getAsJsonObject("action")
                 val id = action0?.get("id")?.asInt ?: obj.get("id")?.asInt ?: 0
-
-                val data =
-                    if (action0 != null) action0.getAsJsonObject("data")?.entrySet()?.associate { it.key to it.value.asString } ?: emptyMap()
-                    else IMessageAction.get(id)?.fields?.mapIndexed { i, v -> v.key to (obj.get(v.key)?.asString ?: if (i == 0) obj.get("value")?.asString else v.defaultValue) }?.toMap() ?: emptyMap()
-
+                val data = if (action0 != null) action0.getAsJsonObject("data")?.entrySet()?.associate { it.key to it.value.asString } ?: emptyMap() else IMessageAction.get(id)?.fields?.mapIndexed { i, v -> v.key to (obj.get(v.key)?.asString ?: if (i == 0) obj.get("value")?.asString else v.defaultValue) }?.toMap() ?: emptyMap()
                 val action = IMessageAction.create(id, data)
-                return MessageActionEntry(pattern, match, action, enabled, category, cancel, delay)
+                return MessageActionEntry(pattern, match, action, enabled, category, cancel, delay, floors, classes)
             }
         })
         .registerTypeAdapter(MessageActionsData::class.java, JsonDeserializer { json, _, context ->
@@ -193,6 +195,14 @@ object MessageActions : Module(
         fn()
         return true
     }
+    
+    fun add(pattern: String, match: MessageMatchType, action: IMessageAction, category: String, cancel: Boolean, delay: Double, floors: MutableSet<DungeonFloor> = mutableSetOf(), classes: MutableSet<DungeonClass> = mutableSetOf()): Boolean {
+        if (pattern.isBlank()) return false
+        store.data.actions.add(MessageActionEntry(pattern, match, action, true, category, cancel, delay, floors, classes))
+        fn()
+        return true
+    }
+    
 
     fun remove(index: Int): Boolean {
         if (index !in store.data.actions.indices) return false
