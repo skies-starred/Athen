@@ -5,6 +5,7 @@ fabric-api = "0.155.2+26.1.2"
 
 modmenu = "3rsoV1bk"
 caxton = "paJOxYlD"
+gnetum = "k2ABEhJA"
 entityculling = "DhN0G638"
 exordium = "IK5p5vrB"
 iris = "YEGDGnJM"
@@ -15,6 +16,7 @@ fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fab
 
 modmenu = { module = "maven.modrinth:modmenu", version.ref = "modmenu" }
 caxton = { module = "maven.modrinth:caxton", version.ref = "caxton" }
+gnetum = { module = "maven.modrinth:gnetum", version.ref = "gnetum" }
 entityculling = { module = "maven.modrinth:entityculling", version.ref = "entityculling" }
 exordium = { module = "maven.modrinth:exordium", version.ref = "exordium" }
 iris = { module = "maven.modrinth:iris", version.ref = "iris" }

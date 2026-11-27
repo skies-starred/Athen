@@ -28,6 +28,7 @@ dependencies {
     localRuntime(libs.devauth)
 
     compileOnly(lib["caxton"])
+    compileOnly(lib["gnetum"])
     compileOnly(lib["entityculling"])
     compileOnly(lib["exordium"])
     compileOnly(lib["iris"])
