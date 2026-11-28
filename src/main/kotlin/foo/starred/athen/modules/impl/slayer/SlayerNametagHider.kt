@@ -56,6 +56,6 @@ object SlayerNametagHider : Module(
     }
 
     private fun boolean(id1: Int, id2: Int, nametag: Boolean, timer: Boolean, spawner: Boolean): Boolean {
-        return nametag && id1 == id2 - 1 || timer && id1 == id2 - 2 || spawner && id1 == id2 - 3
+        return nametag && id1 == id2 - 1 || timer && id1 == id2 - 2 || spawner && id1 == id2 - 3 || spawner && id1 == id2 - 4
     }
 }
